@@ -2,6 +2,8 @@ using System.Text;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.InterfaceImplementations;
 using Electronics_Shop_17.Services.Interfaces;
+using Electronics_Shop_17.Services.OrderStateMachine;
+using Electronics_Shop_17.Services.ProductStateMachine;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +51,21 @@ builder.Services.AddTransient<IAdressService, AdressService>();
 builder.Services.AddTransient<IPersonService, PersonService>();
 builder.Services.AddTransient<ICustomerCouponService, CustomerCouponService>();
 builder.Services.AddTransient<IAccessoryCategoryService, AccessoryCategoryService>();
+
+
+builder.Services.AddTransient<BaseProductState>();
+builder.Services.AddTransient<InitialProductState>();
+builder.Services.AddTransient<DraftProductState>();
+builder.Services.AddTransient<ActiveProductState>();
+builder.Services.AddTransient<OutOfStockProductState>();
+builder.Services.AddTransient<ArchivedProductState>();
+
+
+builder.Services.AddTransient<BaseOrderState>();
+builder.Services.AddTransient<DraftOrderState>();
+builder.Services.AddTransient<PendingOrderState>();
+builder.Services.AddTransient<CompletedOrderState>();
+builder.Services.AddTransient<DeletedOrderState>();
 
 // Add services to the container.
 

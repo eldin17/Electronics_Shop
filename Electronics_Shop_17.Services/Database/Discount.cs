@@ -15,6 +15,6 @@ namespace Electronics_Shop_17.Services.Database
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual List<ProductDiscount> ProductDiscount { get; set; }
+        public virtual List<ProductDiscount> ProductDiscounts { get; set; }
     }
 }

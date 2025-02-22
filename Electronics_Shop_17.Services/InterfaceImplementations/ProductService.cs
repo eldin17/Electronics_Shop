@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
+using Electronics_Shop_17.Model.Helpers;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Electronics_Shop_17.Services.ProductStateMachine;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -17,8 +19,33 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
     public class ProductService : BaseServiceSoftDelete<DtoProduct, Product, SearchProduct, AddProduct, UpdateProduct>, IProductService
     {
-        public ProductService(DataContext context, IMapper mapper) : base(context, mapper)
+        BaseProductState _baseProductState;
+        public ProductService(DataContext context, IMapper mapper, BaseProductState baseProductState) : base(context, mapper)
         {
+            _baseProductState = baseProductState;
+        }
+
+        public override async Task<Pagination<DtoProduct>> GetAll(SearchProduct? search = null)
+        {
+            var products = await base.GetAll(search);
+
+            foreach (var item in products.Data)
+            {
+                var priceCheckedObj = await Checks.PriceCheck(item.Id);
+                item.FinalPrice = priceCheckedObj.FinalPrice;
+            }
+
+            return products;
+        }
+
+        public override async Task<DtoProduct> GetById(int id)
+        {
+            var product = await base.GetById(id);
+
+            var priceCheckedObj = await Checks.PriceCheck(product.Id);
+            product.FinalPrice = priceCheckedObj.FinalPrice;
+
+            return product;
         }
 
         public override IQueryable<Product> AddInclude(IQueryable<Product> data)
@@ -100,10 +127,10 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.Price <= search.PriceHigh);
             }
-            if (search.AllColorsStock != null)
-            {
-                data = data.Where(x => x.AllColorsStock >= search.AllColorsStock);
-            }
+            //if (search.AllColorsStock != null)
+            //{
+            //    data = data.Where(x => x.AllColorsStock >= search.AllColorsStock);
+            //}
             if (search.ProductCategoryId != null)
             {
                 data = data.Where(x => x.ProductCategoryId == search.ProductCategoryId);
@@ -114,7 +141,42 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                     .Any(pt => search.ProductProductTags.Contains(pt.Id)));
             }
 
+
+
             return base.AddFilter(data, search);
+        }
+
+        public async Task<DtoProduct> Activate(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.Activate(id);
+        }
+
+        public override async Task<DtoProduct> SoftDelete(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.SoftDelete(id);
+        }
+
+        public async Task<DtoProduct> CheckStock(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.CheckStock(id);
+        }
+        public async Task<DtoProduct> Restock(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.Restock(id);
+        }
+        public async Task<DtoProduct> Restore(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.Restore(id);
         }
     }
 }

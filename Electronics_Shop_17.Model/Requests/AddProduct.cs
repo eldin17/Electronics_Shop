@@ -32,5 +32,6 @@ namespace Electronics_Shop_17.Model.Requests
         public virtual AddAccessory? Accessory { get; set; }
         public bool isDeleted { get; set; } = false;
 
+        public string StateMachine { get; set; } = "Initial";
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Electronics_Shop_17.Services.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250206140413_test2")]
-    partial class test2
+    [Migration("20250221145050_test")]
+    partial class test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -205,6 +205,9 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ProductColorId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -215,6 +218,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductColorId");
 
                     b.HasIndex("ShoppingCartId");
 
@@ -696,6 +701,14 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<DateTime>("OrderTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentIntent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
@@ -705,6 +718,9 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -727,11 +743,17 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("FinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductColorId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -742,6 +764,8 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductColorId");
 
                     b.HasIndex("ProductId");
 
@@ -931,9 +955,6 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AllColorsStock")
-                        .HasColumnType("int");
-
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -951,6 +972,10 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     b.Property<int>("ProductCategoryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("StateMachine")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
@@ -1028,6 +1053,8 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DiscountId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductDiscounts");
                 });
@@ -1591,11 +1618,19 @@ namespace Electronics_Shop_17.Services.Migrations
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.CartItem", b =>
                 {
+                    b.HasOne("Electronics_Shop_17.Services.Database.ProductColor", "ProductColor")
+                        .WithMany()
+                        .HasForeignKey("ProductColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Electronics_Shop_17.Services.Database.ShoppingCart", null)
                         .WithMany("CartItems")
                         .HasForeignKey("ShoppingCartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ProductColor");
                 });
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.Customer", b =>
@@ -1685,6 +1720,12 @@ namespace Electronics_Shop_17.Services.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Electronics_Shop_17.Services.Database.ProductColor", "ProductColor")
+                        .WithMany()
+                        .HasForeignKey("ProductColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Electronics_Shop_17.Services.Database.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -1692,6 +1733,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductColor");
                 });
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.PaymentMethod", b =>
@@ -1735,8 +1778,14 @@ namespace Electronics_Shop_17.Services.Migrations
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.ProductDiscount", b =>
                 {
                     b.HasOne("Electronics_Shop_17.Services.Database.Discount", null)
-                        .WithMany("ProductDiscount")
+                        .WithMany("ProductDiscounts")
                         .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Electronics_Shop_17.Services.Database.Product", null)
+                        .WithMany("ProductDiscounts")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1934,7 +1983,7 @@ namespace Electronics_Shop_17.Services.Migrations
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.Discount", b =>
                 {
-                    b.Navigation("ProductDiscount");
+                    b.Navigation("ProductDiscounts");
                 });
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.Notification", b =>
@@ -1974,6 +2023,8 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Navigation("Phone");
 
                     b.Navigation("ProductColors");
+
+                    b.Navigation("ProductDiscounts");
 
                     b.Navigation("ProductImages");
 

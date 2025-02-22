@@ -15,5 +15,8 @@ namespace Electronics_Shop_17.Services.Database
         public int OrderId { get; set; }
         public int ProductId { get; set; }
         public virtual Product Product { get; set; }
+        public decimal FinalPrice { get; set; }
+        public int ProductColorId { get; set; }
+        public virtual ProductColor ProductColor { get; set; }
     }
 }

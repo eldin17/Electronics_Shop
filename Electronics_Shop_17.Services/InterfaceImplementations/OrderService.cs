@@ -9,14 +9,17 @@ using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Electronics_Shop_17.Services.OrderStateMachine;
 using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
-    public class OrderService : BaseServiceCRUD<DtoOrder, Order, SearchOrder, AddOrder, UpdateOrder>, IOrderService
+    public class OrderService : BaseServiceSoftDelete<DtoOrder, Order, SearchOrder, AddOrder, UpdateOrder>, IOrderService
     {
-        public OrderService(DataContext context, IMapper mapper) : base(context, mapper)
+        BaseOrderState _baseOrderState;
+        public OrderService(DataContext context, IMapper mapper, BaseOrderState baseOrderState) : base(context, mapper)
         {
+            _baseOrderState = baseOrderState;
         }
 
         public override IQueryable<Order> AddInclude(IQueryable<Order> data)
@@ -70,5 +73,47 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             }
             return base.AddFilter(data, search);
         }
+
+        public async Task<DtoOrderSuggestion> Confirm(int id, string? paymentId = null, string? paymentIntent = null)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.Confirm(id, paymentId, paymentIntent);
+        }
+
+        public async Task<DtoOrder> BackToDraft(int id)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.BackToDraft(id);
+        }
+
+        public async Task<DtoOrder> AddItem(int id, int productColorId, int quantity)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.AddItem(id, productColorId, quantity);
+        }
+
+        public async Task<DtoOrder> RemoveItem(int id, int itemId)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.RemoveItem(id, itemId);
+        }
+
+        public async Task<DtoOrder> Activate(int id)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.Activate(id);
+        }
+        public async Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request)
+        {
+            var state = _baseOrderState.GetState(request.StateMachine);
+            return await state.CheckAndAdd(request);
+        }
     }
+
+
 }

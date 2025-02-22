@@ -14,5 +14,8 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
 
         public int OrderId { get; set; }
         public virtual DtoProduct Product { get; set; }
+        public decimal FinalPrice { get; set; }
+        public int ProductColorId { get; set; }
+        public DtoProductColor ProductColor { get; set; }
     }
 }

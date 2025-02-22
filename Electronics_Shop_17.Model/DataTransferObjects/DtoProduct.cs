@@ -13,6 +13,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public string Model { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public decimal FinalPrice { get; set; } 
         public int AllColorsStock { get; set; }
 
         public int ProductCategoryId { get; set; }

@@ -11,5 +11,9 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IProductService : IBaseServiceSoftDelete<DtoProduct,SearchProduct,AddProduct,UpdateProduct>
     {
+        Task<DtoProduct> Activate(int id);
+        Task<DtoProduct> CheckStock(int id);
+        Task<DtoProduct> Restock(int id);
+        Task<DtoProduct> Restore(int id);
     }
 }

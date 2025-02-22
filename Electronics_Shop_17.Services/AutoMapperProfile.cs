@@ -219,7 +219,7 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.Model, opt => opt.Condition(src => src.Model != null))
             .ForMember(dest => dest.Description, opt => opt.Condition(src => src.Description != null))
             .ForMember(dest => dest.Price, opt => opt.Condition(src => src.Price != null))
-            .ForMember(dest => dest.AllColorsStock, opt => opt.Condition(src => src.AllColorsStock != null))
+            //.ForMember(dest => dest.AllColorsStock, opt => opt.Condition(src => src.AllColorsStock != null))
             
             .ForMember(dest => dest.ProductCategoryId, opt => opt.Condition(src => src.ProductCategoryId != null))
             .ForMember(dest => dest.ProductColors, opt => opt.Condition(src => src.ProductColors != null && src.ProductColors.Any()))
@@ -419,6 +419,9 @@ namespace Electronics_Shop_17.Services
             CreateMap<ProductImage, DtoProductImage>().ReverseMap();
 
             CreateMap<ProductColor, DtoProductColor>().ReverseMap();
+
+            
+
 
 
             CreateMap<Electronics_Shop_17.Services.Database.ProductCategory, DtoProductCategory>().ReverseMap();
