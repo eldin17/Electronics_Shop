@@ -12,7 +12,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public int Quantity { get; set; }
         public int ProductId { get; set; }
         public int ShoppingCartId { get; set; }
-        public decimal FinalPrice { get; set; }
+        public double FinalPrice { get; set; }
 
     }
 }

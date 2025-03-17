@@ -12,7 +12,8 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public string StoreName { get; set; }
         public int LicenseNumber { get; set; }
         public virtual DtoAdress Adress { get; set; }
-        public virtual DtoUserAccount UserAccount { get; set; }
+        public int UserAccountId { get; set; }
+        //public virtual DtoUserAccount UserAccount { get; set; }
 
         public virtual DtoPerson Person { get; set; }
         public bool isDeleted { get; set; }

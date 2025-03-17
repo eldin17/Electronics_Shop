@@ -18,11 +18,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
         }
 
-        public override IQueryable<ProductColor> AddInclude(IQueryable<ProductColor> data)
-        {
-            data = data.Include(x => x.ProductImages).ThenInclude(x => x.Image);
-            return base.AddInclude(data);
-        }
+        
 
         public override IQueryable<ProductColor> AddFilter(IQueryable<ProductColor> data, SearchProductColor? search)
         {

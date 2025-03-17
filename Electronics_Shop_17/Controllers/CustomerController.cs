@@ -9,7 +9,7 @@ namespace Electronics_Shop_17.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseCRUDController<DtoCustomer, SearchCustomer, AddCustomer, UpdateCustomer>
+    public class CustomerController : BaseSoftDeleteController<DtoCustomer, SearchCustomer, AddCustomer, UpdateCustomer>
     {
         public CustomerController(ICustomerService service) : base(service)
         {

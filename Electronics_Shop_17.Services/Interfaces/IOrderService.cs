@@ -17,5 +17,6 @@ namespace Electronics_Shop_17.Services.Interfaces
         Task<DtoOrder> RemoveItem(int id, int itemId);
         Task<DtoOrder> Activate(int id);
         Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request);
+        Task<DtoOrder> ApplyCoupon(int id, int couponId);
     }
 }

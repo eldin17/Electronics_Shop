@@ -12,7 +12,7 @@ namespace Electronics_Shop_17.Services.Database
         public string Brand { get; set; }
         public string Model { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; }
+        public double Price { get; set; }
         //public int AllColorsStock { get; set; }
 
         public int ProductCategoryId { get; set; }

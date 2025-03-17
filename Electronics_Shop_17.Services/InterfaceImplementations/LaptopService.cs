@@ -32,9 +32,9 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.Processor.Contains(search.Processor));
             }
-            if (search.RAM != null)
+            if (search.Ram != null)
             {
-                data = data.Where(x => x.RAM == search.RAM);
+                data = data.Where(x => x.Ram == search.Ram);
             }
             if (!string.IsNullOrWhiteSpace(search.StorageType))
             {
@@ -76,9 +76,9 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.HasBluetooth == search.HasBluetooth);
             }
-            if (search.USBPorts != null)
+            if (search.UsbPorts != null)
             {
-                data = data.Where(x => x.USBPorts >= search.USBPorts);
+                data = data.Where(x => x.UsbPorts >= search.UsbPorts);
             }
             if (search.HasEthernetPort != null)
             {

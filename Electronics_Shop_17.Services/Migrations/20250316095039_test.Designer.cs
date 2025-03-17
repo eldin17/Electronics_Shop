@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Electronics_Shop_17.Services.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250221145050_test")]
+    [Migration("20250316095039_test")]
     partial class test
     {
         /// <inheritdoc />
@@ -21,6 +21,9 @@ namespace Electronics_Shop_17.Services.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -158,7 +161,7 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Dimensions_mm")
+                    b.Property<string>("Dimensions")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -172,8 +175,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Megapixels")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Megapixels")
+                        .HasColumnType("float");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -186,8 +189,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Weight_grams")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -287,6 +290,9 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("UserAccountId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PersonId")
@@ -367,7 +373,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RAM")
+                    b.Property<int>("Ram")
                         .HasColumnType("int");
 
                     b.Property<int>("StorageCapacity")
@@ -377,11 +383,11 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("USBPorts")
+                    b.Property<int>("UsbPorts")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -473,7 +479,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RAM")
+                    b.Property<int>("Ram")
                         .HasColumnType("int");
 
                     b.Property<int>("StorageCapacity")
@@ -492,11 +498,11 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<bool>("SupportsVR")
                         .HasColumnType("bit");
 
-                    b.Property<int>("USBPorts")
+                    b.Property<int>("UsbPorts")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -522,11 +528,11 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProductImageId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProductImageId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserAccountId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserAccountId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -594,7 +600,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RAM")
+                    b.Property<int>("Ram")
                         .HasColumnType("int");
 
                     b.Property<string>("ScreenResolution")
@@ -616,11 +622,11 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("USBPorts")
+                    b.Property<int>("UsbPorts")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -698,6 +704,9 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<double?>("FinalTotalAmount")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("OrderTime")
                         .HasColumnType("datetime2");
 
@@ -716,8 +725,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("float");
 
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
@@ -743,14 +752,14 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("FinalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("FinalPrice")
+                        .HasColumnType("float");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int>("ProductColorId")
                         .HasColumnType("int");
@@ -856,7 +865,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("EstimatedBatteryLife")
                         .HasColumnType("int");
 
-                    b.Property<int>("FrontCameraResolution_MP")
+                    b.Property<int>("FrontCameraResolution")
                         .HasColumnType("int");
 
                     b.Property<bool>("HasBluetooth")
@@ -886,7 +895,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<bool>("IsWaterResistant")
                         .HasColumnType("bit");
 
-                    b.Property<int>("MainCameraResolution_MP")
+                    b.Property<int>("MainCameraResolution")
                         .HasColumnType("int");
 
                     b.Property<string>("OperatingSystem")
@@ -900,7 +909,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RAM")
+                    b.Property<int>("Ram")
                         .HasColumnType("int");
 
                     b.Property<int>("RearCamerasCount")
@@ -936,8 +945,8 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<bool>("SupportsWirelessCharging")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -967,8 +976,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int>("ProductCategoryId")
                         .HasColumnType("int");
@@ -1070,9 +1079,6 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("ImageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ImageId1")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ProductColorId")
                         .HasColumnType("int");
 
@@ -1081,7 +1087,7 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ImageId1");
+                    b.HasIndex("ImageId");
 
                     b.HasIndex("ProductColorId");
 
@@ -1294,7 +1300,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RAM")
+                    b.Property<int>("Ram")
                         .HasColumnType("int");
 
                     b.Property<string>("RearCameraResolution")
@@ -1334,8 +1340,8 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<bool>("SupportsWirelessCharging")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -1361,9 +1367,6 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("HDMIInputs")
-                        .HasColumnType("int");
-
                     b.Property<bool>("HasBluetooth")
                         .HasColumnType("bit");
 
@@ -1372,6 +1375,9 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     b.Property<bool>("HasWiFi")
                         .HasColumnType("bit");
+
+                    b.Property<int>("HdmiInputs")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsSmartTV")
                         .HasColumnType("bit");
@@ -1417,11 +1423,11 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Property<bool>("SupportsVoiceControl")
                         .HasColumnType("bit");
 
-                    b.Property<int>("USBPorts")
+                    b.Property<int>("UsbPorts")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -1444,9 +1450,6 @@ namespace Electronics_Shop_17.Services.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ImageId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ImageId1")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("PasswordHash")
@@ -1472,7 +1475,7 @@ namespace Electronics_Shop_17.Services.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ImageId1");
+                    b.HasIndex("ImageId");
 
                     b.HasIndex("RoleId");
 
@@ -1688,11 +1691,11 @@ namespace Electronics_Shop_17.Services.Migrations
                         .IsRequired();
 
                     b.HasOne("Electronics_Shop_17.Services.Database.Coupon", "Coupon")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("CouponId");
 
                     b.HasOne("Electronics_Shop_17.Services.Database.Customer", "Customer")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1794,12 +1797,12 @@ namespace Electronics_Shop_17.Services.Migrations
                 {
                     b.HasOne("Electronics_Shop_17.Services.Database.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId1")
+                        .HasForeignKey("ImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Electronics_Shop_17.Services.Database.ProductColor", "ProductColor")
-                        .WithMany("ProductImages")
+                        .WithMany()
                         .HasForeignKey("ProductColorId");
 
                     b.HasOne("Electronics_Shop_17.Services.Database.Product", null)
@@ -1896,10 +1899,10 @@ namespace Electronics_Shop_17.Services.Migrations
                 {
                     b.HasOne("Electronics_Shop_17.Services.Database.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId1");
+                        .HasForeignKey("ImageId");
 
                     b.HasOne("Electronics_Shop_17.Services.Database.Role", "Role")
-                        .WithMany("UserAccounts")
+                        .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1929,13 +1932,11 @@ namespace Electronics_Shop_17.Services.Migrations
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.Wishlist", b =>
                 {
-                    b.HasOne("Electronics_Shop_17.Services.Database.Customer", "Customer")
+                    b.HasOne("Electronics_Shop_17.Services.Database.Customer", null)
                         .WithOne("Wishlist")
                         .HasForeignKey("Electronics_Shop_17.Services.Database.Wishlist", "CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.WishlistItem", b =>
@@ -1965,16 +1966,9 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("Electronics_Shop_17.Services.Database.Coupon", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.Customer", b =>
                 {
                     b.Navigation("Adresses");
-
-                    b.Navigation("Orders");
 
                     b.Navigation("PaymentMethods");
 
@@ -2037,16 +2031,6 @@ namespace Electronics_Shop_17.Services.Migrations
                     b.Navigation("Television");
 
                     b.Navigation("Warranty");
-                });
-
-            modelBuilder.Entity("Electronics_Shop_17.Services.Database.ProductColor", b =>
-                {
-                    b.Navigation("ProductImages");
-                });
-
-            modelBuilder.Entity("Electronics_Shop_17.Services.Database.Role", b =>
-                {
-                    b.Navigation("UserAccounts");
                 });
 
             modelBuilder.Entity("Electronics_Shop_17.Services.Database.ShoppingCart", b =>

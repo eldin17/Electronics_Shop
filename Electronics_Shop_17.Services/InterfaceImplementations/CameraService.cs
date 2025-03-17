@@ -44,13 +44,13 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.VideoResolution.Contains(search.VideoResolution));
             }
-            if (search.Weight_grams != null)
+            if (search.Weight != null)
             {
-                data = data.Where(x => x.Weight_grams <= search.Weight_grams);
+                data = data.Where(x => x.Weight <= search.Weight);
             }
-            if (search.Dimensions_mm != null)
+            if (search.Dimensions != null)
             {
-                data = data.Where(x => x.Dimensions_mm == search.Dimensions_mm);
+                data = data.Where(x => x.Dimensions == search.Dimensions);
             }
             if (search.HasWiFi != null)
             {

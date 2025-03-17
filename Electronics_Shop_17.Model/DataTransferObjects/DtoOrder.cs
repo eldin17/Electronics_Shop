@@ -10,7 +10,8 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
     {
         public int Id { get; set; }
         public DateTime OrderTime { get; set; }
-        public decimal TotalAmount { get; set; }
+        public double TotalAmount { get; set; }
+        public double? FinalTotalAmount { get; set; }
 
         public virtual DtoCustomer Customer { get; set; }
         public virtual DtoAdress Adress { get; set; }

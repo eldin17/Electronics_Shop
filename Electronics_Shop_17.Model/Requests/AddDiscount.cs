@@ -12,8 +12,8 @@ namespace Electronics_Shop_17.Model.Requests
         public int Amount { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; }        
 
-        public virtual List<AddProductDiscount> ProductDiscount { get; set; }
+        public virtual List<AddProductDiscount> ProductDiscounts { get; set; }
     }
 }

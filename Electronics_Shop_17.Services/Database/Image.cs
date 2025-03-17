@@ -12,7 +12,7 @@ namespace Electronics_Shop_17.Services.Database
         public string Name { get; set; }
         public string Path { get; set; }
 
-        public int? ProductImageId { get; set; }
-        public int? UserAccountId { get; set; }
+        public virtual List<int>? ProductImageId { get; set; }
+        public virtual List<int>? UserAccountId { get; set; }
     }
 }

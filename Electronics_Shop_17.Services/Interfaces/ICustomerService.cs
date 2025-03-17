@@ -9,7 +9,7 @@ using Electronics_Shop_17.Model.SearchObjects;
 
 namespace Electronics_Shop_17.Services.Interfaces
 {
-    public interface ICustomerService : IBaseServiceCRUD<DtoCustomer,SearchCustomer,AddCustomer,UpdateCustomer>
+    public interface ICustomerService : IBaseServiceSoftDelete<DtoCustomer,SearchCustomer,AddCustomer,UpdateCustomer>
     {
     }
 }

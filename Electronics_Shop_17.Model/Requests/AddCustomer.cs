@@ -14,5 +14,8 @@ namespace Electronics_Shop_17.Model.Requests
         public virtual List<AddAdress> Adresses { get; set; }
         public virtual List<AddPaymentMethod> PaymentMethods { get; set; }
         public int PersonId { get; set; }
+        public AddPerson Person { get; set; }
+        public bool isDeleted { get; set; } = false;
+
     }
 }

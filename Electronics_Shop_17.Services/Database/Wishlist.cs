@@ -10,7 +10,6 @@ namespace Electronics_Shop_17.Services.Database
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; }
         public DateTime DateCreated { get; set; }
         public virtual List<WishlistItem> WishlistItems { get; set; }
     }

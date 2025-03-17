@@ -19,7 +19,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual List<DtoOrder> Orders { get; set; }
+        //public virtual List<DtoOrder> Orders { get; set; }
         public bool isDeleted { get; set; }
 
     }

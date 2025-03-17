@@ -45,5 +45,10 @@ namespace Electronics_Shop_17.Controllers
         {
             return await (_service as IOrderService).CheckAndAdd(request);
         }
+        [HttpPatch("ApplyCoupon/{id}")]
+        public virtual async Task<DtoOrder> ApplyCoupon(int id, int couponId)
+        {
+            return await (_service as IOrderService).ApplyCoupon(id, couponId);
+        }
     }
 }

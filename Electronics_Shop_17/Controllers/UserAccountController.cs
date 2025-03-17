@@ -32,17 +32,17 @@ namespace Electronics_Shop_17.Controllers
                 var result = await (_service as IUserAccountService).Login(obj);
                 return Ok(result);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                return BadRequest($"{ex.Message}"); 
+                return BadRequest("Invalid input. Please provide a username and password.");
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized($"{ex.Message}"); 
+                return Unauthorized("Invalid credentials.(B)");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(500, "An internal server error occurred. Please try again later.");
             }
         }
 

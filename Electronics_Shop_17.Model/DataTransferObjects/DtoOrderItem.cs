@@ -10,11 +10,11 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
-        public decimal Price { get; set; }
+        public double Price { get; set; }
 
         public int OrderId { get; set; }
         public virtual DtoProduct Product { get; set; }
-        public decimal FinalPrice { get; set; }
+        public double FinalPrice { get; set; }
         public int ProductColorId { get; set; }
         public DtoProductColor ProductColor { get; set; }
     }

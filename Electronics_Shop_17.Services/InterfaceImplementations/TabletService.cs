@@ -48,9 +48,9 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.Processor == search.Processor);
             }
-            if (search.RAM != null)
+            if (search.Ram != null)
             {
-                data = data.Where(x => x.RAM == search.RAM);
+                data = data.Where(x => x.Ram == search.Ram);
             }
             if (search.StorageCapacity != null)
             {

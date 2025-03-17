@@ -11,5 +11,8 @@ namespace Electronics_Shop_17.Model.Helpers
         public string Token { get; set; }
         public int UserId { get; set; }
         public string RoleName { get; set; }
+        public bool isCustomer { get; set; } 
+        public bool isSeller { get; set; } 
+        
     }
 }

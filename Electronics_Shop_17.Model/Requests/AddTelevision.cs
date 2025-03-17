@@ -23,7 +23,7 @@ namespace Electronics_Shop_17.Model.Requests
         public bool SupportsDolbyAtmos { get; set; } // Whether it supports Dolby Atmos
 
         // Connectivity
-        public int HDMIInputs { get; set; } // Number of HDMI inputs
+        public int HdmiInputs { get; set; } // Number of HDMI inputs
         public int USBPorts { get; set; } // Number of USB ports
         public bool HasBluetooth { get; set; } // Whether it supports Bluetooth
         public bool HasWiFi { get; set; } // Whether it has WiFi
@@ -34,7 +34,7 @@ namespace Electronics_Shop_17.Model.Requests
         public bool HasScreenMirroring { get; set; } // Whether it supports screen mirroring (e.g., AirPlay, Miracast)
 
         // Physical Characteristics
-        public decimal Weight { get; set; } // Weight in kg, e.g., 15.5
+        public double Weight { get; set; } // Weight in kg, e.g., 15.5
         public string Dimensions { get; set; } // Dimensions in mm, e.g., "1228 x 707 x 25"
         public string StandType { get; set; } // e.g., "Central stand", "Side legs", "Wall mount"
 

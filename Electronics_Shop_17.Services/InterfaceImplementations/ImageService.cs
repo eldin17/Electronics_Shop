@@ -36,22 +36,22 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             }
             if (search.ProductImageId != null)
             {
-                data = data.Where(x => x.ProductImageId == search.ProductImageId);
+                data = data.Where(x => x.ProductImageId.Contains((int)search.ProductImageId));
             }
             if (search.UserAccountId != null)
             {
-                data = data.Where(x => x.UserAccountId == search.UserAccountId);
+                data = data.Where(x => x.UserAccountId.Contains((int)search.UserAccountId));
             }
             return base.AddFilter(data, search);
         }
 
         public async Task<DtoProduct> AddMultipleImages(int id, [FromForm] ImgMultipleVM obj)
         {
+            var product = await _context.Products.Include(x=>x.ProductImages).ThenInclude(x=>x.Image).FirstOrDefaultAsync(x=>x.Id== id);
 
-            if (obj == null || obj.ProductColor == null /*|| (product.StateMachine != "Draft" && product.StateMachine != "Active")*/)
+            if (obj == null || obj.ProductColor == null || (product.StateMachine != "Draft" && product.StateMachine != "Active"))
                 throw new ArgumentException("Invalid input!");
             
-            var product = await _context.Products.Include(x=>x.ProductImages).ThenInclude(x=>x.Image).FirstOrDefaultAsync(x=>x.Id== id);
             
             if (product == null)
                 throw new KeyNotFoundException($"Product with ID {id} not found!");
@@ -145,8 +145,12 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 {
                     Name = obj.vmImage.FileName,
                     Path = Config.ImagesUsersUrl + obj.vmImage.FileName,
+                    UserAccountId = new List<int>() { userAccount.Id },
                 };
                 _context.Images.Add(newImage);
+                await _context.SaveChangesAsync();
+
+                userAccount.ImageId = newImage.Id;
                 await _context.SaveChangesAsync();
 
                 var returnUserAccount = await _context.UserAccounts.Include(x => x.Image).FirstOrDefaultAsync(x => x.Id == id);

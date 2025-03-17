@@ -58,8 +58,8 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.SensorType, opt => opt.Condition(src => src.SensorType != null))
             .ForMember(dest => dest.LensMount, opt => opt.Condition(src => src.LensMount != null))
             .ForMember(dest => dest.VideoResolution, opt => opt.Condition(src => src.VideoResolution != null))
-            .ForMember(dest => dest.Weight_grams, opt => opt.Condition(src => src.Weight_grams != null))
-            .ForMember(dest => dest.Dimensions_mm, opt => opt.Condition(src => src.Dimensions_mm != null))
+            .ForMember(dest => dest.Weight, opt => opt.Condition(src => src.Weight != null))
+            .ForMember(dest => dest.Dimensions, opt => opt.Condition(src => src.Dimensions != null))
             .ForMember(dest => dest.HasWiFi, opt => opt.Condition(src => src.HasWiFi != null))
             .ForMember(dest => dest.HasBluetooth, opt => opt.Condition(src => src.HasBluetooth != null))
             .ForMember(dest => dest.BatteryType, opt => opt.Condition(src => src.BatteryType != null))
@@ -70,7 +70,7 @@ namespace Electronics_Shop_17.Services
             CreateMap<DesktopPC, UpdateDesktopPC>().ReverseMap()
             .ForMember(dest => dest.ProductId, opt => opt.Condition(src => src.ProductId != null))
             .ForMember(dest => dest.Processor, opt => opt.Condition(src => src.Processor != null))
-            .ForMember(dest => dest.RAM, opt => opt.Condition(src => src.RAM != null))
+            .ForMember(dest => dest.Ram, opt => opt.Condition(src => src.Ram != null))
             .ForMember(dest => dest.StorageType, opt => opt.Condition(src => src.StorageType != null))
             .ForMember(dest => dest.StorageCapacity, opt => opt.Condition(src => src.StorageCapacity != null))
             .ForMember(dest => dest.GraphicsCard, opt => opt.Condition(src => src.GraphicsCard != null))
@@ -78,7 +78,7 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.FormFactor, opt => opt.Condition(src => src.FormFactor != null))
             .ForMember(dest => dest.Weight, opt => opt.Condition(src => src.Weight != null))
             .ForMember(dest => dest.Dimensions, opt => opt.Condition(src => src.Dimensions != null))
-            .ForMember(dest => dest.USBPorts, opt => opt.Condition(src => src.USBPorts != null))
+            .ForMember(dest => dest.UsbPorts, opt => opt.Condition(src => src.UsbPorts != null))
             .ForMember(dest => dest.HasWiFi, opt => opt.Condition(src => src.HasWiFi != null))
             .ForMember(dest => dest.HasBluetooth, opt => opt.Condition(src => src.HasBluetooth != null))
             .ForMember(dest => dest.PowerSupplyWattage, opt => opt.Condition(src => src.PowerSupplyWattage != null))
@@ -95,7 +95,7 @@ namespace Electronics_Shop_17.Services
             CreateMap<Laptop, UpdateLaptop>().ReverseMap()
             .ForMember(dest => dest.ProductId, opt => opt.Condition(src => src.ProductId != null))
             .ForMember(dest => dest.Processor, opt => opt.Condition(src => src.Processor != null))
-            .ForMember(dest => dest.RAM, opt => opt.Condition(src => src.RAM != null))
+            .ForMember(dest => dest.Ram, opt => opt.Condition(src => src.Ram != null))
             .ForMember(dest => dest.StorageType, opt => opt.Condition(src => src.StorageType != null))
             .ForMember(dest => dest.StorageCapacity, opt => opt.Condition(src => src.StorageCapacity != null))
             .ForMember(dest => dest.GraphicsCard, opt => opt.Condition(src => src.GraphicsCard != null))
@@ -106,7 +106,7 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.BatteryLife, opt => opt.Condition(src => src.BatteryLife != null))
             .ForMember(dest => dest.HasWiFi, opt => opt.Condition(src => src.HasWiFi != null))
             .ForMember(dest => dest.HasBluetooth, opt => opt.Condition(src => src.HasBluetooth != null))
-            .ForMember(dest => dest.USBPorts, opt => opt.Condition(src => src.USBPorts != null))
+            .ForMember(dest => dest.UsbPorts, opt => opt.Condition(src => src.UsbPorts != null))
             .ForMember(dest => dest.HasEthernetPort, opt => opt.Condition(src => src.HasEthernetPort != null))
             .ForMember(dest => dest.HasHDMI, opt => opt.Condition(src => src.HasHDMI != null))
             .ForMember(dest => dest.HasThunderbolt, opt => opt.Condition(src => src.HasThunderbolt != null))
@@ -128,14 +128,14 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.ScreenType, opt => opt.Condition(src => src.ScreenType != null))
             .ForMember(dest => dest.RefreshRate, opt => opt.Condition(src => src.RefreshRate != null))            
             .ForMember(dest => dest.Processor, opt => opt.Condition(src => src.Processor != null))
-            .ForMember(dest => dest.RAM, opt => opt.Condition(src => src.RAM != null))
+            .ForMember(dest => dest.Ram, opt => opt.Condition(src => src.Ram != null))
             .ForMember(dest => dest.StorageCapacity, opt => opt.Condition(src => src.StorageCapacity != null))
             .ForMember(dest => dest.SupportsExpandableStorage, opt => opt.Condition(src => src.SupportsExpandableStorage != null))            
             .ForMember(dest => dest.RearCamerasCount, opt => opt.Condition(src => src.RearCamerasCount != null))
             .ForMember(dest => dest.HasUltrawideLens, opt => opt.Condition(src => src.HasUltrawideLens != null))
             .ForMember(dest => dest.HasZoomLens, opt => opt.Condition(src => src.HasZoomLens != null))
-            .ForMember(dest => dest.MainCameraResolution_MP, opt => opt.Condition(src => src.MainCameraResolution_MP != null))
-            .ForMember(dest => dest.FrontCameraResolution_MP, opt => opt.Condition(src => src.FrontCameraResolution_MP != null))            
+            .ForMember(dest => dest.MainCameraResolution, opt => opt.Condition(src => src.MainCameraResolution != null))
+            .ForMember(dest => dest.FrontCameraResolution, opt => opt.Condition(src => src.FrontCameraResolution != null))            
             .ForMember(dest => dest.BatteryCapacity, opt => opt.Condition(src => src.BatteryCapacity != null))
             .ForMember(dest => dest.SupportsFastCharging, opt => opt.Condition(src => src.SupportsFastCharging != null))
             .ForMember(dest => dest.SupportsWirelessCharging, opt => opt.Condition(src => src.SupportsWirelessCharging != null))
@@ -163,7 +163,7 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.ScreenType, opt => opt.Condition(src => src.ScreenType != null))
             .ForMember(dest => dest.RefreshRate, opt => opt.Condition(src => src.RefreshRate != null))            
             .ForMember(dest => dest.Processor, opt => opt.Condition(src => src.Processor != null))
-            .ForMember(dest => dest.RAM, opt => opt.Condition(src => src.RAM != null))
+            .ForMember(dest => dest.Ram, opt => opt.Condition(src => src.Ram != null))
             .ForMember(dest => dest.StorageCapacity, opt => opt.Condition(src => src.StorageCapacity != null))
             .ForMember(dest => dest.SupportsExpandableStorage, opt => opt.Condition(src => src.SupportsExpandableStorage != null))            
             .ForMember(dest => dest.RearCameraResolution, opt => opt.Condition(src => src.RearCameraResolution != null))
@@ -198,8 +198,8 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.SupportsHDR, opt => opt.Condition(src => src.SupportsHDR != null))            
             .ForMember(dest => dest.SpeakerOutputPower, opt => opt.Condition(src => src.SpeakerOutputPower != null))
             .ForMember(dest => dest.SupportsDolbyAtmos, opt => opt.Condition(src => src.SupportsDolbyAtmos != null))            
-            .ForMember(dest => dest.HDMIInputs, opt => opt.Condition(src => src.HDMIInputs != null))
-            .ForMember(dest => dest.USBPorts, opt => opt.Condition(src => src.USBPorts != null))
+            .ForMember(dest => dest.HdmiInputs, opt => opt.Condition(src => src.HdmiInputs != null))
+            .ForMember(dest => dest.UsbPorts, opt => opt.Condition(src => src.UsbPorts != null))
             .ForMember(dest => dest.HasBluetooth, opt => opt.Condition(src => src.HasBluetooth != null))
             .ForMember(dest => dest.HasWiFi, opt => opt.Condition(src => src.HasWiFi != null))            
             .ForMember(dest => dest.OperatingSystem, opt => opt.Condition(src => src.OperatingSystem != null))
@@ -312,10 +312,13 @@ namespace Electronics_Shop_17.Services
             CreateMap<OrderItem, DtoOrderItem>().ReverseMap();
             CreateMap<OrderItem, AddOrderItem>().ReverseMap();
             CreateMap<OrderItem, UpdateOrderItem>().ReverseMap()
+            .ForMember(dest => dest.Id, opt => opt.Condition(src => src.Id != null))
             .ForMember(dest => dest.Quantity, opt => opt.Condition(src => src.Quantity != null))
             .ForMember(dest => dest.Price, opt => opt.Condition(src => src.Price != null))
             .ForMember(dest => dest.OrderId, opt => opt.Condition(src => src.OrderId != null))
-            .ForMember(dest => dest.ProductId, opt => opt.Condition(src => src.ProductId != null));
+            .ForMember(dest => dest.ProductId, opt => opt.Condition(src => src.ProductId != null))
+            .ForMember(dest => dest.FinalPrice, opt => opt.Condition(src => src.FinalPrice != null))
+            .ForMember(dest => dest.ProductColorId, opt => opt.Condition(src => src.ProductColorId != null));
 
             CreateMap<Order, DtoOrder>().ReverseMap();
             CreateMap<Order, AddOrder>().ReverseMap();
@@ -364,7 +367,8 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.DiscountId, opt => opt.Condition(src => src.DiscountId != null));
 
             CreateMap<Discount, DtoDiscount>().ReverseMap();
-            CreateMap<Discount, AddDiscount>().ReverseMap();
+            CreateMap<Discount, AddDiscount>().ReverseMap()
+               .ForMember(dest => dest.ProductDiscounts, opt => opt.Ignore());
             CreateMap<Discount, UpdateDiscount>().ReverseMap()
             .ForMember(dest => dest.DiscountType, opt => opt.Condition(src => src.DiscountType != null))
             .ForMember(dest => dest.Amount, opt => opt.Condition(src => src.Amount != null))
@@ -377,6 +381,7 @@ namespace Electronics_Shop_17.Services
             CreateMap<Customer, UpdateCustomer>().ReverseMap()
             .ForMember(dest => dest.LoyaltyPoints, opt => opt.Condition(src => src.LoyaltyPoints != null))
             .ForMember(dest => dest.Adresses, opt => opt.Condition(src => src.Adresses != null))
+            .ForMember(dest => dest.isDeleted, opt => opt.Condition(src => src.isDeleted != null))
             .ForMember(dest => dest.PaymentMethods, opt => opt.Condition(src => src.PaymentMethods != null));
 
             CreateMap<Seller, DtoSeller>().ReverseMap();
@@ -419,8 +424,12 @@ namespace Electronics_Shop_17.Services
             CreateMap<ProductImage, DtoProductImage>().ReverseMap();
 
             CreateMap<ProductColor, DtoProductColor>().ReverseMap();
+            CreateMap<ProductColor, AddProductColor>().ReverseMap();
+            CreateMap<ProductColor, UpdateProductColor>().ReverseMap()
+            .ForMember(dest => dest.Name, opt => opt.Condition(src => src.Name != null))
+            .ForMember(dest => dest.HexCode, opt => opt.Condition(src => src.HexCode != null))
+            .ForMember(dest => dest.Stock, opt => opt.Condition(src => src.Stock != null));
 
-            
 
 
 

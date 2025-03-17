@@ -20,7 +20,7 @@ namespace Electronics_Shop_17.Services.Database
 
 
         public int RoleId { get; set; }
-        public virtual Role Role { get; set; }
+        public virtual Role? Role { get; set; }
 
         public int? ImageId { get; set; }
         public virtual Image? Image { get; set; }

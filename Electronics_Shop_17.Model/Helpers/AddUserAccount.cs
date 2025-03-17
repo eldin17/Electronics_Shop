@@ -28,5 +28,7 @@ namespace Electronics_Shop_17.Model.Helpers
         public int RoleId { get; set; }
 
         public int? ImageId { get; set; }//postaviti neku defaultnu na id 1
+        public bool isDeactivated { get; set; } = false;
+
     }
 }

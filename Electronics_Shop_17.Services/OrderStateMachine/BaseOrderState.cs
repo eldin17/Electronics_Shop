@@ -86,5 +86,9 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         {
             throw new Exception("Action Not Allowed :(");
         }
+        public virtual async Task<DtoOrder> ApplyCoupon(int id, int couponId)
+        {
+            throw new Exception("Action Not Allowed :(");
+        }
     }
 }

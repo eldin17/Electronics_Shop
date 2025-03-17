@@ -15,6 +15,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual List<DtoProductDiscount> ProductDiscount { get; set; }
+        public virtual List<DtoProductDiscount> ProductDiscounts { get; set; }
+        public virtual List<DtoProduct> NotAppliedList { get; set; } = new List<DtoProduct>();
     }
 }

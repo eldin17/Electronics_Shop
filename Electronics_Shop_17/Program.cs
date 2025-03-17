@@ -1,4 +1,5 @@
 using System.Text;
+using Electronics_Shop_17.Services;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.InterfaceImplementations;
 using Electronics_Shop_17.Services.Interfaces;
@@ -67,6 +68,9 @@ builder.Services.AddTransient<PendingOrderState>();
 builder.Services.AddTransient<CompletedOrderState>();
 builder.Services.AddTransient<DeletedOrderState>();
 
+builder.Services.AddTransient<Checks>();
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -100,7 +104,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseLazyLoadingProxies()
+           .UseSqlServer(connectionString));
+
+
 
 builder.Services.AddAutoMapper(typeof(IAccessoryService));
 

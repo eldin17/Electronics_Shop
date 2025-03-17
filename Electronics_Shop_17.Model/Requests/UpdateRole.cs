@@ -9,7 +9,7 @@ namespace Electronics_Shop_17.Model.Requests
     public class UpdateRole
     {
         public string? RoleName { get; set; }
-        public bool isDeleted { get; set; }
+        public bool? isDeleted { get; set; }
     }
 }
 

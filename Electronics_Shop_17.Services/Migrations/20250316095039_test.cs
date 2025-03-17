@@ -87,8 +87,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductImageId = table.Column<int>(type: "int", nullable: true),
-                    UserAccountId = table.Column<int>(type: "int", nullable: true)
+                    ProductImageId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAccountId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -226,7 +226,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
                     ProductCategoryId = table.Column<int>(type: "int", nullable: false),
                     isDeleted = table.Column<bool>(type: "bit", nullable: false),
                     StateMachine = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -255,15 +255,14 @@ namespace Electronics_Shop_17.Services.Migrations
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     ImageId = table.Column<int>(type: "int", nullable: true),
-                    ImageId1 = table.Column<int>(type: "int", nullable: true),
                     isDeactivated = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserAccounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserAccounts_Images_ImageId1",
-                        column: x => x.ImageId1,
+                        name: "FK_UserAccounts_Images_ImageId",
+                        column: x => x.ImageId,
                         principalTable: "Images",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -309,12 +308,12 @@ namespace Electronics_Shop_17.Services.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Megapixels = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Megapixels = table.Column<double>(type: "float", nullable: false),
                     SensorType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LensMount = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VideoResolution = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Weight_grams = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Dimensions_mm = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
+                    Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HasWiFi = table.Column<bool>(type: "bit", nullable: false),
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
                     BatteryType = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -339,15 +338,15 @@ namespace Electronics_Shop_17.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Processor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RAM = table.Column<int>(type: "int", nullable: false),
+                    Ram = table.Column<int>(type: "int", nullable: false),
                     StorageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StorageCapacity = table.Column<int>(type: "int", nullable: false),
                     GraphicsCard = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OperatingSystem = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FormFactor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
                     Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    USBPorts = table.Column<int>(type: "int", nullable: false),
+                    UsbPorts = table.Column<int>(type: "int", nullable: false),
                     HasWiFi = table.Column<bool>(type: "bit", nullable: false),
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
                     PowerSupplyWattage = table.Column<int>(type: "int", nullable: false),
@@ -374,12 +373,12 @@ namespace Electronics_Shop_17.Services.Migrations
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Processor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GraphicsProcessor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RAM = table.Column<int>(type: "int", nullable: false),
+                    Ram = table.Column<int>(type: "int", nullable: false),
                     StorageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StorageCapacity = table.Column<int>(type: "int", nullable: false),
                     MaxResolution = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MaxFPS = table.Column<int>(type: "int", nullable: false),
-                    USBPorts = table.Column<int>(type: "int", nullable: false),
+                    UsbPorts = table.Column<int>(type: "int", nullable: false),
                     HasWiFi = table.Column<bool>(type: "bit", nullable: false),
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
                     HasEthernetPort = table.Column<bool>(type: "bit", nullable: false),
@@ -390,7 +389,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     ControllerType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SupportsBackwardCompatibility = table.Column<bool>(type: "bit", nullable: false),
                     OnlineService = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
                     Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -412,7 +411,7 @@ namespace Electronics_Shop_17.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Processor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RAM = table.Column<int>(type: "int", nullable: false),
+                    Ram = table.Column<int>(type: "int", nullable: false),
                     StorageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StorageCapacity = table.Column<int>(type: "int", nullable: false),
                     GraphicsCard = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -423,11 +422,11 @@ namespace Electronics_Shop_17.Services.Migrations
                     BatteryLife = table.Column<int>(type: "int", nullable: false),
                     HasWiFi = table.Column<bool>(type: "bit", nullable: false),
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
-                    USBPorts = table.Column<int>(type: "int", nullable: false),
+                    UsbPorts = table.Column<int>(type: "int", nullable: false),
                     HasEthernetPort = table.Column<bool>(type: "bit", nullable: false),
                     HasHDMI = table.Column<bool>(type: "bit", nullable: false),
                     HasThunderbolt = table.Column<bool>(type: "bit", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
                     Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BuildMaterial = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HasBacklitKeyboard = table.Column<bool>(type: "bit", nullable: false),
@@ -458,14 +457,14 @@ namespace Electronics_Shop_17.Services.Migrations
                     ScreenType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RefreshRate = table.Column<int>(type: "int", nullable: false),
                     Processor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RAM = table.Column<int>(type: "int", nullable: false),
+                    Ram = table.Column<int>(type: "int", nullable: false),
                     StorageCapacity = table.Column<int>(type: "int", nullable: false),
                     SupportsExpandableStorage = table.Column<bool>(type: "bit", nullable: false),
                     RearCamerasCount = table.Column<int>(type: "int", nullable: false),
                     HasUltrawideLens = table.Column<bool>(type: "bit", nullable: false),
                     HasZoomLens = table.Column<bool>(type: "bit", nullable: false),
-                    MainCameraResolution_MP = table.Column<int>(type: "int", nullable: false),
-                    FrontCameraResolution_MP = table.Column<int>(type: "int", nullable: false),
+                    MainCameraResolution = table.Column<int>(type: "int", nullable: false),
+                    FrontCameraResolution = table.Column<int>(type: "int", nullable: false),
                     BatteryCapacity = table.Column<int>(type: "int", nullable: false),
                     SupportsFastCharging = table.Column<bool>(type: "bit", nullable: false),
                     SupportsWirelessCharging = table.Column<bool>(type: "bit", nullable: false),
@@ -475,7 +474,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
                     HasNFC = table.Column<bool>(type: "bit", nullable: false),
                     HasDualSIM = table.Column<bool>(type: "bit", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
                     Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BuildMaterial = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OperatingSystem = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -579,7 +578,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     ScreenType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RefreshRate = table.Column<int>(type: "int", nullable: false),
                     Processor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RAM = table.Column<int>(type: "int", nullable: false),
+                    Ram = table.Column<int>(type: "int", nullable: false),
                     StorageCapacity = table.Column<int>(type: "int", nullable: false),
                     SupportsExpandableStorage = table.Column<bool>(type: "bit", nullable: false),
                     RearCameraResolution = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -592,7 +591,7 @@ namespace Electronics_Shop_17.Services.Migrations
                     HasWiFi6 = table.Column<bool>(type: "bit", nullable: false),
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
                     HasCellular = table.Column<bool>(type: "bit", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
                     Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BuildMaterial = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OperatingSystem = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -627,14 +626,14 @@ namespace Electronics_Shop_17.Services.Migrations
                     SupportsHDR = table.Column<bool>(type: "bit", nullable: false),
                     SpeakerOutputPower = table.Column<int>(type: "int", nullable: false),
                     SupportsDolbyAtmos = table.Column<bool>(type: "bit", nullable: false),
-                    HDMIInputs = table.Column<int>(type: "int", nullable: false),
-                    USBPorts = table.Column<int>(type: "int", nullable: false),
+                    HdmiInputs = table.Column<int>(type: "int", nullable: false),
+                    UsbPorts = table.Column<int>(type: "int", nullable: false),
                     HasBluetooth = table.Column<bool>(type: "bit", nullable: false),
                     HasWiFi = table.Column<bool>(type: "bit", nullable: false),
                     OperatingSystem = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SupportsVoiceControl = table.Column<bool>(type: "bit", nullable: false),
                     HasScreenMirroring = table.Column<bool>(type: "bit", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: false),
                     Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StandType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EnergyRating = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -680,7 +679,8 @@ namespace Electronics_Shop_17.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LoyaltyPoints = table.Column<int>(type: "int", nullable: false),
                     UserAccountId = table.Column<int>(type: "int", nullable: false),
-                    PersonId = table.Column<int>(type: "int", nullable: false)
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    isDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -756,15 +756,14 @@ namespace Electronics_Shop_17.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     ImageId = table.Column<int>(type: "int", nullable: false),
-                    ImageId1 = table.Column<int>(type: "int", nullable: false),
                     ProductColorId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductImages_Images_ImageId1",
-                        column: x => x.ImageId1,
+                        name: "FK_ProductImages_Images_ImageId",
+                        column: x => x.ImageId,
                         principalTable: "Images",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -921,7 +920,8 @@ namespace Electronics_Shop_17.Services.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalAmount = table.Column<double>(type: "float", nullable: false),
+                    FinalTotalAmount = table.Column<double>(type: "float", nullable: true),
                     StateMachine = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     AdressId = table.Column<int>(type: "int", nullable: false),
@@ -992,10 +992,10 @@ namespace Electronics_Shop_17.Services.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    FinalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    FinalPrice = table.Column<double>(type: "float", nullable: false),
                     ProductColorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -1150,9 +1150,9 @@ namespace Electronics_Shop_17.Services.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImages_ImageId1",
+                name: "IX_ProductImages_ImageId",
                 table: "ProductImages",
-                column: "ImageId1");
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_ProductColorId",
@@ -1219,9 +1219,9 @@ namespace Electronics_Shop_17.Services.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAccounts_ImageId1",
+                name: "IX_UserAccounts_ImageId",
                 table: "UserAccounts",
-                column: "ImageId1");
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAccounts_RoleId",

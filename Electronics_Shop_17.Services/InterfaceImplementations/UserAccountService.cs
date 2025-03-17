@@ -76,15 +76,16 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 PasswordSalt = pwSalt,
                 RegistrationDate = obj.RegistrationDate,
                 RoleId = obj.RoleId,
+                ImageId = obj.ImageId,
                 isDeactivated = false,
             };
 
             _context.UserAccounts.Add(novi);
             await _context.SaveChangesAsync();
 
-            var noviDto = _mapper.Map<DtoUserAccount>(novi);
+            var newDto = _mapper.Map<DtoUserAccount>(novi);
 
-            return noviDto;
+            return newDto;
         }
 
         private void CreatePasswordHash(string pw, out byte[] pwHash, out byte[] pwSalt)
@@ -99,31 +100,35 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             if (obj == null || string.IsNullOrWhiteSpace(obj.Username) || string.IsNullOrWhiteSpace(obj.Password))
             {
-                throw new ArgumentException("No input");
+                throw new ArgumentException();
             }
 
-            var izbaze = _context.UserAccounts.Include(x => x.Role).Single(x => x.Username == obj.Username);
+            var dbObj = _context.UserAccounts.Include(x => x.Role).Include(x=>x.Customer).Include(x => x.Seller).SingleOrDefault(x => x.Username == obj.Username);            
+            
 
-            if (izbaze.Username != obj.Username)
+            if (dbObj == null || !VerifyPasswordHash(obj.Password, dbObj.PasswordHash, dbObj.PasswordSalt) || dbObj.isDeactivated)
             {
-                throw new UnauthorizedAccessException("Username or Password incorrect!");
+                throw new UnauthorizedAccessException();
             }
 
-            if (!VerifyPasswordHash(obj.Password, izbaze.PasswordHash, izbaze.PasswordSalt))
-            {
-                throw new UnauthorizedAccessException("Username or Password incorrect!");
-            }
+            if (dbObj.Customer != null)            
+                if(dbObj.Customer.isDeleted)
+                    throw new UnauthorizedAccessException();
 
-            string token = CreateToken(izbaze);
+            if (dbObj.Seller != null)
+                if (dbObj.Seller.isDeleted)
+                    throw new UnauthorizedAccessException();
 
-            var logiraniKorisnik = new DtoLogin
+            string token = CreateToken(dbObj);
+
+            return new DtoLogin
             {
                 Token = token,
-                UserId = izbaze.Id,
-                RoleName = izbaze.Role.RoleName,
-            };
-
-            return logiraniKorisnik;
+                UserId = dbObj.Id,
+                RoleName = dbObj.Role.RoleName,
+                isCustomer = dbObj.Customer != null,
+                isSeller = dbObj.Seller != null,                
+            }; 
         }
 
         private bool VerifyPasswordHash(string pw, byte[] pwHash, byte[] pwSalt)

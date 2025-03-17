@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +20,12 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
     public class ProductService : BaseServiceSoftDelete<DtoProduct, Product, SearchProduct, AddProduct, UpdateProduct>, IProductService
     {
         BaseProductState _baseProductState;
-        public ProductService(DataContext context, IMapper mapper, BaseProductState baseProductState) : base(context, mapper)
+        Checks _checks;
+
+        public ProductService(DataContext context, IMapper mapper, BaseProductState baseProductState, Checks checks) : base(context, mapper)
         {
             _baseProductState = baseProductState;
+            _checks = checks;
         }
 
         public override async Task<Pagination<DtoProduct>> GetAll(SearchProduct? search = null)
@@ -31,7 +34,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             foreach (var item in products.Data)
             {
-                var priceCheckedObj = await Checks.PriceCheck(item.Id);
+                var priceCheckedObj = await _checks.PriceCheck(item.Id);
                 item.FinalPrice = priceCheckedObj.FinalPrice;
             }
 
@@ -42,7 +45,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             var product = await base.GetById(id);
 
-            var priceCheckedObj = await Checks.PriceCheck(product.Id);
+            var priceCheckedObj = await _checks.PriceCheck(product.Id);
             product.FinalPrice = priceCheckedObj.FinalPrice;
 
             return product;

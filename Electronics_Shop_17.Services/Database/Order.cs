@@ -11,7 +11,8 @@ namespace Electronics_Shop_17.Services.Database
     {
         public int Id { get; set; }
         public DateTime OrderTime { get; set; }
-        public decimal TotalAmount { get; set; }
+        public double TotalAmount { get; set; }
+        public double? FinalTotalAmount { get; set; }
         public string StateMachine { get; set; }
 
         public int CustomerId { get; set; }

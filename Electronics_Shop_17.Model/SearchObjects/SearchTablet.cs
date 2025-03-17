@@ -19,7 +19,7 @@ namespace Electronics_Shop_17.Model.SearchObjects
 
         // Performance
         public string? Processor { get; set; } // e.g., "Apple M1", "Qualcomm Snapdragon 8 Gen 2"
-        public int? RAM { get; set; } // RAM size in GB, e.g., 4, 8, 16
+        public int? Ram { get; set; } // RAM size in GB, e.g., 4, 8, 16
         public int? StorageCapacity { get; set; } // Internal storage in GB, e.g., 64, 128, 256
         public bool? SupportsExpandableStorage { get; set; } // Whether it supports microSD cards
 
@@ -40,7 +40,7 @@ namespace Electronics_Shop_17.Model.SearchObjects
         public bool? HasCellular { get; set; } // Whether it supports cellular networks (e.g., LTE, 5G)
 
         // Physical Characteristics
-        public decimal? Weight { get; set; } // Weight in grams, e.g., 460
+        public double? Weight { get; set; } // Weight in grams, e.g., 460
         public string? Dimensions { get; set; } // Dimensions in mm, e.g., "247.6 x 178.5 x 6.1"
         public string? BuildMaterial { get; set; } // e.g., "Aluminum", "Plastic", "Glass"
 

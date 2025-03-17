@@ -48,9 +48,9 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.Processor.Contains(search.Processor));
             }
-            if (search.RAM != null)
+            if (search.Ram != null)
             {
-                data = data.Where(x => x.RAM >= search.RAM);
+                data = data.Where(x => x.Ram >= search.Ram);
             }
             if (search.StorageCapacity != null)
             {
@@ -72,13 +72,13 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.HasZoomLens == search.HasZoomLens);
             }
-            if (search.MainCameraResolution_MP != null)
+            if (search.MainCameraResolution != null)
             {
-                data = data.Where(x => x.MainCameraResolution_MP >= search.MainCameraResolution_MP);
+                data = data.Where(x => x.MainCameraResolution >= search.MainCameraResolution);
             }
-            if (search.FrontCameraResolution_MP != null)
+            if (search.FrontCameraResolution != null)
             {
-                data = data.Where(x => x.FrontCameraResolution_MP >= search.FrontCameraResolution_MP);
+                data = data.Where(x => x.FrontCameraResolution >= search.FrontCameraResolution);
             }
             if (search.BatteryCapacity != null)
             {

@@ -11,9 +11,9 @@ namespace Electronics_Shop_17.Model.SearchObjects
         public int? Id { get; set; }
         public DateTime? MinOrderTime { get; set; }
         public DateTime? MaxOrderTime { get; set; }
-        public decimal? TotalAmount { get; set; }
-        public decimal? MaxTotalAmount { get; set; }
-        public decimal? MinTotalAmount { get; set; }
+        public double? TotalAmount { get; set; }
+        public double? MaxTotalAmount { get; set; }
+        public double? MinTotalAmount { get; set; }
 
         public int? CustomerId { get; set; }
         public int? AdressId { get; set; }

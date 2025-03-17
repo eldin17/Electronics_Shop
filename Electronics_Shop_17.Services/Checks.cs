@@ -13,14 +13,14 @@ namespace Electronics_Shop_17.Services
 {
     public class Checks
     {
-        static DataContext _context;
-        static IMapper _mapper;
+        public DataContext _context;
+        public IMapper _mapper;
         public Checks(DataContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
-        public static async Task<DtoProduct> PriceCheck(int productId)
+        public async Task<DtoProduct> PriceCheck(int productId)
         {
             var product = await _context.Products.Include(x=>x.ProductDiscounts).FirstOrDefaultAsync(x=>x.Id== productId);
             if (product == null)
@@ -45,7 +45,7 @@ namespace Electronics_Shop_17.Services
             return dtoProduct;
         }
 
-        public static async Task<DtoOrderItem> StockCheck(OrderItem obj)
+        public async Task<DtoOrderItem> StockCheck(OrderItem obj)
         {
             var productColor = await _context.ProductColors.SingleOrDefaultAsync(x => x.Id == obj.ProductColorId);
             if (productColor == null)
@@ -62,19 +62,6 @@ namespace Electronics_Shop_17.Services
             }
         }
 
-        public static async Task<DtoProductColor> StockRemove(int productColorId, int quantity)
-        {
-            var productColor = await _context.ProductColors.SingleOrDefaultAsync(x => x.Id == productColorId);
-            
-            if (productColor == null)
-                throw new KeyNotFoundException($"Product doesn't exist");
-            if (productColor.Stock <= quantity)
-                throw new InvalidOperationException($"Stock too low");
-            
-            productColor.Stock -= quantity;
-            await _context.SaveChangesAsync();            
-
-            return _mapper.Map<DtoProductColor>(productColor);
-        }
+       
     }
 }

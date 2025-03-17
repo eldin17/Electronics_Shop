@@ -10,11 +10,11 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public virtual DtoProduct Product { get; set; }
+        //public virtual DtoProduct Product { get; set; }
 
         // General Information
         public string Processor { get; set; } // e.g., "Intel Core i7-12700K", "AMD Ryzen 9 5900X"
-        public int RAM { get; set; } // RAM size in GB, e.g., 16, 32
+        public int Ram { get; set; } // RAM size in GB, e.g., 16, 32
         public string StorageType { get; set; } // e.g., "SSD", "HDD", or "Hybrid"
         public int StorageCapacity { get; set; } // Storage size in GB or TB, e.g., 512, 1000
         public string GraphicsCard { get; set; } // e.g., "NVIDIA RTX 3080", "AMD Radeon RX 6700 XT"
@@ -22,11 +22,11 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
 
         // Physical Characteristics
         public string FormFactor { get; set; } // e.g., "Mini Tower", "Mid Tower", "Full Tower", "All-in-One"
-        public decimal Weight { get; set; } // Weight in kilograms
+        public double Weight { get; set; } // Weight in kilograms
         public string Dimensions { get; set; } // Dimensions in mm or inches, e.g., "450 x 200 x 400 mm"
 
         // Connectivity
-        public int USBPorts { get; set; } // Number of USB ports, e.g., 6
+        public int UsbPorts { get; set; } // Number of USB ports, e.g., 6
         public bool HasWiFi { get; set; } // Whether it has built-in WiFi
         public bool HasBluetooth { get; set; } // Whether it has built-in Bluetooth
 

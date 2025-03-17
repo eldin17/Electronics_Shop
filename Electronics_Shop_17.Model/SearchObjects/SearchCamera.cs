@@ -12,14 +12,14 @@ namespace Electronics_Shop_17.Model.SearchObjects
         public int? ProductId { get; set; }
 
         // Technical Specifications
-        public decimal? Megapixels { get; set; } // Sensor resolution
+        public double? Megapixels { get; set; } // Sensor resolution
         public string? SensorType { get; set; } // e.g., Full-frame, APS-C, Micro Four Thirds
         public string? LensMount { get; set; } // e.g., Canon RF, Nikon Z
         public string? VideoResolution { get; set; } // e.g., "4K at 60fps"
 
         // Physical Characteristics
-        public decimal? Weight_grams { get; set; } // Weight in grams
-        public string? Dimensions_mm { get; set; } // e.g., "138 x 97 x 88 mm"
+        public double? Weight { get; set; } // Weight in grams
+        public string? Dimensions { get; set; } // e.g., "138 x 97 x 88 mm"
 
         // Connectivity
         public bool? HasWiFi { get; set; }

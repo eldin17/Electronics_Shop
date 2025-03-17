@@ -19,7 +19,7 @@ namespace Electronics_Shop_17.Services.Database
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual List<Order> Orders { get; set; }
+        //public virtual List<Order> Orders { get; set; }
         public bool isDeleted { get; set; }
 
     }

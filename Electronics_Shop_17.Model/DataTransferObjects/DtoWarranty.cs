@@ -11,6 +11,8 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public int Id { get; set; }
         public int Period_mm { get; set; }
         public string CoverageDetails { get; set; }
+        public int ProductId { get; set; }
+
         //public virtual DtoProduct Product { get; set; }
     }
 }

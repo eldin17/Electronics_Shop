@@ -1,0 +1,76 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'phone.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Phone _$PhoneFromJson(Map<String, dynamic> json) => Phone(
+      id: (json['id'] as num?)?.toInt(),
+      productId: (json['productId'] as num?)?.toInt(),
+      screenSize: json['screenSize'] as String?,
+      screenResolution: json['screenResolution'] as String?,
+      screenType: json['screenType'] as String?,
+      refreshRate: (json['refreshRate'] as num?)?.toInt(),
+      processor: json['processor'] as String?,
+      ram: (json['ram'] as num?)?.toInt(),
+      storageCapacity: (json['storageCapacity'] as num?)?.toInt(),
+      supportsExpandableStorage: json['supportsExpandableStorage'] as bool?,
+      rearCamerasCount: (json['rearCamerasCount'] as num?)?.toInt(),
+      hasUltrawideLens: json['hasUltrawideLens'] as bool?,
+      hasZoomLens: json['hasZoomLens'] as bool?,
+      mainCameraResolutionMP: (json['mainCameraResolutionMP'] as num?)?.toInt(),
+      frontCameraResolutionMP:
+          (json['frontCameraResolutionMP'] as num?)?.toInt(),
+      batteryCapacity: (json['batteryCapacity'] as num?)?.toInt(),
+      supportsFastCharging: json['supportsFastCharging'] as bool?,
+      supportsWirelessCharging: json['supportsWirelessCharging'] as bool?,
+      estimatedBatteryLife: (json['estimatedBatteryLife'] as num?)?.toInt(),
+      supports5G: json['supports5G'] as bool?,
+      hasWiFi6: json['hasWiFi6'] as bool?,
+      hasBluetooth: json['hasBluetooth'] as bool?,
+      hasNFC: json['hasNFC'] as bool?,
+      hasDualSIM: json['hasDualSIM'] as bool?,
+      weight: (json['weight'] as num?)?.toDouble(),
+      dimensions: json['dimensions'] as String?,
+      buildMaterial: json['buildMaterial'] as String?,
+      operatingSystem: json['operatingSystem'] as String?,
+      hasFingerprintSensor: json['hasFingerprintSensor'] as bool?,
+      hasFaceRecognition: json['hasFaceRecognition'] as bool?,
+      isWaterResistant: json['isWaterResistant'] as bool?,
+    );
+
+Map<String, dynamic> _$PhoneToJson(Phone instance) => <String, dynamic>{
+      'id': instance.id,
+      'productId': instance.productId,
+      'screenSize': instance.screenSize,
+      'screenResolution': instance.screenResolution,
+      'screenType': instance.screenType,
+      'refreshRate': instance.refreshRate,
+      'processor': instance.processor,
+      'ram': instance.ram,
+      'storageCapacity': instance.storageCapacity,
+      'supportsExpandableStorage': instance.supportsExpandableStorage,
+      'rearCamerasCount': instance.rearCamerasCount,
+      'hasUltrawideLens': instance.hasUltrawideLens,
+      'hasZoomLens': instance.hasZoomLens,
+      'mainCameraResolutionMP': instance.mainCameraResolutionMP,
+      'frontCameraResolutionMP': instance.frontCameraResolutionMP,
+      'batteryCapacity': instance.batteryCapacity,
+      'supportsFastCharging': instance.supportsFastCharging,
+      'supportsWirelessCharging': instance.supportsWirelessCharging,
+      'estimatedBatteryLife': instance.estimatedBatteryLife,
+      'supports5G': instance.supports5G,
+      'hasWiFi6': instance.hasWiFi6,
+      'hasBluetooth': instance.hasBluetooth,
+      'hasNFC': instance.hasNFC,
+      'hasDualSIM': instance.hasDualSIM,
+      'weight': instance.weight,
+      'dimensions': instance.dimensions,
+      'buildMaterial': instance.buildMaterial,
+      'operatingSystem': instance.operatingSystem,
+      'hasFingerprintSensor': instance.hasFingerprintSensor,
+      'hasFaceRecognition': instance.hasFaceRecognition,
+      'isWaterResistant': instance.isWaterResistant,
+    };

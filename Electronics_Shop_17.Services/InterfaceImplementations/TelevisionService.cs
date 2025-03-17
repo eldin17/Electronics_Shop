@@ -60,13 +60,13 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.SupportsDolbyAtmos == search.SupportsDolbyAtmos);
             }
-            if (search.HDMIInputs != null)
+            if (search.HdmiInputs != null)
             {
-                data = data.Where(x => x.HDMIInputs == search.HDMIInputs);
+                data = data.Where(x => x.HdmiInputs == search.HdmiInputs);
             }
-            if (search.USBPorts != null)
+            if (search.UsbPorts != null)
             {
-                data = data.Where(x => x.USBPorts == search.USBPorts);
+                data = data.Where(x => x.UsbPorts == search.UsbPorts);
             }
             if (search.HasBluetooth != null)
             {

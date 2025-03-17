@@ -12,5 +12,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public int Rating { get; set; }
         public string Comment { get; set; }
         public virtual DtoCustomer Customer { get; set; }
+        public int ProductId { get; set; }
+
     }
 }

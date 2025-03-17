@@ -10,7 +10,6 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
     {
         public int Id { get; set; }
         public string RoleName { get; set; }
-        public virtual List<DtoUserAccount> UserAccounts { get; set; }
         public bool isDeleted { get; set; }
 
     }

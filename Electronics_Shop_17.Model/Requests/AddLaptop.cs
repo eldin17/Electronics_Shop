@@ -12,7 +12,7 @@ namespace Electronics_Shop_17.Model.Requests
 
         // Performance
         public string Processor { get; set; } // e.g., "Intel Core i7-12700H", "AMD Ryzen 7 5800U"
-        public int RAM { get; set; } // RAM size in GB, e.g., 8, 16, 32
+        public int Ram { get; set; } // RAM size in GB, e.g., 8, 16, 32
         public string StorageType { get; set; } // e.g., "SSD", "HDD"
         public int StorageCapacity { get; set; } // Storage size in GB or TB, e.g., 256, 512, 1000
         public string GraphicsCard { get; set; } // e.g., "NVIDIA RTX 3060", "Integrated Intel Iris Xe"
@@ -29,13 +29,13 @@ namespace Electronics_Shop_17.Model.Requests
         // Connectivity
         public bool HasWiFi { get; set; } // Whether it has built-in WiFi
         public bool HasBluetooth { get; set; } // Whether it has built-in Bluetooth
-        public int USBPorts { get; set; } // Number of USB ports, e.g., 3
+        public int UsbPorts { get; set; } // Number of USB ports, e.g., 3
         public bool HasEthernetPort { get; set; } // Whether it has an Ethernet port
         public bool HasHDMI { get; set; } // Whether it has an HDMI port
         public bool HasThunderbolt { get; set; } // Whether it supports Thunderbolt
 
         // Physical Characteristics
-        public decimal Weight { get; set; } // Weight in kilograms, e.g., 1.5
+        public double Weight { get; set; } // Weight in kilograms, e.g., 1.5
         public string Dimensions { get; set; } // Dimensions in mm or inches, e.g., "357 x 230 x 15 mm"
         public string BuildMaterial { get; set; } // e.g., "Aluminum", "Plastic", "Carbon Fiber"
 

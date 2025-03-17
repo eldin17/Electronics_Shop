@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
-    public class CustomerService : BaseServiceCRUD<DtoCustomer, Customer, SearchCustomer, AddCustomer, UpdateCustomer>, ICustomerService
+    public class CustomerService : BaseServiceSoftDelete<DtoCustomer, Customer, SearchCustomer, AddCustomer, UpdateCustomer>, ICustomerService
     {
         public CustomerService(DataContext context, IMapper mapper) : base(context, mapper)
         {
@@ -21,7 +21,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
         public override IQueryable<Customer> AddInclude(IQueryable<Customer> data)
         {
-            data = data.Include(x => x.UserAccount).ThenInclude(x=>x.Image).Include(x => x.Orders).Include(x => x.Adresses).Include(x => x.Wishlist).Include(x => x.PaymentMethods).Include(x => x.Person);
+            data = data.Include(x => x.UserAccount).ThenInclude(x=>x.Image).Include(x => x.Adresses).Include(x => x.Wishlist).Include(x => x.PaymentMethods).Include(x => x.Person);
             return base.AddInclude(data);
         }
 

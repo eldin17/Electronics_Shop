@@ -14,8 +14,10 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
     public class OrderItemService : BaseServiceCRUD<DtoOrderItem, OrderItem, SearchOrderItem, AddOrderItem, UpdateOrderItem>, IOrderItemService
     {
-        public OrderItemService(DataContext context, IMapper mapper) : base(context, mapper)
+        Checks _checks;
+        public OrderItemService(DataContext context, IMapper mapper, Checks checks) : base(context, mapper)
         {
+            _checks = checks;
         }
 
         public override IQueryable<OrderItem> AddFilter(IQueryable<OrderItem> data, SearchOrderItem? search)
@@ -37,6 +39,22 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.OrderId == search.OrderId);
             }            
             return base.AddFilter(data, search);
+        }
+
+
+        public override async Task<DtoOrderItem> Add(AddOrderItem addRequest)
+        {
+            var obj = _mapper.Map<OrderItem>(addRequest);
+            var dtoProduct = await _checks.PriceCheck(addRequest.ProductId);
+            obj.FinalPrice = dtoProduct.FinalPrice;
+
+            var checkStock = await _checks.StockCheck(obj);
+            obj.Quantity = checkStock.Quantity;
+
+            var returnObj = _context.OrderItems.Add(obj);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<DtoOrderItem>(returnObj);
         }
     }
 }

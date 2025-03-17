@@ -113,6 +113,13 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var state = _baseOrderState.GetState(request.StateMachine);
             return await state.CheckAndAdd(request);
         }
+
+        public async Task<DtoOrder> ApplyCoupon(int id, int couponId)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.ApplyCoupon(id, couponId);
+        }
     }
 
 
