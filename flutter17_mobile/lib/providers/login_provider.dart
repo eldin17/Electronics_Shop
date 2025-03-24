@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/models/login_model.dart';
 import 'package:flutter17_mobile/models/user_account.dart';
+import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -11,45 +12,14 @@ import '../models/register_model.dart';
 class LoginProvider with ChangeNotifier {
   static String? _baseUrl;
   final String _endpoint = "api/UserAccount";
+  late CustomerProvider _customerProvider;
 
   LoginProvider() {
     _baseUrl = const String.fromEnvironment("baseUrl",
         defaultValue: "http://10.0.2.2:5116/");
+    _customerProvider = new CustomerProvider();
   }
 
-  // Future<void> login(LoginModel obj) async {
-  //   var url = "$_baseUrl$_endpoint/login";
-  //   var uri = Uri.parse(url);
-
-  //   var body = {
-  //     "username": obj.username,
-  //     "password": obj.password,
-  //   };
-
-  //   var headers = _getHeaders(withAuth: false);
-
-  //   try {
-  //     print("Sending login request...");
-  //     var client = http.Client();
-  //     try {
-  //       var response =
-  //           await client.post(uri, headers: headers, body: jsonEncode(body));
-  //       // Handle response
-
-  //       print("Received response with status code: ${response.statusCode}");
-  //       if (response.statusCode == 200) {
-  //         var data = jsonDecode(response.body);
-  //         print("Login successful. Token: ${data['token']}");
-  //       } else {
-  //         print("Login failed with status: ${response.statusCode}");
-  //       }
-  //     } finally {
-  //       client.close();
-  //     }
-  //   } catch (e) {
-  //     print("Error during HTTP call: $e");
-  //   }
-  // }
   Future<void> login(LoginModel obj) async {
     var url = "$_baseUrl$_endpoint/login";
     var uri = Uri.parse(url);
@@ -75,6 +45,14 @@ class LoginProvider with ChangeNotifier {
         LoginResponse.roleName = data['roleName'];
         LoginResponse.isCustomer = data['isCustomer'];
         LoginResponse.isSeller = data['isSeller'];
+
+        if (LoginResponse.isCustomer!) {
+          var customer = await _customerProvider
+              .getAll(filter: {'userAccountId': LoginResponse.userId});
+          if (customer.data.isNotEmpty)
+            LoginResponse.currentCustomer = customer.data[0];
+            print("HepeK!! ${LoginResponse.currentCustomer!.id}");
+        }
 
         return;
       }

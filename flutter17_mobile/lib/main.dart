@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/providers/image_upload_provider.dart';
 import 'package:flutter17_mobile/providers/login_provider.dart';
+import 'package:flutter17_mobile/providers/product_provider.dart';
+import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
+import 'package:flutter17_mobile/providers/wishlist_provider.dart';
 import 'package:flutter17_mobile/screens/splash_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +18,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => CustomerProvider()),
         ChangeNotifierProvider(create: (_) => ImageUploadProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistItemProvider()),
 
       ],
       child: const MyApp(),

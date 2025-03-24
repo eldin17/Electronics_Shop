@@ -10,6 +10,7 @@ using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
 using Electronics_Shop_17.Services.OrderStateMachine;
+using Electronics_Shop_17.Services.ProductStateMachine;
 using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
@@ -72,6 +73,20 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.PaymentMethodId == search.PaymentMethodId);
             }
             return base.AddFilter(data, search);
+        }
+
+        public async Task<List<string>> AllowedActionsInState(int id)
+        {
+            var obj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(obj.StateMachine);
+            return await state.AllowedActionsInState();
+        }
+
+        public override async Task<DtoOrder> Update(int id, UpdateOrder updateRequest)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseOrderState.GetState(obj.StateMachine);
+            return await state.Update(id, updateRequest);
         }
 
         public async Task<DtoOrderSuggestion> Confirm(int id, string? paymentId = null, string? paymentIntent = null)

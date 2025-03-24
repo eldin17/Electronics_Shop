@@ -34,19 +34,41 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             foreach (var item in products.Data)
             {
-                var priceCheckedObj = await _checks.PriceCheck(item.Id);
+                var priceCheckedObj = await _checks.PriceCheck(item);
                 item.FinalPrice = priceCheckedObj.FinalPrice;
+                item.reviewScoreAvg = await _checks.ReviewCheck(item);
             }
 
             return products;
         }
 
+        public async Task<Pagination<DtoProduct>> GetAllWithChecks(int customerId, SearchProduct search = null)
+        {
+            var customer = await _context.Customers.Include(x=>x.Wishlist).FirstOrDefaultAsync(x=>x.Id==customerId);
+            if(customer!=null && customer.Wishlist != null && customer.Wishlist.WishlistItems.Any())
+            {
+                var wishlist = customer.Wishlist.WishlistItems.Select(x=>x.ProductId).ToList();
+                var products = await GetAll(search);
+                foreach (var item in products.Data)
+                {
+                    if (wishlist.Contains(item.Id))
+                        item.isFavourite = true;
+                    else 
+                        item.isFavourite = false;
+                }
+                return products;
+            }
+            return await GetAll(search);
+        }
+
+
         public override async Task<DtoProduct> GetById(int id)
         {
             var product = await base.GetById(id);
 
-            var priceCheckedObj = await _checks.PriceCheck(product.Id);
+            var priceCheckedObj = await _checks.PriceCheck(product);
             product.FinalPrice = priceCheckedObj.FinalPrice;
+            product.reviewScoreAvg = await _checks.ReviewCheck(product);
 
             return product;
         }
@@ -57,7 +79,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 .Include(x => x.ProductImages).ThenInclude(x => x.Image)
                 .Include(x => x.ProductColors)
                 .Include(x => x.ProductProductTags)
-                .Include(x => x.Reviews)
+                //.Include(x => x.Reviews)
                 .Include(x => x.Warranty);
 
             return base.AddInclude(data);
@@ -110,6 +132,16 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.Id == search.Id);
             }
+            if (!string.IsNullOrWhiteSpace(search.FullTextSearch))
+            {
+                data = data.Where(x => x.Brand.Contains(search.FullTextSearch) ||
+                x.Model.Contains(search.FullTextSearch) ||
+                x.Description.Contains(search.FullTextSearch));
+            }
+            if (!string.IsNullOrWhiteSpace(search.FullTextCategorySearch))
+            {
+                data = data.Where(x => search.FullTextCategorySearch.Contains(x.ProductCategory.Name));
+            }
             if (!string.IsNullOrWhiteSpace(search.Brand))
             {
                 data = data.Where(x => x.Brand.Contains(search.Brand));
@@ -149,6 +181,34 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return base.AddFilter(data, search);
         }
 
+        public override async Task<DtoProduct> Add(AddProduct addRequest)
+        {
+            var state = _baseProductState.GetState(addRequest.StateMachine);
+            return await state.Add(addRequest);
+        }
+        
+
+        public override async Task<DtoProduct> Update(int id, UpdateProduct updateRequest)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.Update(id, updateRequest);
+        }
+
+        public override async Task<DtoProduct> Delete(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.Delete(id);
+        }
+
+        public async Task<List<string>> AllowedActionsInState(int id)
+        {
+            var obj = await _context.Products.FindAsync(id);
+            var state = _baseProductState.GetState(obj.StateMachine);
+            return await state.AllowedActionsInState();
+        }
+
         public async Task<DtoProduct> Activate(int id)
         {
             var obj = await _context.Products.FindAsync(id);
@@ -181,5 +241,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var state = _baseProductState.GetState(obj.StateMachine);
             return await state.Restore(id);
         }
+
+        
     }
 }

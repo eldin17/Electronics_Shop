@@ -20,14 +20,9 @@ namespace Electronics_Shop_17.Services
             _context = context;
             _mapper = mapper;
         }
-        public async Task<DtoProduct> PriceCheck(int productId)
-        {
-            var product = await _context.Products.Include(x=>x.ProductDiscounts).FirstOrDefaultAsync(x=>x.Id== productId);
-            if (product == null)
-                throw new KeyNotFoundException($"Product with id {productId} doesn't exist"); 
-
-            var dtoProduct = _mapper.Map<DtoProduct>(product);
-            dtoProduct.FinalPrice= product.Price;
+        public async Task<DtoProduct> PriceCheck(DtoProduct product)
+        {            
+            product.FinalPrice= product.Price;
 
             var discounts = await _context.Discounts
                 .Where(d => product.ProductDiscounts.Select(pd => pd.DiscountId).Contains(d.Id) &&
@@ -36,14 +31,57 @@ namespace Electronics_Shop_17.Services
                     DateTime.UtcNow <= d.EndDate)
                     .ToListAsync();
 
-            foreach (var discount in discounts) {                 
-                    dtoProduct.FinalPrice-=discount.Amount;
-                    if ((double)dtoProduct.FinalPrice < (double)product.Price * 0.6)
+            foreach (var discount in discounts) {
+                product.FinalPrice-=discount.Amount;
+                    if ((double)product.FinalPrice < (double)product.Price * 0.6)
                         throw new InvalidOperationException("There has been a mistake with discounts for this product");
             }
             
+            return product;
+        }
+
+        public async Task<DtoProduct> PriceCheck(int productId)
+        {
+            var product = await _context.Products.Include(x => x.ProductDiscounts).FirstOrDefaultAsync(x => x.Id == productId);
+            if (product == null)
+                throw new KeyNotFoundException($"Product with id {productId} doesn't exist");
+
+            var dtoProduct = _mapper.Map<DtoProduct>(product);
+            dtoProduct.FinalPrice = product.Price;
+
+            var discounts = await _context.Discounts
+                .Where(d => product.ProductDiscounts.Select(pd => pd.DiscountId).Contains(d.Id) &&
+                    d.IsActive &&
+                    DateTime.UtcNow >= d.StartDate &&
+                    DateTime.UtcNow <= d.EndDate)
+                    .ToListAsync();
+
+            foreach (var discount in discounts)
+            {
+                dtoProduct.FinalPrice -= discount.Amount;
+                if ((double)dtoProduct.FinalPrice < (double)product.Price * 0.6)
+                    throw new InvalidOperationException("There has been a mistake with discounts for this product");
+            }
+
             return dtoProduct;
         }
+
+
+        public async Task<double> ReviewCheck(DtoProduct product)
+        {
+            var ratings = await _context.Reviews
+                .Where(r => r.ProductId == product.Id)
+                .Select(r => r.Rating)
+                .ToListAsync(); 
+
+            return ratings.Any() ? ratings.Average() : 0; 
+        }
+
+        
+
+
+
+
 
         public async Task<DtoOrderItem> StockCheck(OrderItem obj)
         {

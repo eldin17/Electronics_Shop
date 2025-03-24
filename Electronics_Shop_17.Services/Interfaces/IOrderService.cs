@@ -18,5 +18,7 @@ namespace Electronics_Shop_17.Services.Interfaces
         Task<DtoOrder> Activate(int id);
         Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request);
         Task<DtoOrder> ApplyCoupon(int id, int couponId);
+        Task<List<string>> AllowedActionsInState(int id);
+
     }
 }

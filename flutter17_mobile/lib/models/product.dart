@@ -31,10 +31,10 @@ class Product {
   double? finalPrice;
   int? productCategoryId;
   ProductCategory? productCategory;
-  List<ProductImage>? productImage;
-  List<ProductColor>? productColor;
-  List<ProductProductTag>? productProductTag;
-  List<Review>? review;
+  List<ProductImage>? productImages;
+  List<ProductColor>? productColors;
+  List<ProductProductTag>? productProductTags;
+  List<Review>? reviews;
   int? warrantyId;
   Warranty? warranty;
   Camera? camera;
@@ -46,6 +46,8 @@ class Product {
   Television? television;
   Accessory? accessory;
   bool? isDeleted;
+  double? reviewScoreAvg;
+  bool? isFavourite;
 
   Product({    
     this.id,
@@ -56,10 +58,10 @@ class Product {
     this.finalPrice,
     this.productCategoryId,
     this.productCategory,
-    this.productImage,
-    this.productColor,
-    this.productProductTag,
-    this.review,
+    this.productImages,
+    this.productColors,
+    this.productProductTags,
+    this.reviews,
     this.warrantyId,
     this.warranty,
     this.camera,
@@ -71,7 +73,9 @@ class Product {
     this.television,
     this.accessory,
     this.isDeleted,
-  });
+    this.reviewScoreAvg,
+    this.isFavourite,
+  }); 
 
   factory Product.fromJson(Map<String, dynamic> json) =>
       _$ProductFromJson(json);

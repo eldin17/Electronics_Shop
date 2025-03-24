@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/screens/home2.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
-import 'package:flutter17_mobile/screens/login_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
 class MasterScreen extends StatefulWidget {
-  //Widget child;
   int index;
 
-  MasterScreen(
-      {super.key,
-      //required this.child,
-      required this.index});
+  MasterScreen({super.key, required this.index});
 
   @override
   State<MasterScreen> createState() => _MasterScreenState();
@@ -22,61 +17,39 @@ class MasterScreen extends StatefulWidget {
 
 class _MasterScreenState extends State<MasterScreen> {
   int currentSelectedIndex = 0;
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+  ];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    updateCurrentIndex(widget.index);
+    currentSelectedIndex = widget.index;
   }
 
-  void updateCurrentIndex(int index) {
-    setState(() {
-      currentSelectedIndex = index;
-    });
-    // if (index == 2) {
-    //   Navigator.of(context).push(
-    //     PageRouteBuilder(
-    //       transitionDuration: Duration.zero,
-    //       pageBuilder: (context, animation, secondaryAnimation) =>
-    //           HomeScreen2(),
-    //     ),
-    //   );
-    // }
-  }
-
-  // final pages = [
-  //   const Center(
-  //     child: HomeScreen(),
-  //   ),
-  //   const Center(
-  //     child: HomeScreen2(),
-  //   ),
-  //   const Center(
-  //     child: Text("Cart"),
-  //   ),
-  //   const Center(
-  //     child: Text("Profile"),
-  //   ),
-  // ];
-  final pages = [
-    () => const HomeScreen(),
-    () => const Center(child: Text("Wishlist")),
-    () => const Center(child: Text("Cart")),
-    //() => const Center(child: Text("Notifications")),
-    () => const HomeScreen2(),
-  ];
+  void _onItemTapped(int index) {
+    if (index == currentSelectedIndex) {
+      _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+    } else {
+      setState(() {
+        currentSelectedIndex = index;
+      });
+    }
+  }  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: SafeArea(
-      //   child: widget.child!,
-      // ),
-      body: pages[currentSelectedIndex](),
+      body: IndexedStack(
+        index: currentSelectedIndex,
+        children: List.generate(4, (index) => _buildPage(index)),
+      ),
       bottomNavigationBar: BottomNavigationBar(
-        onTap: updateCurrentIndex,
+        onTap: _onItemTapped,
         currentIndex: currentSelectedIndex,
         showSelectedLabels: false,
         showUnselectedLabels: false,
@@ -133,23 +106,6 @@ class _MasterScreenState extends State<MasterScreen> {
             ),
             label: "Chat",
           ),
-          // BottomNavigationBarItem(
-          //   icon: SvgPicture.string(
-          //     countryIcon,
-          //     colorFilter: const ColorFilter.mode(
-          //       inActiveIconColor,
-          //       BlendMode.srcIn,
-          //     ),
-          //   ),
-          //   activeIcon: SvgPicture.string(
-          //     countryIcon,
-          //     colorFilter: const ColorFilter.mode(
-          //       Color(0xFFFF7643),
-          //       BlendMode.srcIn,
-          //     ),
-          //   ),
-          //   label: "Notifications",
-          // ),
           BottomNavigationBarItem(
             icon: SvgPicture.string(
               userIcon,
@@ -170,5 +126,36 @@ class _MasterScreenState extends State<MasterScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return Navigator(
+          key: _navigatorKeys[0],
+          onGenerateRoute: (routeSettings) => MaterialPageRoute(
+            builder: (context) => HomeScreen(),
+          ),
+        );
+      case 1:
+        return Navigator(
+          key: _navigatorKeys[1],
+          onGenerateRoute: (routeSettings) => MaterialPageRoute(
+            builder: (context) => Center(child: Text("Wishlist")),
+          ),
+        );
+      case 2:
+        return Navigator(
+          key: _navigatorKeys[2],
+          onGenerateRoute: (routeSettings) => MaterialPageRoute(
+            builder: (context) => Center(child: Text("Cart")),
+          ),
+        );
+      case 3:
+        return HomeScreen2();
+          
+      default:
+        return HomeScreen();
+    }
   }
 }

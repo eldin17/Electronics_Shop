@@ -18,16 +18,16 @@ Product _$ProductFromJson(Map<String, dynamic> json) => Product(
           ? null
           : ProductCategory.fromJson(
               json['productCategory'] as Map<String, dynamic>),
-      productImage: (json['productImage'] as List<dynamic>?)
+      productImages: (json['productImages'] as List<dynamic>?)
           ?.map((e) => ProductImage.fromJson(e as Map<String, dynamic>))
           .toList(),
-      productColor: (json['productColor'] as List<dynamic>?)
+      productColors: (json['productColors'] as List<dynamic>?)
           ?.map((e) => ProductColor.fromJson(e as Map<String, dynamic>))
           .toList(),
-      productProductTag: (json['productProductTag'] as List<dynamic>?)
+      productProductTags: (json['productProductTags'] as List<dynamic>?)
           ?.map((e) => ProductProductTag.fromJson(e as Map<String, dynamic>))
           .toList(),
-      review: (json['review'] as List<dynamic>?)
+      reviews: (json['reviews'] as List<dynamic>?)
           ?.map((e) => Review.fromJson(e as Map<String, dynamic>))
           .toList(),
       warrantyId: (json['warrantyId'] as num?)?.toInt(),
@@ -60,6 +60,8 @@ Product _$ProductFromJson(Map<String, dynamic> json) => Product(
           ? null
           : Accessory.fromJson(json['accessory'] as Map<String, dynamic>),
       isDeleted: json['isDeleted'] as bool?,
+      reviewScoreAvg: (json['reviewScoreAvg'] as num?)?.toDouble(),
+      isFavourite: json['isFavourite'] as bool?,
     );
 
 Map<String, dynamic> _$ProductToJson(Product instance) => <String, dynamic>{
@@ -71,10 +73,10 @@ Map<String, dynamic> _$ProductToJson(Product instance) => <String, dynamic>{
       'finalPrice': instance.finalPrice,
       'productCategoryId': instance.productCategoryId,
       'productCategory': instance.productCategory,
-      'productImage': instance.productImage,
-      'productColor': instance.productColor,
-      'productProductTag': instance.productProductTag,
-      'review': instance.review,
+      'productImages': instance.productImages,
+      'productColors': instance.productColors,
+      'productProductTags': instance.productProductTags,
+      'reviews': instance.reviews,
       'warrantyId': instance.warrantyId,
       'warranty': instance.warranty,
       'camera': instance.camera,
@@ -86,4 +88,6 @@ Map<String, dynamic> _$ProductToJson(Product instance) => <String, dynamic>{
       'television': instance.television,
       'accessory': instance.accessory,
       'isDeleted': instance.isDeleted,
+      'reviewScoreAvg': instance.reviewScoreAvg,
+      'isFavourite': instance.isFavourite,
     };

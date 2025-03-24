@@ -8,7 +8,7 @@ part of 'wishlist.dart';
 
 Wishlist _$WishlistFromJson(Map<String, dynamic> json) => Wishlist(
       id: (json['id'] as num?)?.toInt(),
-      customerId: json['customerId'] as String?,
+      customerId: (json['customerId'] as num?)?.toInt(),
       dateCreated: json['dateCreated'] == null
           ? null
           : DateTime.parse(json['dateCreated'] as String),

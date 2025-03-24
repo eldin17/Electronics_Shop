@@ -10,6 +10,7 @@ using Electronics_Shop_17.Model.SearchObjects;
 namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IWishlistService : IBaseServiceCRUD<DtoWishlist,SearchWishlist,AddWishlist,UpdateWishlist>
-    {
+    {       
+
     }
 }

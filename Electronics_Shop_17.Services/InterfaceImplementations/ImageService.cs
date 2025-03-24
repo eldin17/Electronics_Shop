@@ -59,16 +59,30 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
-            {
-                var oldImages = await _context.ProductImages.Where(x => x.ProductId == id).ToListAsync();
-                if (oldImages.Any())
+            {                
+                var oldProductImages = await _context.ProductImages
+                    .Include(x => x.ProductColor)
+                    .Include(x=>x.Image)                     
+                    .Where(x => x.ProductId == id
+                        && x.ProductColor.Name == obj.ProductColor.Name
+                        && x.ProductColor.HexCode == obj.ProductColor.HexCode)
+                    .ToListAsync();
+
+                var existingColor = oldProductImages.FirstOrDefault()?.ProductColor;
+
+                var oldImages = oldProductImages.Select(x => x.Image);
+
+                if (oldProductImages.Any() && existingColor != null)
                 {
-                    _context.ProductImages.RemoveRange(oldImages);
+                    _context.ProductImages.RemoveRange(oldProductImages);
+                    _context.Images.RemoveRange(oldImages);
+                    _context.ProductColors.Remove(existingColor);
                     await _context.SaveChangesAsync();
                 }
 
-                var newProductColor = _mapper.Map<ProductColor>(obj.ProductColor);
+                var newProductColor = _mapper.Map<ProductColor>(obj.ProductColor);                
                 _context.ProductColors.Add(newProductColor);
+                product.ProductColors.Add(newProductColor);
                 await _context.SaveChangesAsync();
 
                 foreach (var item in obj.vmImages)

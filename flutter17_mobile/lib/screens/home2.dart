@@ -31,12 +31,13 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   await box.delete('userId');
                   await box.delete('roleName');
 
-                  Navigator.of(context).pushReplacement(
-                    PageRouteBuilder(
-                      transitionDuration: Duration.zero,
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          SplashScreen(),
+                  // Clear the navigation stack and push to SplashScreen
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => SplashScreen(),
                     ),
+                    (Route<dynamic> route) =>
+                        false, // Remove all previous routes
                   );
                 },
                 style: ElevatedButton.styleFrom(

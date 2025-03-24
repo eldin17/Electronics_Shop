@@ -7,6 +7,7 @@ import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/login_screen.dart';
+import 'package:flutter17_mobile/screens/master_screen.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -430,13 +431,15 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
               if (check == true) {
                 try {
                   await _customerProvider
-                      .registerCustomer(jsonEncode(requestData));
+                      .add(requestData);
 
                   Navigator.of(context).pushReplacement(
                     PageRouteBuilder(
                       transitionDuration: Duration.zero,
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          HomeScreen(),
+                          MasterScreen(
+                            index: 0,
+                          ),
                     ),
                   );
                 } on Exception catch (e) {

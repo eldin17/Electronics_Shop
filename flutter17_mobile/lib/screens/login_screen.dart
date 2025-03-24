@@ -276,7 +276,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
                                     MasterScreen(
-                              //child: HomeScreen(),
                               index: 0,
                             ),
                           ),

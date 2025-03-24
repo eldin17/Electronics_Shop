@@ -1,37 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
+import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/helpers/utils.dart';
+import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/providers/product_provider.dart';
+import 'package:flutter17_mobile/screens/product_details_screen.dart';
+import 'package:flutter17_mobile/screens/products_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Product> productsList = [];
+  List<Product> latestProductsList = [];
+  List<Product> discountProductsList = [];
+  late ProductProvider _productProvider;
+  bool isLoading = true;
+  TextEditingController searchController = new TextEditingController();
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _productProvider = context.read<ProductProvider>();
+    initForm();
+  }
+
+  Future initForm() async {
+    //var productsObj = await _productProvider.getAll();
+    var productsObj = await _productProvider
+        .getAllWithChecks(LoginResponse.currentCustomer!.id!);
+
+    setState(() {
+      productsList = List<Product>.from(productsObj.data);
+
+      latestProductsList = List<Product>.from(productsList);
+      discountProductsList = List<Product>.from(productsList);
+
+      latestProductsList.sort((a, b) => b.id!.compareTo(a.id!));
+      discountProductsList = List<Product>.from(discountProductsList
+          .where((element) => element.finalPrice != element.price));
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            children: [
-              HomeHeader(),
-              DiscountBanner(),
-              PopularProducts(),
-              Categories(),
-              News(),
-              SizedBox(height: 20),
-              LatestProducts(),
-              SizedBox(height: 20),
-              DiscountProducts(),
-              SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
+      body: isLoading
+          ? Container()
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  children: [
+                    HomeHeader(
+                      searchController: searchController,
+                    ),
+                    DiscountBanner(),
+                    LatestProducts(
+                      products: latestProductsList,
+                    ),
+                    Categories(),
+                    News(),
+                    SizedBox(height: 20),
+                    DiscountProducts(
+                      products: discountProductsList,
+                    ),
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  TextEditingController searchController;
+
+  HomeHeader({super.key, required this.searchController});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -46,7 +106,8 @@ class _HomeHeaderState extends State<HomeHeader> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Expanded(child: SearchField()),
+          Expanded(
+              child: SearchField(searchController: widget.searchController)),
           const SizedBox(width: 16),
           // IconBtnWithCounter(
           //   // numOfitem: 3,
@@ -70,13 +131,34 @@ class _HomeHeaderState extends State<HomeHeader> {
 }
 
 class SearchField extends StatelessWidget {
-  const SearchField({Key? key}) : super(key: key);
+  TextEditingController searchController;
+
+  SearchField({Key? key, required this.searchController}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Form(
       child: TextFormField(
         onChanged: (value) {},
+        onFieldSubmitted: (value) {
+          print(value);
+          Navigator.of(context).push(
+            PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 150),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ProductsScreen(
+                      searchBox: value,
+                    )),
+          );
+        },
+        controller: searchController,
         decoration: InputDecoration(
           filled: true,
           hintStyle: const TextStyle(color: Color(0xFF757575)),
@@ -206,20 +288,11 @@ class Categories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> categories = [
-      {"icon": cameraIcon, "text": "Camera"},
-      {"icon": pcIcon, "text": "PC"},
-      {"icon": consoleIcon, "text": "Console"},
-      {"icon": laptopIcon, "text": "Laptop"},
-      {"icon": phoneIcon, "text": "Phone"},
-      {"icon": tabletIcon, "text": "Tablet"},
-      {"icon": tvIcon, "text": "TV"},
-      {"icon": accessoryIcon, "text": "Accessory"},
-    ];
+    List<Map<String, dynamic>> categories = categoriesFromUtils;
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20,30,20,0),
+          padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
           child: SectionTitle(
             showSeeMore: false,
             title: "Browse Category",
@@ -227,7 +300,7 @@ class Categories extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(20,10,20,20),
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -235,11 +308,28 @@ class Categories extends StatelessWidget {
               children: List.generate(
                 categories.length,
                 (index) => Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                  padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                   child: CategoryCard(
                     icon: categories[index]["icon"],
                     text: categories[index]["text"],
-                    press: () {},
+                    press: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                            transitionDuration: Duration(milliseconds: 150),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ProductsScreen(
+                                      category: categories[index]["text"],
+                                    )),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -269,7 +359,7 @@ class CategoryCard extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(10),
             height: 56,
             width: 56,
             decoration: BoxDecoration(
@@ -279,7 +369,13 @@ class CategoryCard extends StatelessWidget {
             child: SvgPicture.string(icon),
           ),
           const SizedBox(height: 4),
-          Text(text, textAlign: TextAlign.center)
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          )
         ],
       ),
     );
@@ -299,9 +395,10 @@ class News extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SectionTitle(
             showSeeMore: true,
-
             title: "News",
-            press: () {},
+            press: () {
+              print("News See More");
+            },
           ),
         ),
         SingleChildScrollView(
@@ -428,19 +525,27 @@ class SectionTitle extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        showSeeMore? TextButton(
-          onPressed: press,
-          style: TextButton.styleFrom(foregroundColor: Colors.grey),
-          child: const Text("See more"),
-        ):Container(),
+        showSeeMore
+            ? TextButton(
+                onPressed: press,
+                style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                child: const Text("See more"),
+              )
+            : Container(),
       ],
     );
   }
 }
 
-class PopularProducts extends StatelessWidget {
-  const PopularProducts({super.key});
+class LatestProducts extends StatefulWidget {
+  List<Product> products;
+  LatestProducts({super.key, required this.products});
 
+  @override
+  State<LatestProducts> createState() => _LatestProductsState();
+}
+
+class _LatestProductsState extends State<LatestProducts> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -449,55 +554,25 @@ class PopularProducts extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SectionTitle(
             showSeeMore: true,
-
-            title: "Popular Products",
-            press: () {},
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...List.generate(
-                demoProducts.length,
-                (index) {
-                  if (demoProducts[index].isPopular) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: ProductCard(
-                        product: demoProducts[index],
-                        onPress: () {},
-                      ),
-                    );
-                  }
-
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
-                },
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class LatestProducts extends StatelessWidget {
-  const LatestProducts({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SectionTitle(
-            showSeeMore: true,
-
             title: "Latest Products",
-            press: () {},
+            press: () {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 150),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        ProductsScreen(
+                          fromLatest: true,
+                        )),
+              );
+              print("Latest See More");
+            },
           ),
         ),
         SingleChildScrollView(
@@ -505,20 +580,41 @@ class LatestProducts extends StatelessWidget {
           child: Row(
             children: [
               ...List.generate(
-                demoProducts.length,
+                widget.products.length < 4 ? widget.products.length : 4,
                 (index) {
-                  if (demoProducts[index].isPopular) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: ProductCard(
-                        product: demoProducts[index],
-                        onPress: () {},
-                      ),
-                    );
-                  }
-
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: ProductCard(
+                        product: widget.products[index],
+                        onPress: () {
+                          print(widget.products[index].brand);
+                          print(
+                              "favourite: ${widget.products[index].isFavourite}");
+                          print(
+                              "review: ${widget.products[index].reviewScoreAvg}");
+                          Navigator.of(context)
+                              .push(
+                            PageRouteBuilder(
+                              transitionDuration: Duration(milliseconds: 150),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      ProductDetailsScreen(
+                                selectedProduct: widget.products[index],
+                              ),
+                            ),
+                          )
+                              .then((_) {
+                            setState(() {});
+                          });
+                        }),
+                  );
                 },
               ),
               const SizedBox(width: 20),
@@ -531,7 +627,9 @@ class LatestProducts extends StatelessWidget {
 }
 
 class DiscountProducts extends StatelessWidget {
-  const DiscountProducts({super.key});
+  List<Product> products;
+
+  DiscountProducts({super.key, required this.products});
 
   @override
   Widget build(BuildContext context) {
@@ -541,9 +639,25 @@ class DiscountProducts extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SectionTitle(
             showSeeMore: true,
-
             title: "On Discount",
-            press: () {},
+            press: () {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 150),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        ProductsScreen(
+                          fromOnDiscount: true,
+                        )),
+              );
+              print("Discount See More");
+            },
           ),
         ),
         SingleChildScrollView(
@@ -551,20 +665,17 @@ class DiscountProducts extends StatelessWidget {
           child: Row(
             children: [
               ...List.generate(
-                demoProducts.length,
+                products.length < 4 ? products.length : 4,
                 (index) {
-                  if (demoProducts[index].isPopular) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: ProductCard(
-                        product: demoProducts[index],
-                        onPress: () {},
-                      ),
-                    );
-                  }
-
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: ProductCard(
+                      product: products[index],
+                      onPress: () {
+                        print(products[index].brand);
+                      },
+                    ),
+                  );
                 },
               ),
               const SizedBox(width: 20),
@@ -595,38 +706,93 @@ class ProductCard extends StatelessWidget {
       width: width,
       child: GestureDetector(
         onTap: onPress,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            AspectRatio(
-              aspectRatio: 1.02,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF979797).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Image.network(product.images[0]),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              product.title,
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: 2,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "\$${product.price}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color.fromARGB(255, 255, 118, 67),
+                AspectRatio(
+                  aspectRatio: aspectRetio,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white, // White background
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Color.fromARGB(255, 53, 53, 53).withOpacity(0.1),
+                          blurRadius: 15,
+                          offset: const Offset(0, 4), // Soft drop shadow
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        adjustImage(product.productImages![0].image!.path!),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
-                InkWell(
+                const SizedBox(height: 8),
+                Text(
+                  "${product.brand!} ${product.model!}",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    product.finalPrice == product.price
+                        ? Text(
+                            "${product.finalPrice}€",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color.fromARGB(255, 255, 118, 67),
+                            ),
+                          )
+                        : Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("${product.price}€",
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                          decorationColor: Color.fromARGB(
+                                              141, 158, 158, 158),
+                                          decorationThickness: 3)),
+                                  Text(
+                                    "${product.finalPrice}€",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color.fromARGB(255, 255, 118, 67),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
+                child: InkWell(
                   borderRadius: BorderRadius.circular(50),
                   onTap: () {},
                   child: Container(
@@ -634,103 +800,26 @@ class ProductCard extends StatelessWidget {
                     height: 24,
                     width: 24,
                     decoration: BoxDecoration(
-                      color: product.isFavourite
+                      color: product.isFavourite!
                           ? const Color(0xFFFF7643).withOpacity(0.15)
                           : const Color(0xFF979797).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: SvgPicture.string(
-                      heartIcon,
+                      heartIconFull,
                       colorFilter: ColorFilter.mode(
-                          product.isFavourite
+                          product.isFavourite!
                               ? const Color(0xFFFF4848)
                               : const Color(0xFFDBDEE4),
                           BlendMode.srcIn),
                     ),
                   ),
                 ),
-              ],
-            )
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-class Product {
-  final int id;
-  final String title, description;
-  final List<String> images;
-  final List<Color> colors;
-  final double rating, price;
-  final bool isFavourite, isPopular;
-
-  Product({
-    required this.id,
-    required this.images,
-    required this.colors,
-    this.rating = 0.0,
-    this.isFavourite = false,
-    this.isPopular = false,
-    required this.title,
-    required this.price,
-    required this.description,
-  });
-}
-
-// Our demo Products
-
-List<Product> demoProducts = [
-  Product(
-    id: 1,
-    images: ["https://i.postimg.cc/c19zpJ6f/Image-Popular-Product-1.png"],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Wireless Controller for PS4™",
-    price: 64.99,
-    description: description,
-    rating: 4.8,
-    isFavourite: true,
-    isPopular: true,
-  ),
-  Product(
-    id: 2,
-    images: [
-      "https://i.postimg.cc/CxD6nH74/Image-Popular-Product-2.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Nike Sport White - Man Pant",
-    price: 50.5,
-    description: description,
-    rating: 4.1,
-    isPopular: true,
-  ),
-  Product(
-    id: 3,
-    images: [
-      "https://i.postimg.cc/1XjYwvbv/glap.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Gloves XC Omega - Polygon",
-    price: 36.55,
-    description: description,
-    rating: 4.1,
-    isFavourite: true,
-    isPopular: true,
-  ),
-];

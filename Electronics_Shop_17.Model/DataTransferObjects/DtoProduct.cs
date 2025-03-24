@@ -21,9 +21,10 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public virtual List<DtoProductImage> ProductImages { get; set; }
         public virtual List<DtoProductColor> ProductColors { get; set; }
         public virtual List<DtoProductProductTag> ProductProductTags { get; set; }
-        public virtual List<DtoReview> Reviews { get; set; }
+        //public virtual List<DtoReview> Reviews { get; set; }
         public int? WarrantyId { get; set; }
         public virtual DtoWarranty? Warranty { get; set; }
+        public virtual List<DtoProductDiscount> ProductDiscounts { get; set; }
 
         public virtual DtoCamera? Camera { get; set; }
         public virtual DtoDesktopPC? DesktopPC { get; set; }
@@ -36,6 +37,8 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public virtual DtoAccessory? Accessory { get; set; }
 
         public bool isDeleted { get; set; }
+        public double reviewScoreAvg { get; set; } = 0;
+        public bool isFavourite { get; set; } = false;
 
     }
 }

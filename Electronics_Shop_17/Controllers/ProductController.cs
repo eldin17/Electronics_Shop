@@ -1,4 +1,5 @@
 ﻿using Electronics_Shop_17.Model.DataTransferObjects;
+using Electronics_Shop_17.Model.Helpers;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Interfaces;
@@ -35,6 +36,16 @@ namespace Electronics_Shop_17.Controllers
         public virtual async Task<DtoProduct> Restore(int id)
         {
             return await (_service as IProductService).Restore(id);
+        }
+        [HttpGet("AllowedActionsInState/{id}")]
+        public virtual async Task<List<string>> AllowedActionsInState(int id)
+        {
+            return await (_service as IProductService).AllowedActionsInState(id);
+        }
+        [HttpGet("GetAllWithChecks/{customerId}")]
+        public async Task<Pagination<DtoProduct>> GetAllWithChecks(int customerId,[FromQuery] SearchProduct? search = null)
+        {
+            return await (_service as IProductService).GetAllWithChecks(customerId, search);
         }
     }
 }

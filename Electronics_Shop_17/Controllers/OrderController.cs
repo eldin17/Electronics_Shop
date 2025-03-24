@@ -50,5 +50,10 @@ namespace Electronics_Shop_17.Controllers
         {
             return await (_service as IOrderService).ApplyCoupon(id, couponId);
         }
+        [HttpGet("AllowedActionsInState/{id}")]
+        public virtual async Task<List<string>> AllowedActionsInState(int id)
+        {
+            return await (_service as IOrderService).AllowedActionsInState(id);
+        }
     }
 }

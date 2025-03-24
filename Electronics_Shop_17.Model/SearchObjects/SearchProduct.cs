@@ -10,6 +10,8 @@ namespace Electronics_Shop_17.Model.SearchObjects
     public class SearchProduct : BaseSearch
     {
         public int? Id { get; set; }
+        public string? FullTextSearch { get; set; }
+        public string? FullTextCategorySearch { get; set; }
         public string? Brand { get; set; }
         public string? Model { get; set; }
         public string? Description { get; set; }
