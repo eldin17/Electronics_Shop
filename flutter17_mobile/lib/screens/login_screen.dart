@@ -286,6 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             pageBuilder: (context, animation,
                                     secondaryAnimation) =>
                                 RegisterCustomerScreen(
+                                  rememberMe: _rememberMe,
                                     UserAccountId: LoginResponse.userId!),
                           ),
                         );

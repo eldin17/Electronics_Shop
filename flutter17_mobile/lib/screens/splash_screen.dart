@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
+import 'package:flutter17_mobile/helpers/utils.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/providers/customer_provider.dart';
 
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
+  late CustomerProvider _customerProvider;
+
+  SplashScreen({super.key}) {
+    _customerProvider = new CustomerProvider();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +76,28 @@ class SplashScreen extends StatelessWidget {
 
   TextButton _button(BuildContext context) {
     return TextButton.icon(
-      onPressed: () {
+      onPressed: () async {
         var box = Hive.box('authBox');
         var token = box.get('token');
+        var isCustomer = box.get('isCustomer');
+        var userId = box.get('userId');
         print(token);
 
-        if (token != null) {
+        if (token != null && !isTokenExpired(token)) {
+          if (isCustomer) {
+            var customer = await _customerProvider
+                .getAll(filter: {'userAccountId': userId});
+            if (customer.data.isNotEmpty)
+              LoginResponse.currentCustomer = customer.data[0];
+            print("HepeK!! ${LoginResponse.currentCustomer!.id}");
+          } else {
+            await box.delete('token');
+            await box.delete('userId');
+            await box.delete('roleName');
+            await box.delete('isCustomer');
+            await box.delete('isSeller');
+          }
+
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
               transitionDuration: Duration.zero,

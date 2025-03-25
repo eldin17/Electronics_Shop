@@ -30,6 +30,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   await box.delete('token');
                   await box.delete('userId');
                   await box.delete('roleName');
+                  await box.delete('isCustomer');
+                  await box.delete('isSeller');
 
                   // Clear the navigation stack and push to SplashScreen
                   Navigator.of(context).pushAndRemoveUntil(

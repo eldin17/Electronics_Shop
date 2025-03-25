@@ -47,5 +47,10 @@ namespace Electronics_Shop_17.Controllers
         {
             return await (_service as IProductService).GetAllWithChecks(customerId, search);
         }
+        [HttpGet("GetByIdWithChecks/{customerId}/{id}")]
+        public async Task<DtoProduct> GetByIdWithChecks(int customerId, int id)
+        {
+            return await (_service as IProductService).GetByIdWithChecks(customerId, id);
+        }
     }
 }

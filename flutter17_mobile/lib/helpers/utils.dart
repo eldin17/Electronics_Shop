@@ -2,6 +2,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/models/image.dart' as Model;
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+
+bool isTokenExpired(String? token) {
+  if (token == null) return true; 
+  try {
+    final jwt = JWT.decode(token);
+    final exp = jwt.payload['exp']; 
+
+    if (exp == null) return true; 
+
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    return now >= exp; 
+  } catch (e) {
+    return true; 
+  }
+}
 
 String adjustImage(String image) {
   Uri uri = Uri.parse(image);

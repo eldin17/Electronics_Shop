@@ -585,6 +585,7 @@ class _LatestProductsState extends State<LatestProducts> {
                   return Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: ProductCard(
+                      align: Alignment.bottomRight,
                         product: widget.products[index],
                         onPress: () {
                           print(widget.products[index].brand);
@@ -670,6 +671,7 @@ class DiscountProducts extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: ProductCard(
+                      align: Alignment.bottomRight,
                       product: products[index],
                       onPress: () {
                         print(products[index].brand);
@@ -694,11 +696,13 @@ class ProductCard extends StatelessWidget {
     this.aspectRetio = 1.02,
     required this.product,
     required this.onPress,
+    required this.align,
   }) : super(key: key);
 
   final double width, aspectRetio;
   final Product product;
   final VoidCallback onPress;
+  final AlignmentGeometry align;
 
   @override
   Widget build(BuildContext context) {
@@ -789,7 +793,7 @@ class ProductCard extends StatelessWidget {
               ],
             ),
             Align(
-              alignment: Alignment.bottomRight,
+              alignment: align,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
                 child: InkWell(

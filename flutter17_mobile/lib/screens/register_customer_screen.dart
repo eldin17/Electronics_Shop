@@ -8,14 +8,18 @@ import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/login_screen.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
+import 'package:flutter17_mobile/screens/welcome.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class RegisterCustomerScreen extends StatefulWidget {
+  bool rememberMe;
   int UserAccountId;
-  RegisterCustomerScreen({super.key, required this.UserAccountId});
+  RegisterCustomerScreen(
+      {super.key, required this.UserAccountId, required this.rememberMe});
 
   @override
   State<RegisterCustomerScreen> createState() => _RegisterCustomerScreenState();
@@ -106,8 +110,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
         _SignInForm(),
         SizedBox(height: MediaQuery.of(context).size.height * 0.025),
         const HasAccountText(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-
+        SizedBox(height: MediaQuery.of(context).size.height * 0.05),
       ],
     );
   }
@@ -143,7 +146,6 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                   const NoAccountText(),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-
                 ],
               ),
             ),
@@ -410,7 +412,6 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                       borderSide: const BorderSide(color: Color(0xFFFF7643)))),
             ),
           ),
-          
           const SizedBox(height: 18),
           ElevatedButton(
             onPressed: () async {
@@ -430,16 +431,33 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
               print("${jsonEncode(requestData)}");
               if (check == true) {
                 try {
-                  await _customerProvider
-                      .add(requestData);
+                  var obj = await _customerProvider.add(requestData);
+
+                  if (obj != null && widget.rememberMe) {
+                    var box = Hive.box('authBox');
+                    // await box.put('token', LoginResponse.token);
+                    // await box.put('userId', LoginResponse.userId);
+                    LoginResponse.currentCustomer = obj;
+                    LoginResponse.roleName = 'Customer';
+                    LoginResponse.isCustomer = true;
+                    LoginResponse.isSeller = false;
+                    await box.put('roleName', 'Customer');
+                    await box.put('isCustomer', true);
+                    await box.put('isSeller', false);
+                  }
+print("------------------------??????????????????????-----------------------------");
+                  print(LoginResponse.currentCustomer?.id);
+                  print(LoginResponse.roleName);
+                  print(LoginResponse.isCustomer);
+                  print(LoginResponse.isSeller);
+                  print(LoginResponse.token);
+                  print(LoginResponse.userId);
 
                   Navigator.of(context).pushReplacement(
                     PageRouteBuilder(
                       transitionDuration: Duration.zero,
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          MasterScreen(
-                            index: 0,
-                          ),
+                          WelcomeScreen(),
                     ),
                   );
                 } on Exception catch (e) {

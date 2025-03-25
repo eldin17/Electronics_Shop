@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
+import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
@@ -60,7 +61,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future initForm() async {
     //filter za searchBox sa homeScreen
-    var productsObj = await _productProvider.getAll(filter: {
+    var productsObj = await _productProvider.getAllWithChecks(LoginResponse.currentCustomer!.id!,filter: {
       'fullTextSearch': widget.searchBox,
     });
     print("hepekekekekeek ${widget.searchBox}");
@@ -127,9 +128,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             shape: const CircleBorder(),
                             padding: EdgeInsets.zero,
@@ -316,6 +315,26 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         child: const Text("Apply filters"),
                                       ),
                                     ),
+                                    Center(
+                                      child: ElevatedButton(
+                                          onPressed: () {},
+                                          style: ElevatedButton.styleFrom(
+                                            shape: const CircleBorder(),
+                                            padding: EdgeInsets.zero,
+                                            elevation: 0,
+                                            backgroundColor: Color.fromARGB(
+                                                0, 255, 255, 255),
+                                          ),
+                                          child: IconBtn(
+                                            svgSrc: upToClose,
+                                            press: () {
+                                              setState(() {
+                                                filterSectionVisibility =
+                                                    !filterSectionVisibility;
+                                              });
+                                            },
+                                          )),
+                                    ),
                                   ],
                                 ),
                               )
@@ -334,6 +353,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               crossAxisSpacing: 16,
                             ),
                             itemBuilder: (context, index) => ProductCard(
+                              align: Alignment.topRight,
                               product: listProducts[index],
                               onPress: () {
                                 Navigator.of(context).push(
@@ -582,107 +602,6 @@ class IconBtn extends StatelessWidget {
             child: SvgPicture.string(svgSrc),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  const ProductCard({
-    Key? key,
-    this.width = 140,
-    this.aspectRetio = 1.02,
-    required this.product,
-    required this.onPress,
-  }) : super(key: key);
-
-  final double width, aspectRetio;
-  final Product product;
-  final VoidCallback onPress;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: GestureDetector(
-        onTap: onPress,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: aspectRetio,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white, // White background
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromARGB(255, 53, 53, 53).withOpacity(0.1),
-                      blurRadius: 15,
-                      offset: const Offset(0, 4), // Soft drop shadow
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    adjustImage(product.productImages![0].image!.path!),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "${product.brand!} ${product.model!}",
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                product.finalPrice == product.price
-                    ? Text(
-                        "${product.finalPrice}€",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color.fromARGB(255, 255, 118, 67),
-                        ),
-                      )
-                    : Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("${product.price}€",
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.grey,
-                                      decoration: TextDecoration.lineThrough,
-                                      decorationColor:
-                                          Color.fromARGB(141, 158, 158, 158),
-                                      decorationThickness: 3)),
-                              Text(
-                                "${product.finalPrice}€",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color.fromARGB(255, 255, 118, 67),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-              ],
-            )
-          ],
-        ),
       ),
     );
   }

@@ -73,6 +73,22 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return product;
         }
 
+        public async Task<DtoProduct> GetByIdWithChecks(int customerId, int id)
+        {
+            var customer = await _context.Customers.Include(x => x.Wishlist).FirstOrDefaultAsync(x => x.Id == customerId);
+            if (customer != null && customer.Wishlist != null && customer.Wishlist.WishlistItems.Any())
+            {
+                var wishlist = customer.Wishlist.WishlistItems.Select(x => x.ProductId).ToList();
+                var product = await GetById(id);
+                if (wishlist.Contains(product.Id))
+                    product.isFavourite = true;
+                else
+                    product.isFavourite = false;
+                return product;
+            }
+            return await GetById(id); 
+        }
+
         public override IQueryable<Product> AddInclude(IQueryable<Product> data)
         {
             data = data.Include(x => x.ProductCategory)

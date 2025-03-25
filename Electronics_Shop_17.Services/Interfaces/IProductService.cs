@@ -18,6 +18,7 @@ namespace Electronics_Shop_17.Services.Interfaces
         Task<DtoProduct> Restore(int id);
         Task<List<string>> AllowedActionsInState(int id);
         Task<Pagination<DtoProduct>> GetAllWithChecks(int customerId, SearchProduct search = null);
+        Task<DtoProduct> GetByIdWithChecks(int customerId, int id);
 
     }
 }
