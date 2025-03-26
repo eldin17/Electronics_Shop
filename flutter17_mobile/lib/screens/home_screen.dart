@@ -54,6 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
           .where((element) => element.finalPrice != element.price));
       isLoading = false;
     });
+    print("******FROM HOME SCREEN******");
+                  print(LoginResponse.token);
+                  print(LoginResponse.userId);
+                  print(LoginResponse.roleName);
+                  print("customer - ${LoginResponse.isCustomer}");
+                  print("seller - ${LoginResponse.isSeller}");
+                  print("current - ${LoginResponse.currentCustomer?.id}");
+
   }
 
   @override

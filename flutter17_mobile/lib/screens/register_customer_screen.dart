@@ -432,27 +432,36 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
               if (check == true) {
                 try {
                   var obj = await _customerProvider.add(requestData);
+                  if (obj != null) 
+                    LoginResponse.currentCustomer = obj;
+                  LoginResponse.roleName = 'Customer';
+                  LoginResponse.isCustomer = true;
+                  LoginResponse.isSeller = false;
+
+                    var box = Hive.box('authBox');
 
                   if (obj != null && widget.rememberMe) {
-                    var box = Hive.box('authBox');
                     // await box.put('token', LoginResponse.token);
                     // await box.put('userId', LoginResponse.userId);
-                    LoginResponse.currentCustomer = obj;
-                    LoginResponse.roleName = 'Customer';
-                    LoginResponse.isCustomer = true;
-                    LoginResponse.isSeller = false;
+
                     await box.put('roleName', 'Customer');
                     await box.put('isCustomer', true);
                     await box.put('isSeller', false);
                   }
-                  print(
-                      "------------------------??????????????????????-----------------------------");
-                  print(LoginResponse.currentCustomer?.id);
-                  print(LoginResponse.roleName);
-                  print(LoginResponse.isCustomer);
-                  print(LoginResponse.isSeller);
+                  print("******FROM REGISTER CUSTOMER******");
                   print(LoginResponse.token);
                   print(LoginResponse.userId);
+                  print(LoginResponse.roleName);
+                  print("customer - ${LoginResponse.isCustomer}");
+                  print("seller - ${LoginResponse.isSeller}");
+                  print("current - ${LoginResponse.currentCustomer?.id}");
+
+                  print("******FROM AUTH_BOX******");
+                  print(box.get('token'));
+                  print(box.get('userId'));
+                  print(box.get('roleId'));
+                  print("customer - ${box.get('isCustomer')}");
+                  print("seller - ${box.get('isSeller')}");
 
                   Navigator.of(context).pushReplacement(
                     PageRouteBuilder(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/models/customer.dart';
 import 'package:flutter17_mobile/screens/splash_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -32,6 +34,13 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   await box.delete('roleName');
                   await box.delete('isCustomer');
                   await box.delete('isSeller');
+
+                  LoginResponse.token = null;
+                  LoginResponse.userId = null;
+                  LoginResponse.roleName = null;
+                  LoginResponse.isCustomer = null;
+                  LoginResponse.isSeller = null;
+                  LoginResponse.currentCustomer = null;
 
                   // Clear the navigation stack and push to SplashScreen
                   Navigator.of(context).pushAndRemoveUntil(

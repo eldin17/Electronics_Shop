@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
+import 'package:flutter17_mobile/models/customer.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
 import 'package:flutter17_mobile/screens/register_customer_screen.dart';
@@ -44,6 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
       'username': "",
       'password': "",
     };
+    LoginResponse.token = null;
+    LoginResponse.userId = null;
+    LoginResponse.roleName = null;
+    LoginResponse.isCustomer = null;
+    LoginResponse.isSeller = null;
+    LoginResponse.currentCustomer = null;
   }
 
   @override
@@ -263,11 +270,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     await box.put('isSeller', LoginResponse.isSeller);
                   }
 
+                  print("******FROM LOGIN******");
                   print(LoginResponse.token);
                   print(LoginResponse.userId);
                   print(LoginResponse.roleName);
                   print("customer - ${LoginResponse.isCustomer}");
                   print("seller - ${LoginResponse.isSeller}");
+                  print("current - ${LoginResponse.currentCustomer?.id}");
 
                   LoginResponse.isCustomer!
                       ? Navigator.of(context).pushReplacement(
@@ -286,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             pageBuilder: (context, animation,
                                     secondaryAnimation) =>
                                 RegisterCustomerScreen(
-                                  rememberMe: _rememberMe,
+                                    rememberMe: _rememberMe,
                                     UserAccountId: LoginResponse.userId!),
                           ),
                         );
