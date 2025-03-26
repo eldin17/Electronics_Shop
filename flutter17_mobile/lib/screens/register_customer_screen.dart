@@ -445,7 +445,8 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                     await box.put('isCustomer', true);
                     await box.put('isSeller', false);
                   }
-print("------------------------??????????????????????-----------------------------");
+                  print(
+                      "------------------------??????????????????????-----------------------------");
                   print(LoginResponse.currentCustomer?.id);
                   print(LoginResponse.roleName);
                   print(LoginResponse.isCustomer);

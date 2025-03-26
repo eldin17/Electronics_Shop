@@ -61,10 +61,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future initForm() async {
     //filter za searchBox sa homeScreen
-    var productsObj = await _productProvider.getAllWithChecks(LoginResponse.currentCustomer!.id!,filter: {
+    var productsObj = await _productProvider
+        .getAllWithChecks(LoginResponse.currentCustomer!.id!, filter: {
       'fullTextSearch': widget.searchBox,
     });
-    print("hepekekekekeek ${widget.searchBox}");
+    if (widget.category != "") {
+      _selectedCategories.add(widget.category);
+    }
 
     setState(() {
       if (widget.searchBox != "") _searchController.text = widget.searchBox;
@@ -193,7 +196,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                 "" ||
                                             _priceLowController.value.text !=
                                                 "" ||
-                                            _selectedCategories.isNotEmpty
+                                            _selectedCategories.isNotEmpty ||
+                                            (discountProductsList.isNotEmpty &&
+                                                widget.fromOnDiscount)
                                         ? Padding(
                                             padding: const EdgeInsets.all(4),
                                             child: ElevatedButton(
