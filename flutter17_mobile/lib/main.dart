@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/providers/image_upload_provider.dart';
 import 'package:flutter17_mobile/providers/login_provider.dart';
+import 'package:flutter17_mobile/providers/news_provider.dart';
+import 'package:flutter17_mobile/providers/notification_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_provider.dart';
@@ -21,6 +23,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => WishlistItemProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => NewsProvider()),
 
       ],
       child: const MyApp(),

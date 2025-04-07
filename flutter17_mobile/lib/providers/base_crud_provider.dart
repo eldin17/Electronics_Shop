@@ -23,15 +23,11 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
 
     var headers = getHeaders(withAuth: true);
 
-    var send = jsonEncode(obj);    
+    var send = jsonEncode(obj);
 
-print("ADD ADD ADD $uri $send");
+    print("ADD ADD ADD $uri $send");
     try {
-      var response = await http.post(
-        uri,
-        headers: headers,
-        body: send
-      );
+      var response = await http.post(uri, headers: headers, body: send);
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -76,7 +72,7 @@ print("ADD ADD ADD $uri $send");
     var headers = getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
-print("DEL DEL DEL");
+    print("DEL DEL DEL");
 
     try {
       var response = await http.delete(

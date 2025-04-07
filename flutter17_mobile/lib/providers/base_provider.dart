@@ -69,6 +69,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
         var result = fromJson(data);
         print(result.toString());
+
+        return result;
       }
     } catch (e) {
       throw Exception("Action failed: ${e.toString()}");

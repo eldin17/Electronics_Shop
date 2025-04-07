@@ -345,11 +345,58 @@ class _ProductDescriptionState extends State<ProductDescription> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            widget.product.brand != null && widget.product.model != null
-                ? "${widget.product.brand!} ${widget.product.model!}"
-                : "No data",
-            style: Theme.of(context).textTheme.titleLarge,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.product.brand != null && widget.product.model != null
+                    ? "${widget.product.brand!}\n${widget.product.model!}"
+                    : "No data",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+                child: widget.product.finalPrice == widget.product.price
+                    ? Text(
+                        "${widget.product.finalPrice}€",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color.fromARGB(255, 255, 118, 67),
+                        ),
+                      )
+                    : Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "${widget.product.price}€",
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey,
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor:
+                                        Color.fromARGB(141, 158, 158, 158),
+                                    decorationThickness: 3),
+                              ),
+                              SizedBox(width: 15,),
+                              Text(
+                                "${widget.product.finalPrice}€",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color.fromARGB(255, 255, 118, 67),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
+            ],
           ),
         ),
         Align(

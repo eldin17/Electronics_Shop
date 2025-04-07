@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/models/image.dart' as Model;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 bool isTokenExpired(String? token) {
   if (token == null) return true; 
@@ -17,6 +18,10 @@ bool isTokenExpired(String? token) {
   } catch (e) {
     return true; 
   }
+}
+
+String getTimeAgo(DateTime createdAt) {
+  return timeago.format(createdAt, locale: 'en'); // Change locale if needed
 }
 
 String adjustImage(String image) {

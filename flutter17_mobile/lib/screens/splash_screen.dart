@@ -80,17 +80,25 @@ class SplashScreen extends StatelessWidget {
         var box = Hive.box('authBox');
         var token = box.get('token');
         var isCustomer = box.get('isCustomer');
+        var isSeller = box.get('isSeller');
         var userId = box.get('userId');
+        var roleName = box.get('roleName');
         print(token);
 
         if (token != null && !isTokenExpired(token)) {
           if (isCustomer) {
             var customer = await _customerProvider
                 .getAll(filter: {'userAccountId': userId});
-            if (customer.data.isNotEmpty)
+            if (customer.data.isNotEmpty){
               LoginResponse.currentCustomer = customer.data[0];
+              LoginResponse.token = token;
+              LoginResponse.roleName = roleName;
+              LoginResponse.isCustomer = isCustomer;
+              LoginResponse.isSeller = isSeller;
+              LoginResponse.userId = userId;
+            }
             print("HepeK!! ${LoginResponse.currentCustomer!.id}");
-          } else {
+          } else {print('splash');
             await box.delete('token');
             await box.delete('userId');
             await box.delete('roleName');

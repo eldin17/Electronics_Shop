@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/models/customer.dart';
+import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/screens/splash_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen2 extends StatefulWidget {
   const HomeScreen2({super.key});
@@ -12,6 +14,16 @@ class HomeScreen2 extends StatefulWidget {
 }
 
 class _HomeScreen2State extends State<HomeScreen2> {
+  late ProductProvider _prov;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _prov = context.read<ProductProvider>();
+
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
@@ -42,13 +54,12 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   LoginResponse.isSeller = null;
                   LoginResponse.currentCustomer = null;
 
-                  // Clear the navigation stack and push to SplashScreen
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => SplashScreen(),
                     ),
                     (Route<dynamic> route) =>
-                        false, // Remove all previous routes
+                        false, 
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -61,7 +72,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   ),
                 ),
                 child: const Text("Log Out"),
-              )
+              )             
             ],
           ),
         ),

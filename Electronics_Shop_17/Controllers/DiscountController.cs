@@ -14,5 +14,11 @@ namespace Electronics_Shop_17.Controllers
         public DiscountController(IDiscountService service) : base(service)
         {
         }
+
+        [HttpGet("GetOneRandom")]
+        public async Task<ActionResult<DtoDiscount>> GetOneRandom()
+        {
+            return await (_service as IDiscountService).GetOneRandom();
+        }
     }
 }

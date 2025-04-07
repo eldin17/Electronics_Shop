@@ -11,5 +11,7 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IDiscountService : IBaseServiceCRUD<DtoDiscount,SearchDiscount,AddDiscount,UpdateDiscount>
     {
+        Task<DtoDiscount> GetOneRandom();
+
     }
 }

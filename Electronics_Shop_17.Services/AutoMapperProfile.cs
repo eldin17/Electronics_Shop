@@ -304,6 +304,7 @@ namespace Electronics_Shop_17.Services
 
             CreateMap<Notification, DtoNotification>().ReverseMap();
             CreateMap<Notification, AddNotification>().ReverseMap();
+            CreateMap<AddNotificationForUser, AddNotification>().ReverseMap();
             CreateMap<Notification, UpdateNotification>().ReverseMap()
             .ForMember(dest => dest.Title, opt => opt.Condition(src => src.Title != null))
             .ForMember(dest => dest.Message, opt => opt.Condition(src => src.Message != null));

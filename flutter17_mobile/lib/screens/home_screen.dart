@@ -3,11 +3,24 @@ import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/models/news.dart' as Model;
+import 'package:flutter17_mobile/providers/news_provider.dart';
+import 'package:flutter17_mobile/providers/notification_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
+import 'package:flutter17_mobile/screens/news_details_screen.dart';
 import 'package:flutter17_mobile/screens/product_details_screen.dart';
 import 'package:flutter17_mobile/screens/products_screen.dart';
+import 'package:flutter17_mobile/screens/test.dart';
+import 'package:flutter17_mobile/widgets/btn_counter.dart';
+import 'package:flutter17_mobile/widgets/categories.dart';
+import 'package:flutter17_mobile/widgets/discount.dart';
+import 'package:flutter17_mobile/widgets/discount_products.dart';
+import 'package:flutter17_mobile/widgets/latest_products.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter17_mobile/models/notification.dart' as Model_n;
+
+import '../widgets/news_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,9 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> productsList = [];
   List<Product> latestProductsList = [];
   List<Product> discountProductsList = [];
+
+  List<Model.News> newsList = [];
   late ProductProvider _productProvider;
+  late NewsProvider _newsProvider;
+
   bool isLoading = true;
   TextEditingController searchController = new TextEditingController();
+  bool isNotificationVisible = false;
+  bool isNewsDetailsVisible = false;
 
   @override
   void didChangeDependencies() {
@@ -35,6 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     _productProvider = context.read<ProductProvider>();
+    _newsProvider = context.read<NewsProvider>();
+
     initForm();
   }
 
@@ -43,8 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
     var productsObj = await _productProvider
         .getAllWithChecks(LoginResponse.currentCustomer!.id!);
 
+    var newsObj = await _newsProvider.getAll();
+
     setState(() {
       productsList = List<Product>.from(productsObj.data);
+      newsList = List<Model.News>.from(newsObj.data);
 
       latestProductsList = List<Product>.from(productsList);
       discountProductsList = List<Product>.from(productsList);
@@ -55,13 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
       isLoading = false;
     });
     print("******FROM HOME SCREEN******");
-                  print(LoginResponse.token);
-                  print(LoginResponse.userId);
-                  print(LoginResponse.roleName);
-                  print("customer - ${LoginResponse.isCustomer}");
-                  print("seller - ${LoginResponse.isSeller}");
-                  print("current - ${LoginResponse.currentCustomer?.id}");
-
+    print(LoginResponse.token);
+    print(LoginResponse.userId);
+    print(LoginResponse.roleName);
+    print("customer - ${LoginResponse.isCustomer}");
+    print("seller - ${LoginResponse.isSeller}");
+    print("current - ${LoginResponse.currentCustomer?.id}");
   }
 
   @override
@@ -72,22 +95,41 @@ class _HomeScreenState extends State<HomeScreen> {
           : SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(vertical: 16),
-                child: Column(
+                child: Stack(
                   children: [
-                    HomeHeader(
-                      searchController: searchController,
+                    Column(
+                      children: [
+                        HomeHeader(
+                          isClicked: isNotificationVisible,
+                          showInfo: () {
+                            setState(() {
+                              isNotificationVisible = !isNotificationVisible;
+                            });
+                            print(isNotificationVisible);
+                          },
+                          searchController: searchController,
+                        ),
+                        DiscountBanner(),
+                        LatestProducts(
+                          products: latestProductsList,
+                        ),
+                        Categories(),
+                        News(list: newsList),
+                        SizedBox(height: 20),
+                        DiscountProducts(
+                          products: discountProductsList,
+                        ),
+                        SizedBox(height: 20),
+                      ],
                     ),
-                    DiscountBanner(),
-                    LatestProducts(
-                      products: latestProductsList,
-                    ),
-                    Categories(),
-                    News(),
-                    SizedBox(height: 20),
-                    DiscountProducts(
-                      products: discountProductsList,
-                    ),
-                    SizedBox(height: 20),
+                    isNotificationVisible
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 65, 0, 0),
+                              child: NotificationDropdown(),
+                            ),
+                          )
+                        : Container(),
                   ],
                 ),
               ),
@@ -96,17 +138,92 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class NotificationDropdown extends StatefulWidget {
+  NotificationDropdown({super.key});
+
+  @override
+  _NotificationDropdownState createState() => _NotificationDropdownState();
+}
+
+class _NotificationDropdownState extends State<NotificationDropdown> {
+  bool isVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted) {
+        setState(() {
+          isVisible = true;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 50),
+      opacity: isVisible ? 1.0 : 0.0,
+      child: Container(
+        width: 380,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: const Color.fromARGB(255, 53, 53, 53).withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 4), // Soft drop shadow
+            ),
+          ],
+        ),
+        child: const NotificationList(),
+      ),
+    );
+  }
+}
+
 class HomeHeader extends StatefulWidget {
   TextEditingController searchController;
+  Function showInfo;
+  bool isClicked;
 
-  HomeHeader({super.key, required this.searchController});
+  HomeHeader(
+      {super.key,
+      required this.searchController,
+      required this.showInfo,
+      required this.isClicked});
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
 }
 
 class _HomeHeaderState extends State<HomeHeader> {
-  int num = 13;
+  late NotificationProvider _notificationProvider;
+  List<Model_n.Notification> notificationsList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _notificationProvider = context.read<NotificationProvider>();
+
+    initForm();
+  }
+
+  Future initForm() async {
+    var notification =
+        await _notificationProvider.getAllForUser(LoginResponse.userId ?? 0);
+
+    setState(() {
+      notificationsList = List<Model_n.Notification>.from(notification.data);
+
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -116,19 +233,16 @@ class _HomeHeaderState extends State<HomeHeader> {
         children: [
           Expanded(
               child: SearchField(searchController: widget.searchController)),
-          const SizedBox(width: 16),
-          // IconBtnWithCounter(
-          //   // numOfitem: 3,
-          //   svgSrc: cartIcon,
-          //   press: () {},
-          // ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 24),          
           IconBtnWithCounter(
+            onClickColor: true,
+            isClicked: widget.isClicked,
             svgSrc: bellIcon,
-            numOfitem: num,
+            numOfitem: notificationsList.length,
             press: () {
               setState(() {
-                num = 0;
+                notificationsList.length = 0;
+                widget.showInfo();
               });
             },
           ),
@@ -152,18 +266,19 @@ class SearchField extends StatelessWidget {
           print(value);
           Navigator.of(context).push(
             PageRouteBuilder(
-                transitionDuration: Duration(milliseconds: 150),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    ProductsScreen(
-                      searchBox: value,
-                    )),
+              transitionDuration: Duration(milliseconds: 150),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ProductsScreen(
+                searchBox: value,
+              ),
+            ),
           );
         },
         controller: searchController,
@@ -193,645 +308,16 @@ class SearchField extends StatelessWidget {
   }
 }
 
-class IconBtnWithCounter extends StatelessWidget {
-  IconBtnWithCounter({
-    Key? key,
-    required this.svgSrc,
-    this.numOfitem = 0,
-    required this.press,
-  }) : super(key: key);
 
-  final String svgSrc;
-  int numOfitem;
-  final GestureTapCallback press;
 
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(100),
-      onTap: press,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            height: 46,
-            width: 46,
-            decoration: BoxDecoration(
-              color: const Color(0xFF979797).withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: SvgPicture.string(svgSrc),
-          ),
-          if (numOfitem != 0)
-            Positioned(
-              top: -3,
-              right: 0,
-              child: Container(
-                height: 20,
-                width: 20,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF4848),
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 1.5, color: Colors.white),
-                ),
-                child: Center(
-                  child: Text(
-                    "$numOfitem",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      height: 1,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            )
-        ],
-      ),
-    );
-  }
-}
 
-class DiscountBanner extends StatelessWidget {
-  const DiscountBanner({
-    Key? key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 16,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4A3298),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Text.rich(
-        TextSpan(
-          style: TextStyle(color: Colors.white),
-          children: [
-            TextSpan(text: "A Summer Surpise\n"),
-            TextSpan(
-              text: "Cashback 20%",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
-class Categories extends StatelessWidget {
-  const Categories({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    List<Map<String, dynamic>> categories = categoriesFromUtils;
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
-          child: SectionTitle(
-            showSeeMore: false,
-            title: "Browse Category",
-            press: () {},
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                categories.length,
-                (index) => Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                  child: CategoryCard(
-                    icon: categories[index]["icon"],
-                    text: categories[index]["text"],
-                    press: () {
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                            transitionDuration: Duration(milliseconds: 150),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    ProductsScreen(
-                                      category: categories[index]["text"],
-                                    )),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
-class CategoryCard extends StatelessWidget {
-  const CategoryCard({
-    Key? key,
-    required this.icon,
-    required this.text,
-    required this.press,
-  }) : super(key: key);
 
-  final String icon, text;
-  final GestureTapCallback press;
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: press,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            height: 56,
-            width: 56,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFECDF),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: SvgPicture.string(icon),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
 
-class News extends StatelessWidget {
-  const News({
-    Key? key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SectionTitle(
-            showSeeMore: true,
-            title: "News",
-            press: () {
-              print("News See More");
-            },
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              SpecialOfferCard(
-                image: "https://i.postimg.cc/yY2bNrmd/Image-Banner-2.png",
-                category: "Phones",
-                numOfBrands: 18,
-                press: () {},
-              ),
-              SpecialOfferCard(
-                image: "https://i.postimg.cc/BQjz4G1k/Image-Banner-3.png",
-                category: "Laptops",
-                numOfBrands: 24,
-                press: () {},
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
 
-class SpecialOfferCard extends StatelessWidget {
-  const SpecialOfferCard({
-    Key? key,
-    required this.category,
-    required this.image,
-    required this.numOfBrands,
-    required this.press,
-  }) : super(key: key);
 
-  final String category, image;
-  final int numOfBrands;
-  final GestureTapCallback press;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20),
-      child: GestureDetector(
-        onTap: press,
-        child: SizedBox(
-          width: 242,
-          height: 100,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              children: [
-                Image.network(
-                  image,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black54,
-                        Colors.black38,
-                        Colors.black26,
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 10,
-                  ),
-                  child: Text.rich(
-                    TextSpan(
-                      style: const TextStyle(color: Colors.white),
-                      children: [
-                        TextSpan(
-                          text: "$category\n",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(text: "$numOfBrands Brands")
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class SectionTitle extends StatelessWidget {
-  SectionTitle({
-    Key? key,
-    required this.title,
-    required this.press,
-    required this.showSeeMore,
-  }) : super(key: key);
-
-  final String title;
-  final GestureTapCallback press;
-  bool showSeeMore;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        showSeeMore
-            ? TextButton(
-                onPressed: press,
-                style: TextButton.styleFrom(foregroundColor: Colors.grey),
-                child: const Text("See more"),
-              )
-            : Container(),
-      ],
-    );
-  }
-}
-
-class LatestProducts extends StatefulWidget {
-  List<Product> products;
-  LatestProducts({super.key, required this.products});
-
-  @override
-  State<LatestProducts> createState() => _LatestProductsState();
-}
-
-class _LatestProductsState extends State<LatestProducts> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SectionTitle(
-            showSeeMore: true,
-            title: "Latest Products",
-            press: () {
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                    transitionDuration: Duration(milliseconds: 150),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        ProductsScreen(
-                          fromLatest: true,
-                        )),
-              );
-              print("Latest See More");
-            },
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...List.generate(
-                widget.products.length < 4 ? widget.products.length : 4,
-                (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: ProductCard(
-                      align: Alignment.bottomRight,
-                        product: widget.products[index],
-                        onPress: () {
-                          print(widget.products[index].brand);
-                          print(
-                              "favourite: ${widget.products[index].isFavourite}");
-                          print(
-                              "review: ${widget.products[index].reviewScoreAvg}");
-                          Navigator.of(context)
-                              .push(
-                            PageRouteBuilder(
-                              transitionDuration: Duration(milliseconds: 150),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      ProductDetailsScreen(
-                                selectedProduct: widget.products[index],
-                              ),
-                            ),
-                          )
-                              .then((_) {
-                            setState(() {});
-                          });
-                        }),
-                  );
-                },
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class DiscountProducts extends StatelessWidget {
-  List<Product> products;
-
-  DiscountProducts({super.key, required this.products});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SectionTitle(
-            showSeeMore: true,
-            title: "On Discount",
-            press: () {
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                    transitionDuration: Duration(milliseconds: 150),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        ProductsScreen(
-                          fromOnDiscount: true,
-                        )),
-              );
-              print("Discount See More");
-            },
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...List.generate(
-                products.length < 4 ? products.length : 4,
-                (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: ProductCard(
-                      align: Alignment.bottomRight,
-                      product: products[index],
-                      onPress: () {
-                        print(products[index].brand);
-                      },
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  const ProductCard({
-    Key? key,
-    this.width = 140,
-    this.aspectRetio = 1.02,
-    required this.product,
-    required this.onPress,
-    required this.align,
-  }) : super(key: key);
-
-  final double width, aspectRetio;
-  final Product product;
-  final VoidCallback onPress;
-  final AlignmentGeometry align;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: GestureDetector(
-        onTap: onPress,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AspectRatio(
-                  aspectRatio: aspectRetio,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white, // White background
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              Color.fromARGB(255, 53, 53, 53).withOpacity(0.1),
-                          blurRadius: 15,
-                          offset: const Offset(0, 4), // Soft drop shadow
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        adjustImage(product.productImages![0].image!.path!),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "${product.brand!} ${product.model!}",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    product.finalPrice == product.price
-                        ? Text(
-                            "${product.finalPrice}€",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color.fromARGB(255, 255, 118, 67),
-                            ),
-                          )
-                        : Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${product.price}€",
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                          decorationColor: Color.fromARGB(
-                                              141, 158, 158, 158),
-                                          decorationThickness: 3)),
-                                  Text(
-                                    "${product.finalPrice}€",
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color.fromARGB(255, 255, 118, 67),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                  ],
-                ),
-              ],
-            ),
-            Align(
-              alignment: align,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 5, 5, 0),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(50),
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    height: 24,
-                    width: 24,
-                    decoration: BoxDecoration(
-                      color: product.isFavourite!
-                          ? const Color(0xFFFF7643).withOpacity(0.15)
-                          : const Color(0xFF979797).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: SvgPicture.string(
-                      heartIconFull,
-                      colorFilter: ColorFilter.mode(
-                          product.isFavourite!
-                              ? const Color(0xFFFF4848)
-                              : const Color(0xFFDBDEE4),
-                          BlendMode.srcIn),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

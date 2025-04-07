@@ -107,6 +107,24 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return returnDtoObj;
         }
 
+        public async Task<DtoDiscount> GetOneRandom()
+        {
+            var temp = await _context.Discounts
+                .Where(d => d.IsActive &&
+                    DateTime.UtcNow >= d.StartDate &&
+                    DateTime.UtcNow <= d.EndDate)
+                .ToListAsync();
+
+            if (temp.Any())
+            {
+                var random = new Random();
+                var obj = temp[random.Next(temp.Count)];
+                return _mapper.Map<DtoDiscount>(obj);
+            }
+            else
+                throw new Exception();
+
+        }
     }
 
 }

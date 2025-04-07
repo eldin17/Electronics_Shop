@@ -7,7 +7,8 @@ import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/no_products.dart';
 import 'package:flutter17_mobile/screens/product_details_screen.dart';
-// TODO: add flutter_svg package to pubspec.yaml
+import 'package:flutter17_mobile/widgets/btn_counter.dart';
+import 'package:flutter17_mobile/widgets/product_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -105,7 +106,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return listProducts.length > 0
         ? !isLoading
             ? Scaffold(
-                backgroundColor: Colors.white,
+                backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
                 appBar: AppBar(
                   title: Center(child: const Text("Products")),
                   leading: Padding(
@@ -142,8 +143,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             svgSrc: filterIcon,
                             press: () {
                               setState(() {
-                                filterSectionVisibility =
-                                    !filterSectionVisibility;
+                                Future.delayed(
+                                    const Duration(milliseconds: 100), () {
+                                  if (mounted) {
+                                    setState(() {
+                                      filterSectionVisibility =
+                                          !filterSectionVisibility;
+                                    });
+                                  }
+                                });
                               });
                             },
                           )),
@@ -156,233 +164,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        filterSectionVisibility
-                            ? Container(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(4),
-                                      child: SearchField(
-                                        searchController: _searchController,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            child: Padding(
-                                          padding: const EdgeInsets.all(4),
-                                          child: PriceLow(
-                                            priceLowController:
-                                                _priceLowController,
-                                          ),
-                                        )),
-                                        Expanded(
-                                            child: Padding(
-                                          padding: const EdgeInsets.all(4),
-                                          child: PriceHigh(
-                                            priceHighController:
-                                                _priceHighController,
-                                          ),
-                                        )),
-                                      ],
-                                    ),
-                                    CategoriesFilter(
-                                      selectedCategories: _selectedCategories,
-                                    ),
-                                    _searchController.value.text != "" ||
-                                            _priceHighController.value.text !=
-                                                "" ||
-                                            _priceLowController.value.text !=
-                                                "" ||
-                                            _selectedCategories.isNotEmpty ||
-                                            (discountProductsList.isNotEmpty &&
-                                                widget.fromOnDiscount)
-                                        ? Padding(
-                                            padding: const EdgeInsets.all(4),
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                elevation: 0,
-                                                backgroundColor: Color.fromARGB(
-                                                    255, 155, 155, 155),
-                                                foregroundColor: Colors.white,
-                                                minimumSize: const Size(
-                                                    double.infinity, 48),
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(16)),
-                                                ),
-                                              ),
-                                              onPressed: () async {
-                                                var response =
-                                                    await _productProvider
-                                                        .getAll();
-
-                                                setState(() {
-                                                  listProducts =
-                                                      List<Product>.from(
-                                                          response.data);
-                                                  _searchController.value =
-                                                      TextEditingValue.empty;
-                                                  _priceHighController.value =
-                                                      TextEditingValue.empty;
-                                                  _priceLowController.value =
-                                                      TextEditingValue.empty;
-                                                  _selectedCategories =
-                                                      new Set<String>();
-                                                });
-                                              },
-                                              child:
-                                                  const Text("Reset filters"),
-                                            ),
-                                          )
-                                        : Container(),
-                                    Padding(
-                                      padding: const EdgeInsets.all(4),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          elevation: 0,
-                                          backgroundColor:
-                                              const Color(0xFFFF7643),
-                                          foregroundColor: Colors.white,
-                                          minimumSize:
-                                              const Size(double.infinity, 48),
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(16)),
-                                          ),
-                                        ),
-                                        onPressed: () async {
-                                          var priceHigh;
-                                          var priceLow;
-                                          if (_priceHighController.text != "") {
-                                            try {
-                                              priceHigh = double.parse(
-                                                  _priceHighController.text);
-                                            } catch (e) {
-                                              priceHigh = 0;
-                                            }
-                                          }
-                                          if (_priceLowController.text != "") {
-                                            try {
-                                              priceLow = double.parse(
-                                                  _priceLowController.text);
-                                            } catch (e) {
-                                              priceLow = 0;
-                                            }
-                                          }
-                                          if (priceHigh != null &&
-                                              priceLow != null) {
-                                            if (priceHigh > 0 &&
-                                                priceLow > 0 &&
-                                                (priceHigh < priceLow)) {
-                                              setState(() {
-                                                var temp =
-                                                    _priceHighController.text;
-                                                _priceHighController.text =
-                                                    _priceLowController.text;
-                                                _priceLowController.text = temp;
-                                              });
-                                              var temp = priceHigh;
-                                              priceHigh = priceLow;
-                                              priceLow = temp;
-                                            }
-                                          }
-
-                                          var filterCategories = "";
-
-                                          if (_selectedCategories.isNotEmpty) {
-                                            for (var element
-                                                in _selectedCategories) {
-                                              filterCategories += "${element} ";
-                                            }
-                                          }
-                                          print(filterCategories);
-
-                                          var response = await _productProvider
-                                              .getAll(filter: {
-                                            'fullTextSearch':
-                                                _searchController.text,
-                                            'fullTextCategorySearch':
-                                                filterCategories,
-                                            'priceLow': priceLow,
-                                            'priceHigh': priceHigh,
-                                          });
-                                          setState(() {
-                                            //filterSectionVisibility = false;
-                                            listProducts = List<Product>.from(
-                                                response.data);
-                                          });
-                                        },
-                                        child: const Text("Apply filters"),
-                                      ),
-                                    ),
-                                    Center(
-                                      child: ElevatedButton(
-                                          onPressed: () {},
-                                          style: ElevatedButton.styleFrom(
-                                            shape: const CircleBorder(),
-                                            padding: EdgeInsets.zero,
-                                            elevation: 0,
-                                            backgroundColor: Color.fromARGB(
-                                                0, 255, 255, 255),
-                                          ),
-                                          child: IconBtn(
-                                            svgSrc: upToClose,
-                                            press: () {
-                                              setState(() {
-                                                filterSectionVisibility =
-                                                    !filterSectionVisibility;
-                                              });
-                                            },
-                                          )),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(),
+                        AnimatedOpacity(
+                          duration: const Duration(milliseconds: 250),
+                          opacity: filterSectionVisibility ? 1.0 : 0.0,
+                          child: filterSectionVisibility
+                              ? filterSection()
+                              : const SizedBox.shrink(),
+                        ),
                         SizedBox(
                           height: 20,
                         ),
-                        Expanded(
-                          child: GridView.builder(
-                            itemCount: listProducts.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 200,
-                              childAspectRatio: 0.7,
-                              mainAxisSpacing: 20,
-                              crossAxisSpacing: 16,
-                            ),
-                            itemBuilder: (context, index) => ProductCard(
-                              align: Alignment.topRight,
-                              product: listProducts[index],
-                              onPress: () {
-                                Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    transitionDuration:
-                                        Duration(milliseconds: 150),
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                    pageBuilder: (context, animation,
-                                            secondaryAnimation) =>
-                                        ProductDetailsScreen(
-                                      selectedProduct: listProducts[index],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
+                        listContents(),
                       ],
                     ),
                   ),
@@ -392,6 +184,207 @@ class _ProductsScreenState extends State<ProductsScreen> {
         : !isLoading
             ? EmptyNotificationsScreen()
             : Container();
+  }
+
+  Expanded listContents() {
+    return Expanded(
+      child: GridView.builder(
+        itemCount: listProducts.length,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          childAspectRatio: 0.7,
+          mainAxisSpacing: 20,
+          crossAxisSpacing: 16,
+        ),
+        itemBuilder: (context, index) => ProductCard(
+          align: Alignment.topRight,
+          product: listProducts[index],
+          onPress: () {
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 150),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ProductDetailsScreen(
+                  selectedProduct: listProducts[index],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Container filterSection() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: SearchField(
+              searchController: _searchController,
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: PriceLow(
+                  priceLowController: _priceLowController,
+                ),
+              )),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: PriceHigh(
+                  priceHighController: _priceHighController,
+                ),
+              )),
+            ],
+          ),
+          CategoriesFilter(
+            selectedCategories: _selectedCategories,
+          ),
+          _searchController.value.text != "" ||
+                  _priceHighController.value.text != "" ||
+                  _priceLowController.value.text != "" ||
+                  _selectedCategories.isNotEmpty ||
+                  (discountProductsList.isNotEmpty && widget.fromOnDiscount)
+              ? buttonResetFilter()
+              : Container(),
+          buttonApplyFilter(),
+          buttonClose(),
+        ],
+      ),
+    );
+  }
+
+  Center buttonClose() {
+    return Center(
+      child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: EdgeInsets.zero,
+            elevation: 0,
+            backgroundColor: Color.fromARGB(0, 255, 255, 255),
+          ),
+          child: IconBtn(
+            svgSrc: upToClose,
+            press: () {
+              setState(() {
+                filterSectionVisibility = !filterSectionVisibility;
+              });
+            },
+          )),
+    );
+  }
+
+  Padding buttonResetFilter() {
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Color.fromARGB(255, 155, 155, 155),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 48),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+        ),
+        onPressed: () async {
+          var response = await _productProvider.getAll();
+
+          setState(() {
+            listProducts = List<Product>.from(response.data);
+            _searchController.value = TextEditingValue.empty;
+            _priceHighController.value = TextEditingValue.empty;
+            _priceLowController.value = TextEditingValue.empty;
+            _selectedCategories = new Set<String>();
+          });
+        },
+        child: const Text("Reset filters"),
+      ),
+    );
+  }
+
+  Padding buttonApplyFilter() {
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: const Color(0xFFFF7643),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 48),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+        ),
+        onPressed: () async {
+          var priceHigh;
+          var priceLow;
+          if (_priceHighController.text != "") {
+            try {
+              priceHigh = double.parse(_priceHighController.text);
+            } catch (e) {
+              priceHigh = 0;
+            }
+          }
+          if (_priceLowController.text != "") {
+            try {
+              priceLow = double.parse(_priceLowController.text);
+            } catch (e) {
+              priceLow = 0;
+            }
+          }
+          if (priceHigh != null && priceLow != null) {
+            if (priceHigh > 0 && priceLow > 0 && (priceHigh < priceLow)) {
+              setState(() {
+                var temp = _priceHighController.text;
+                _priceHighController.text = _priceLowController.text;
+                _priceLowController.text = temp;
+              });
+              var temp = priceHigh;
+              priceHigh = priceLow;
+              priceLow = temp;
+            }
+          }
+
+          var filterCategories = "";
+
+          if (_selectedCategories.isNotEmpty) {
+            for (var element in _selectedCategories) {
+              filterCategories += "${element} ";
+            }
+          }
+          print(filterCategories);
+
+          var response = await _productProvider.getAll(filter: {
+            'fullTextSearch': _searchController.text,
+            'fullTextCategorySearch': filterCategories,
+            'priceLow': priceLow,
+            'priceHigh': priceHigh,
+          });
+          setState(() {
+            //filterSectionVisibility = false;
+            listProducts = List<Product>.from(response.data);
+          });
+        },
+        child: const Text("Apply filters"),
+      ),
+    );
   }
 }
 
@@ -572,40 +565,6 @@ class FilterCategoryCard extends StatelessWidget {
                   : Colors.grey, // Text color when selected
             ),
           )
-        ],
-      ),
-    );
-  }
-}
-
-class IconBtn extends StatelessWidget {
-  IconBtn({
-    Key? key,
-    required this.svgSrc,
-    required this.press,
-  }) : super(key: key);
-
-  final String svgSrc;
-  final GestureTapCallback press;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(100),
-      onTap: press,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            height: 46,
-            width: 46,
-            decoration: BoxDecoration(
-              color: const Color(0xFF979797).withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: SvgPicture.string(svgSrc),
-          ),
         ],
       ),
     );
