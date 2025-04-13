@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
+import 'package:flutter17_mobile/models/discount.dart';
 import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/news.dart' as Model;
+import 'package:flutter17_mobile/providers/discount_provider.dart';
 import 'package:flutter17_mobile/providers/news_provider.dart';
 import 'package:flutter17_mobile/providers/notification_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
@@ -16,6 +19,7 @@ import 'package:flutter17_mobile/widgets/categories.dart';
 import 'package:flutter17_mobile/widgets/discount.dart';
 import 'package:flutter17_mobile/widgets/discount_products.dart';
 import 'package:flutter17_mobile/widgets/latest_products.dart';
+import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter17_mobile/models/notification.dart' as Model_n;
@@ -33,10 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> productsList = [];
   List<Product> latestProductsList = [];
   List<Product> discountProductsList = [];
+  late Discount discountExample;
 
   List<Model.News> newsList = [];
   late ProductProvider _productProvider;
   late NewsProvider _newsProvider;
+  late DiscountProvider _discountProvider;
 
   bool isLoading = true;
   TextEditingController searchController = new TextEditingController();
@@ -55,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _productProvider = context.read<ProductProvider>();
     _newsProvider = context.read<NewsProvider>();
+    _discountProvider = context.read<DiscountProvider>();
 
     initForm();
   }
@@ -65,11 +72,12 @@ class _HomeScreenState extends State<HomeScreen> {
         .getAllWithChecks(LoginResponse.currentCustomer!.id!);
 
     var newsObj = await _newsProvider.getAll();
+    var discountObj = await _discountProvider.getOneRandom();
 
     setState(() {
       productsList = List<Product>.from(productsObj.data);
       newsList = List<Model.News>.from(newsObj.data);
-
+      discountExample = discountObj;
       latestProductsList = List<Product>.from(productsList);
       discountProductsList = List<Product>.from(productsList);
 
@@ -85,13 +93,14 @@ class _HomeScreenState extends State<HomeScreen> {
     print("customer - ${LoginResponse.isCustomer}");
     print("seller - ${LoginResponse.isSeller}");
     print("current - ${LoginResponse.currentCustomer?.id}");
+    print("discount - ${discountExample.amount}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Container()
+          ? LoadingScreen()
           : SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -109,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           searchController: searchController,
                         ),
-                        DiscountBanner(),
+                        DiscountBanner(obj: discountExample),
                         LatestProducts(
                           products: latestProductsList,
                         ),
@@ -233,7 +242,7 @@ class _HomeHeaderState extends State<HomeHeader> {
         children: [
           Expanded(
               child: SearchField(searchController: widget.searchController)),
-          const SizedBox(width: 24),          
+          const SizedBox(width: 24),
           IconBtnWithCounter(
             onClickColor: true,
             isClicked: widget.isClicked,
@@ -264,7 +273,8 @@ class SearchField extends StatelessWidget {
         onChanged: (value) {},
         onFieldSubmitted: (value) {
           print(value);
-          Navigator.of(context).push(
+          Navigator.of(context)
+              .push(
             PageRouteBuilder(
               transitionDuration: Duration(milliseconds: 150),
               transitionsBuilder:
@@ -277,9 +287,13 @@ class SearchField extends StatelessWidget {
               pageBuilder: (context, animation, secondaryAnimation) =>
                   ProductsScreen(
                 searchBox: value,
+                showScreenIfEmpty: true,
               ),
             ),
-          );
+          )
+              .then((_) {
+            searchController.value = TextEditingValue.empty;
+          });
         },
         controller: searchController,
         decoration: InputDecoration(
@@ -307,17 +321,3 @@ class SearchField extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

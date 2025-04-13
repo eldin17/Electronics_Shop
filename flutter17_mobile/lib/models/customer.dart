@@ -1,6 +1,7 @@
 import 'package:flutter17_mobile/models/adress.dart';
 import 'package:flutter17_mobile/models/payment_method.dart';
 import 'package:flutter17_mobile/models/person.dart';
+import 'package:flutter17_mobile/models/shopping_cart.dart';
 import 'package:flutter17_mobile/models/user_account.dart';
 import 'package:flutter17_mobile/models/wishlist.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -14,6 +15,7 @@ class Customer {
   int? userAccountId;
   List<Adress>? adresses;
   Wishlist? wishlist;
+  ShoppingCart? shoppingCart;
   List<PaymentMethod>? paymentMethods;
   Person? person;
   bool? isDeleted;
@@ -24,6 +26,7 @@ class Customer {
     this.userAccountId,
     this.adresses,
     this.wishlist,
+    this.shoppingCart,
     this.paymentMethods,
     this.person,
     this.isDeleted,

@@ -16,6 +16,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         //public virtual List<DtoOrder> Orders { get; set; }
         public virtual List<DtoAdress> Adresses { get; set; }
         public virtual DtoWishlist? Wishlist { get; set; }
+        public virtual DtoShoppingCart? ShoppingCart { get; set; }
         public virtual List<DtoPaymentMethod> PaymentMethods { get; set; }
         public virtual DtoPerson Person { get; set; }
         public bool isDeleted { get; set; }

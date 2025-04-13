@@ -7,6 +7,7 @@ import 'package:flutter17_mobile/models/laptop.dart';
 import 'package:flutter17_mobile/models/payment_method.dart';
 import 'package:flutter17_mobile/models/person.dart';
 import 'package:flutter17_mobile/models/phone.dart';
+import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/product_category.dart';
 import 'package:flutter17_mobile/models/product_color.dart';
 import 'package:flutter17_mobile/models/product_image.dart';
@@ -28,6 +29,7 @@ class CartItem {
   int? productId;
   int? shoppingCartId;
   double? finalPrice;
+  Product? product;
   
   CartItem({    
     this.id,
@@ -35,6 +37,7 @@ class CartItem {
     this.productId,
     this.shoppingCartId,
     this.finalPrice,    
+    this.product,    
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) =>

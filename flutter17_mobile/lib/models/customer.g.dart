@@ -16,6 +16,9 @@ Customer _$CustomerFromJson(Map<String, dynamic> json) => Customer(
       wishlist: json['wishlist'] == null
           ? null
           : Wishlist.fromJson(json['wishlist'] as Map<String, dynamic>),
+      shoppingCart: json['shoppingCart'] == null
+          ? null
+          : ShoppingCart.fromJson(json['shoppingCart'] as Map<String, dynamic>),
       paymentMethods: (json['paymentMethods'] as List<dynamic>?)
           ?.map((e) => PaymentMethod.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -31,6 +34,7 @@ Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
       'userAccountId': instance.userAccountId,
       'adresses': instance.adresses,
       'wishlist': instance.wishlist,
+      'shoppingCart': instance.shoppingCart,
       'paymentMethods': instance.paymentMethods,
       'person': instance.person,
       'isDeleted': instance.isDeleted,

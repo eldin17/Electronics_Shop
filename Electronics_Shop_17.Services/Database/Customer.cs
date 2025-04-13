@@ -16,6 +16,7 @@ namespace Electronics_Shop_17.Services.Database
         //public virtual List<Order> Orders { get; set; }
         public virtual List<Adress> Adresses { get; set; }
         public virtual Wishlist? Wishlist { get; set; }
+        public virtual ShoppingCart? ShoppingCart { get; set; }
         public virtual List<PaymentMethod> PaymentMethods { get; set; }
         public int PersonId { get; set; }
         public virtual Person Person { get; set; }

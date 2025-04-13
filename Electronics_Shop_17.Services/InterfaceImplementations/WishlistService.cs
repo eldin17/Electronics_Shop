@@ -10,13 +10,16 @@ using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
     public class WishlistService : BaseServiceCRUD<DtoWishlist, Wishlist, SearchWishlist, AddWishlist, UpdateWishlist>, IWishlistService
     {
-        public WishlistService(DataContext context, IMapper mapper) : base(context, mapper)
+        IProductService _productService;
+        public WishlistService(DataContext context, IMapper mapper, IProductService productService) : base(context, mapper)
         {
+            _productService = productService;
         }
 
         public override IQueryable<Wishlist> AddInclude(IQueryable<Wishlist> data)
@@ -40,6 +43,20 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.DateCreated == search.DateCreated);
             }
             return base.AddFilter(data, search);
+        }
+
+        public async override Task<DtoWishlist> GetById(int id)
+        {
+            var dbWishlist = await base.GetById(id);
+            if (dbWishlist != null && dbWishlist.WishlistItems.IsNullOrEmpty())
+                return dbWishlist;
+
+            foreach (var item in dbWishlist.WishlistItems)
+            {
+                item.Product = await _productService.GetByIdWithChecks(dbWishlist.CustomerId, item.Product.Id);
+            }
+
+            return dbWishlist;
         }
     }
 }

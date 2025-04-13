@@ -3,6 +3,7 @@ import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/models/search_result.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/no_products.dart';
@@ -16,6 +17,7 @@ class ProductsScreen extends StatefulWidget {
   String searchBox;
   bool fromLatest;
   bool fromOnDiscount;
+  bool showScreenIfEmpty;
 
   String category;
 
@@ -23,6 +25,7 @@ class ProductsScreen extends StatefulWidget {
     super.key,
     this.fromLatest = false,
     this.fromOnDiscount = false,
+    this.showScreenIfEmpty = false,
     this.category = "",
     this.searchBox = "",
   });
@@ -40,6 +43,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   bool isLoading = true;
   bool filterSectionVisibility = false;
   Set<String> _selectedCategories = {};
+  bool isFiltering = false;
 
   TextEditingController _searchController = new TextEditingController();
   TextEditingController _priceLowController = new TextEditingController();
@@ -61,7 +65,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future initForm() async {
-    //filter za searchBox sa homeScreen
     var productsObj = await _productProvider
         .getAllWithChecks(LoginResponse.currentCustomer!.id!, filter: {
       'fullTextSearch': widget.searchBox,
@@ -101,89 +104,139 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
+  Future resetFilters() async {
+    widget.showScreenIfEmpty = false;
+    var productsObj = await _productProvider
+        .getAllWithChecks(LoginResponse.currentCustomer!.id!);
+
+    setState(() {
+      listHelper(productsObj);
+
+      _searchController.value = TextEditingValue.empty;
+      _priceHighController.value = TextEditingValue.empty;
+      _priceLowController.value = TextEditingValue.empty;
+      _selectedCategories = new Set<String>();
+    });
+  }
+
+  void listHelper(SearchResult<dynamic> productsObj) {
+    productsList = List<Product>.from(productsObj.data);
+
+    if (widget.fromLatest) {
+      latestProductsList = List<Product>.from(productsList);
+      latestProductsList.sort((a, b) => b.id!.compareTo(a.id!));
+
+      listProducts = latestProductsList;
+    } else if (widget.fromOnDiscount) {
+      discountProductsList = List<Product>.from(productsList);
+      discountProductsList = List<Product>.from(discountProductsList
+          .where((element) => element.finalPrice != element.price));
+
+      listProducts = discountProductsList;
+    } else
+      listProducts = productsList;
+  }
+
+  Future applyFilters(String filterCategories, priceLow, priceHigh) async {
+    widget.showScreenIfEmpty = false;
+
+    var productsObj = await _productProvider
+        .getAllWithChecks(LoginResponse.currentCustomer!.id!, filter: {
+      'fullTextSearch': _searchController.text,
+      'fullTextCategorySearch': filterCategories,
+      'priceLow': priceLow,
+      'priceHigh': priceHigh,
+    });
+    setState(() {
+      listHelper(productsObj);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return listProducts.length > 0
+    return widget.showScreenIfEmpty && productsList.length < 1
         ? !isLoading
-            ? Scaffold(
-                backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-                appBar: AppBar(
-                  title: Center(child: const Text("Products")),
-                  leading: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: const CircleBorder(),
-                        padding: EdgeInsets.zero,
-                        elevation: 0,
-                        backgroundColor: const Color(0xFFF5F6F9),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            shape: const CircleBorder(),
-                            padding: EdgeInsets.zero,
-                            elevation: 0,
-                            backgroundColor: const Color(0xFFF5F6F9),
-                          ),
-                          child: IconBtn(
-                            svgSrc: filterIcon,
-                            press: () {
-                              setState(() {
-                                Future.delayed(
-                                    const Duration(milliseconds: 100), () {
-                                  if (mounted) {
-                                    setState(() {
-                                      filterSectionVisibility =
-                                          !filterSectionVisibility;
-                                    });
-                                  }
-                                });
-                              });
-                            },
-                          )),
-                    ),
-                  ],
-                ),
-                body: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 250),
-                          opacity: filterSectionVisibility ? 1.0 : 0.0,
-                          child: filterSectionVisibility
-                              ? filterSection()
-                              : const SizedBox.shrink(),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        listContents(),
-                      ],
-                    ),
-                  ),
-                ),
-              )
+            ? EmptyNotificationsScreen()
             : Container()
         : !isLoading
-            ? EmptyNotificationsScreen()
+            ? testING(context)
             : Container();
+  }
+
+  Scaffold testING(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+      appBar: AppBar(
+        title: Center(child: const Text("Products")),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: EdgeInsets.zero,
+              elevation: 0,
+              backgroundColor: const Color(0xFFF5F6F9),
+            ),
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.black,
+              size: 20,
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: EdgeInsets.zero,
+                  elevation: 0,
+                  backgroundColor: const Color(0xFFF5F6F9),
+                ),
+                child: IconBtn(
+                  svgSrc: filterIcon,
+                  press: () {
+                    setState(() {
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        if (mounted) {
+                          setState(() {
+                            filterSectionVisibility = !filterSectionVisibility;
+                          });
+                        }
+                      });
+                    });
+                  },
+                )),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 250),
+                opacity: filterSectionVisibility ? 1.0 : 0.0,
+                child: filterSectionVisibility
+                    ? filterSection()
+                    : const SizedBox.shrink(),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              listContents(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Expanded listContents() {
@@ -258,8 +311,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
           _searchController.value.text != "" ||
                   _priceHighController.value.text != "" ||
                   _priceLowController.value.text != "" ||
-                  _selectedCategories.isNotEmpty ||
-                  (discountProductsList.isNotEmpty && widget.fromOnDiscount)
+                  _selectedCategories.isNotEmpty
+              // ||
+              // (discountProductsList.isNotEmpty && widget.fromOnDiscount)||
+              // (latestProductsList.isNotEmpty && widget.fromLatest)
+
               ? buttonResetFilter()
               : Container(),
           buttonApplyFilter(),
@@ -304,15 +360,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ),
         onPressed: () async {
-          var response = await _productProvider.getAll();
-
-          setState(() {
-            listProducts = List<Product>.from(response.data);
-            _searchController.value = TextEditingValue.empty;
-            _priceHighController.value = TextEditingValue.empty;
-            _priceLowController.value = TextEditingValue.empty;
-            _selectedCategories = new Set<String>();
-          });
+          await resetFilters();
         },
         child: const Text("Reset filters"),
       ),
@@ -371,16 +419,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           }
           print(filterCategories);
 
-          var response = await _productProvider.getAll(filter: {
-            'fullTextSearch': _searchController.text,
-            'fullTextCategorySearch': filterCategories,
-            'priceLow': priceLow,
-            'priceHigh': priceHigh,
-          });
-          setState(() {
-            //filterSectionVisibility = false;
-            listProducts = List<Product>.from(response.data);
-          });
+          await applyFilters(filterCategories, priceLow, priceHigh);
         },
         child: const Text("Apply filters"),
       ),

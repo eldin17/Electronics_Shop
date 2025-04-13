@@ -21,7 +21,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
         public override IQueryable<Customer> AddInclude(IQueryable<Customer> data)
         {
-            data = data.Include(x => x.UserAccount).ThenInclude(x=>x.Image).Include(x => x.Adresses).Include(x => x.Wishlist).Include(x => x.PaymentMethods).Include(x => x.Person);
+            data = data.Include(x => x.UserAccount).ThenInclude(x=>x.Image).Include(x => x.Adresses).Include(x => x.Wishlist).Include(x => x.ShoppingCart).Include(x => x.PaymentMethods).Include(x => x.Person);
             return base.AddInclude(data);
         }
 

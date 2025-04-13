@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/news.dart' as Model;
 
 class NewsDetailsScreen extends StatefulWidget {
@@ -38,53 +39,51 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(0,20,0,0),
+        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color.fromARGB(255, 231, 231, 231), 
+                Color.fromARGB(255, 231, 231, 231),
                 Color(0xFFFFFFFF),
               ],
             ),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
-            ), 
+            ),
           ),
-          child: ClipRRect(            
+          child: ClipRRect(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(18.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   WelcomeText(
                     title: "${widget.news.title ?? ''}",
                     text: "${widget.news.content ?? ''}",
+                    datePosted: widget.news.datePublished ?? DateTime.now(),
                   ),
-                  const SizedBox(height: 106),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF7643),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 40),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                  const SizedBox(height: 15),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF7643),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("OK"),
                     ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"),
                   ),
                 ],
               ),
@@ -98,8 +97,13 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
 
 class WelcomeText extends StatelessWidget {
   final String title, text;
+  final DateTime datePosted;
 
-  WelcomeText({super.key, required this.title, required this.text});
+  WelcomeText(
+      {super.key,
+      required this.title,
+      required this.text,
+      required this.datePosted});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -108,16 +112,27 @@ class WelcomeText extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           title,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge!
-              .copyWith(fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                fontWeight: FontWeight.w600,
+                foreground: Paint()
+                  ..style = PaintingStyle.fill
+                  ..strokeWidth = 1
+                  ..color = const Color(0xFFFF7643),
+              ),
         ),
-        const SizedBox(height: 8),
-        Text(text, style: Theme.of(context).textTheme.bodyMedium),
         const SizedBox(height: 16),
+        Text(text, style: Theme.of(context).textTheme.bodyMedium),
+        const SizedBox(height: 60),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Text(
+            "Posted ${getTimeAgo(datePosted) ?? ''}",
+            style: TextStyle(
+              color: const Color.fromARGB(255, 107, 107, 107),
+            ),
+          ),
+        ),
       ],
     );
   }
 }
-

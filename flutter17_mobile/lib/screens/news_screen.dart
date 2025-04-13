@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/news.dart' as Model;
 import 'package:flutter17_mobile/providers/news_provider.dart';
 import 'package:flutter17_mobile/screens/news_details_screen.dart';
@@ -79,16 +80,17 @@ class _NewsScreenState extends State<NewsScreen> {
                 (index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: qwe(
+                    child: LargeNewsCard(
                       image: 'assets/images/background${index + 1}.jpg',
                       category: newsList[index].title ?? "No Data",
-                      numOfBrands: 18,
+                      datePosted:
+                          newsList[index].datePublished ?? DateTime.now(),
                       press: () {
                         Navigator.of(context).push(
                           PageRouteBuilder(
                             transitionDuration: Duration(milliseconds: 150),
-                            transitionsBuilder:
-                                (context, animation, secondaryAnimation, child) {
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
                               return FadeTransition(
                                 opacity: animation,
                                 child: child,
@@ -115,17 +117,17 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 }
 
-class qwe extends StatelessWidget {
-  const qwe({
+class LargeNewsCard extends StatelessWidget {
+  const LargeNewsCard({
     Key? key,
     required this.category,
     required this.image,
-    required this.numOfBrands,
+    required this.datePosted,
     required this.press,
   }) : super(key: key);
 
   final String category, image;
-  final int numOfBrands;
+  final DateTime datePosted;
   final GestureTapCallback press;
 
   @override
@@ -166,21 +168,24 @@ class qwe extends StatelessWidget {
                     horizontal: 15,
                     vertical: 10,
                   ),
-                  child: Text.rich(
-                    TextSpan(
-                      style: const TextStyle(color: Colors.white),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TextSpan(
-                          text: "$category\n",
-                          style: const TextStyle(
+                        Text(
+                          "$category",
+                          style: TextStyle(
+                            color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        TextSpan(text: "$numOfBrands Brands")
-                      ],
-                    ),
-                  ),
+                        Text(
+                          getTimeAgo(datePosted) ?? '',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ]),
                 ),
               ],
             ),

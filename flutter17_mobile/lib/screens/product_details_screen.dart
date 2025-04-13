@@ -6,6 +6,7 @@ import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/product_color.dart';
 import 'package:flutter17_mobile/models/product_image.dart';
 import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
+import 'package:flutter17_mobile/screens/no_wishlist.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -321,7 +322,7 @@ class _SmallProductImageState extends State<SmallProductImage> {
 }
 
 class ProductDescription extends StatefulWidget {
-  const ProductDescription({
+  ProductDescription({
     Key? key,
     required this.product,
     required this.wishlistItemProvider,
@@ -332,7 +333,7 @@ class ProductDescription extends StatefulWidget {
   final Product product;
   final GestureTapCallback? pressOnSeeMore;
   final WishlistItemProvider wishlistItemProvider;
-  final int deleteId;
+  int deleteId;
   @override
   State<ProductDescription> createState() => _ProductDescriptionState();
 }
@@ -382,7 +383,9 @@ class _ProductDescriptionState extends State<ProductDescription> {
                                         Color.fromARGB(141, 158, 158, 158),
                                     decorationThickness: 3),
                               ),
-                              SizedBox(width: 15,),
+                              SizedBox(
+                                width: 15,
+                              ),
                               Text(
                                 "${widget.product.finalPrice}€",
                                 style: const TextStyle(
@@ -404,18 +407,43 @@ class _ProductDescriptionState extends State<ProductDescription> {
           child: InkWell(
             borderRadius: BorderRadius.circular(50),
             onTap: () async {
-              widget.product.isFavourite!
-                  ? {await widget.wishlistItemProvider.delete(widget.deleteId)}
-                  : {
-                      await widget.wishlistItemProvider.add({
-                        'productId': widget.product.id,
-                        'wishlistId':
-                            LoginResponse.currentCustomer!.wishlist!.id
-                      })
-                    };
-              setState(() {
-                widget.product.isFavourite = !widget.product.isFavourite!;
-              });
+              if (LoginResponse.currentCustomer?.wishlist == null) {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 150),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        NoWishlistScreen(
+                      productObj: widget.product,
+                    ),
+                  ),
+                );
+              } else {
+                if (widget.product.isFavourite!) {
+                  await widget.wishlistItemProvider.delete(widget.deleteId);
+                } else {
+                  var itemObj = await widget.wishlistItemProvider.add({
+                    'productId': widget.product.id,
+                    'wishlistId': LoginResponse.currentCustomer!.wishlist!.id
+                  });
+                  setState(() {
+                    widget.deleteId = itemObj.id!;
+                    LoginResponse.currentCustomer!.wishlist?.wishlistItems
+                        ?.add(itemObj);
+                  });
+                }
+
+                ;
+                setState(() {
+                  widget.product.isFavourite = !widget.product.isFavourite!;
+                });
+              }
             },
             child: Container(
               padding: const EdgeInsets.all(16),

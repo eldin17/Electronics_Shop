@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
+import 'package:flutter17_mobile/providers/discount_provider.dart';
 import 'package:flutter17_mobile/providers/image_upload_provider.dart';
 import 'package:flutter17_mobile/providers/login_provider.dart';
 import 'package:flutter17_mobile/providers/news_provider.dart';
 import 'package:flutter17_mobile/providers/notification_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
+import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
+import 'package:flutter17_mobile/providers/shopping_cart_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_provider.dart';
 import 'package:flutter17_mobile/screens/splash_screen.dart';
@@ -25,6 +28,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => WishlistItemProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => NewsProvider()),
+        ChangeNotifierProvider(create: (_) => DiscountProvider()),
+        ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
+        ChangeNotifierProvider(create: (_) => ShoppingCartItemProvider()),
 
       ],
       child: const MyApp(),
