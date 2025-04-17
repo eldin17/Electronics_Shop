@@ -61,7 +61,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
               topRight: Radius.circular(20),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(18.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
