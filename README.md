@@ -4,7 +4,9 @@
 A multi-platform demo project for an electronics shop.
 
 ### 📸 App Screenshots ###
-Screenshots of the current working parts of the application can be found in the app_screenshots/ folder.
+![Home Screen](app_screenshots/home1_screen.jpg)
+![Product Details](app_screenshots/product_details1_screen.jpg)
+Rest of the screenshots can be found in the app_screenshots/ folder (currently working parts).
 
 This application consists of:
 
