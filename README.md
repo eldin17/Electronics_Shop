@@ -18,16 +18,16 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 🌐 Web App – Built with Angular
 
 ### 🧰 Tech Stack ###
-C# / .NET – Backend API & Desktop Application
+🧠 C# / .NET – Backend API
 
-Flutter – Mobile and Desktop App
+📱 Flutter – Mobile and Desktop App
 
-Angular – Web App
+🌐 Angular – Web App
 
-SQL – Relational Database
+🗄️ SQL – Relational Database
 
-Entity Framework – ORM
+🧬 Entity Framework – ORM
 
-RabbitMQ – Message Brokering, Mail Sending
+📨 RabbitMQ – Message Brokering, Mail Sending
 
-Docker – Containerization
+🐳 Docker – Containerization
