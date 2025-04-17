@@ -1,6 +1,6 @@
 # 🛒 Electronics Shop #
-## Demo Project ##
-### 🚧 Work In Progress 🚧 ### 
+## 🚧 Work In Progress 🚧 ## 
+### Demo Project ###
 A multi-platform demo project for an electronics shop.
 
 ### 📸 App Screenshots ###
