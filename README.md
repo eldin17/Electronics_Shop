@@ -1,9 +1,9 @@
-# 🛒 Electronics Shop 🛒 #
+# 🛒 Electronics Shop #
 ## Demo Project ##
 ### 🚧 Work In Progress 🚧 ### 
 A multi-platform demo project for an electronics shop.
 
-### 📸 App Screenshots 📸 ###
+### 📸 App Screenshots ###
 Screenshots of the current working parts of the application can be found in the app_screenshots/ folder.
 
 This application consists of:
@@ -14,7 +14,7 @@ This application consists of:
 
 🌐 Web App – Built with Angular
 
-### 🧰 Tech Stack 🧰 ###
+### 🧰 Tech Stack ###
 C# / .NET – Backend API & Desktop Application
 
 Flutter – Mobile and Desktop App
