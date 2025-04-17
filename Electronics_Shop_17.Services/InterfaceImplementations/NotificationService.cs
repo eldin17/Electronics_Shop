@@ -26,7 +26,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
         public async Task<DtoNotification> AddForUser(AddNotificationForUser addRequest)
         {
-            if (!addRequest.userAccIds.IsNullOrEmpty())
+            if (addRequest!=null && addRequest.userAccIds!=null)
             {
                 var addObj = _mapper.Map<AddNotification>(addRequest);
                 var obj = await Add(addObj);
