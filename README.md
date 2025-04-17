@@ -14,7 +14,7 @@ This application consists of:
 
 🌐 Web App – Built with Angular
 
-🧰 Tech Stack
+### 🧰 Tech Stack ###
 C# / .NET – Backend API & Desktop Application
 
 Flutter – Mobile and Desktop App
