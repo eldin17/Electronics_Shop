@@ -8,7 +8,7 @@ A multi-platform demo project for an electronics shop.
   <img src="app_screenshots/home1_screen.jpg" alt="Home Screen" width="250"/>  
   <img src="app_screenshots/product_details1_screen.jpg" alt="Product Details" width="250"/>
 </div>
-Rest of the screenshots can be found in the <a href="https://https://github.com/eldin17/Electronics_Shop/tree/main/app_screenshots">app_screenshots</a> folder. (All currently working parts of the project).
+Rest of the screenshots can be found in the <a href="https://github.com/eldin17/Electronics_Shop/tree/main/app_screenshots">app_screenshots</a> folder. (All currently working parts of the project).
 
 
 ### 🧩 This application consists of: ###
