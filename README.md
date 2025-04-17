@@ -4,11 +4,11 @@
 A multi-platform demo project for an electronics shop.
 
 ### 📸 App Screenshots ###
-![Home Screen](app_screenshots/home1_screen.jpg)
-![Product Details](app_screenshots/product_details1_screen.jpg)
+<img src="app_screenshots/home1_screen.jpg" alt="Home Screen" width="200"/> 
+<img src="app_screenshots/product_details1_screen.jpg" alt="Product Details" width="200"/>
 Rest of the screenshots can be found in the app_screenshots/ folder (currently working parts).
 
-This application consists of:
+### 🧩 This application consists of: ###
 
 📱 Mobile App – Built with Flutter
 
