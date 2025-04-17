@@ -3,7 +3,7 @@
 ### 🚧 Work In Progress ### 
 A multi-platform demo project for an electronics shop.
 
-## 📸 App Screenshots ( app_screenshots folder ) ##
+### 📸 App Screenshots ( app_screenshots folder ) ###
 Screenshots of the current working parts of the application can be found in the app_screenshots/ folder.
 
 This application consists of:
