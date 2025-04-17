@@ -9,7 +9,7 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
   <img src="app_screenshots/product_details1_screen.jpg" alt="Product Details" width="250"/>
 </div>
 
-### This application consists of: ###
+### This application consists of ###
 
 📱 Mobile App – Built with Flutter
 
