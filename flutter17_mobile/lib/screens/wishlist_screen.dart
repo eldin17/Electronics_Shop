@@ -35,7 +35,12 @@ class _WishlistScreenState extends State<WishlistScreen> {
     super.initState();
     _wishlistProvider = context.read<WishlistProvider>();
     _wishlistItemProvider = context.read<WishlistItemProvider>();
-    initForm();
+    if (LoginResponse.currentCustomer!.wishlist != null) {
+      initForm();
+    } else {
+      currentUserWishlist = Wishlist();
+      isLoading = false;
+    }
   }
 
   Future initForm() async {
@@ -47,6 +52,19 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
       isLoading = false;
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(milliseconds: 1500),
+        content: Text('💡  Swipe left to remove items'),
+        backgroundColor: Color.fromARGB(255, 158, 158, 158),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        margin: EdgeInsets.only(left: 20, right: 20, bottom: 15),
+      ),
+    );
   }
 
   Future removeItem(int id) async {
@@ -80,18 +98,29 @@ class _WishlistScreenState extends State<WishlistScreen> {
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Dismissible(
-                    key: Key(currentUserWishlist
-                        .wishlistItems![index].product!.id
+                    key: Key(currentUserWishlist.wishlistItems![index].id
                         .toString()),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
-                      removeItem(currentUserWishlist.wishlistItems![index].id!);
+                      var deletedItem =
+                          currentUserWishlist.wishlistItems![index];
 
-                      setState(() {
-                        currentUserWishlist
-                            .wishlistItems![index].product!.isFavourite = false;
-                        currentUserWishlist.wishlistItems?.removeAt(index);
+                      Future.delayed(Duration.zero, () {
+                        setState(() {
+                          currentUserWishlist.wishlistItems![index].product!
+                              .isFavourite = false;
+                          currentUserWishlist.wishlistItems?.removeAt(index);
+                        });
+
+                        removeItem(deletedItem.id!);
                       });
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            duration: Duration(milliseconds: 500),
+                            content: Text(
+                                '${deletedItem.product!.brand} ${deletedItem.product!.model} - Removed  ❌')),
+                      );
                     },
                     background: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),

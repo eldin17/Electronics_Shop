@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
-import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/product_color.dart';
 import 'package:flutter17_mobile/models/product_image.dart';
+import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
+import 'package:flutter17_mobile/screens/no_cart.dart';
 import 'package:flutter17_mobile/screens/no_wishlist.dart';
+import 'package:flutter17_mobile/widgets/color_dots.dart';
+import 'package:flutter17_mobile/widgets/product_images.dart';
+import 'package:flutter17_mobile/widgets/success.dart';
+import 'package:flutter17_mobile/widgets/top_rounded_corner.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   Product selectedProduct;
-  ProductDetailsScreen({super.key, required this.selectedProduct});
+  late ProductColor? selectedProductColor123;
+  ProductDetailsScreen(
+      {super.key, required this.selectedProduct, this.selectedProductColor123});
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -23,13 +30,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late ProductColor selectedProductColor;
   late List<ProductImage> imageList;
   late WishlistItemProvider _wishlistItemProvider;
+  late ShoppingCartItemProvider _shoppingCartItemProvider;
   var wishlistItemId = 0;
+  var quantityInfo = 1;
 
   @override
   void initState() {
     // TODO: implement initState
 
     _wishlistItemProvider = context.read<WishlistItemProvider>();
+    _shoppingCartItemProvider = context.read<ShoppingCartItemProvider>();
+
     if (LoginResponse.currentCustomer?.wishlist != null) {
       var obj = LoginResponse.currentCustomer!.wishlist!.wishlistItems?.where(
           (element) => element.product?.id == widget.selectedProduct.id);
@@ -38,8 +49,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
     }
 
-    selectedProductColor =
+    selectedProductColor = widget.selectedProductColor123 ??
         widget.selectedProduct.productColors![selectedColor2];
+    if (widget.selectedProductColor123 != null) {
+      for (int i = 0; i < widget.selectedProduct.productColors!.length; i++) {
+        if (widget.selectedProduct.productColors![i].id ==
+            selectedProductColor.id) selectedColor2 = i;
+      }
+    }
+
+    // selectedProductColor =
+    //     widget.selectedProduct.productColors![selectedColor2];
 
     imagesColorPickChange();
 
@@ -146,6 +166,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             print("setState ${selectedProductColor.name}");
                           });
                         },
+                        changeQuantity: (value) {
+                          setState(() {
+                            quantityInfo = value;
+
+                            print("quantityInfo - ${quantityInfo}");
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -170,152 +197,48 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () async {
+                if (LoginResponse.currentCustomer!.shoppingCart != null) {
+                  var cartItemObj = await _shoppingCartItemProvider.add({
+                    'quantity': quantityInfo,
+                    'productId': widget.selectedProduct.id,
+                    'shoppingCartId':
+                        LoginResponse.currentCustomer!.shoppingCart!.id,
+                    'productColorId': selectedProductColor.id,
+                  });
+
+                  if (cartItemObj != null) {
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       duration: Duration(milliseconds: 500),
+                    //         content: Text(
+                    //             '${widget.selectedProduct.brand} ${widget.selectedProduct.model} added to Cart!')),
+                    //   );
+                    showSuccessPopup(context, "Added to Cart!");
+                  }
+                } else {
+                  Navigator.of(context).push(
+                    PageRouteBuilder(
+                      transitionDuration: Duration(milliseconds: 150),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          NoCartScreen(
+                        productObj: widget.selectedProduct,
+                      ),
+                    ),
+                  );
+                }
+              },
               child: const Text("Add To Cart"),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class TopRoundedContainer extends StatelessWidget {
-  const TopRoundedContainer({
-    Key? key,
-    required this.color,
-    required this.child,
-  }) : super(key: key);
-
-  final Color color;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.only(top: 20),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(40),
-          topRight: Radius.circular(40),
-        ),
-      ),
-      child: child,
-    );
-  }
-}
-
-class ProductImages extends StatefulWidget {
-  List<ProductImage> list;
-  ProductImages({
-    Key? key,
-    required this.list,
-  }) : super(key: key);
-
-  @override
-  _ProductImagesState createState() => _ProductImagesState();
-}
-
-class _ProductImagesState extends State<ProductImages> {
-  int selectedImage = 0;
-  @override
-  void didUpdateWidget(covariant ProductImages oldWidget) {
-    // TODO: implement didUpdateWidget
-    selectedImage = 0;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        // Use a linear gradient to create the fading effect towards the bottom
-        gradient: LinearGradient(
-          begin: Alignment.topCenter, // Fade starts from the top
-          end: Alignment.bottomCenter, // Fade ends at the bottom
-          colors: [
-            Colors.white.withOpacity(1), // Solid color at the top
-            Colors.white.withOpacity(0), // Transparent color at the bottom
-          ],
-          stops: [0.7, 1], // Adjust the fade start point and smoothness
-        ),
-      ),
-      child: Column(
-        children: [
-          SizedBox(
-            width: 238,
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Image.network(
-                  adjustImage(widget.list[selectedImage].image!.path!)),
-            ),
-          ),
-          // SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ...List.generate(
-                widget.list.length,
-                (index) => SmallProductImage(
-                  isSelected: index == selectedImage,
-                  press: () {
-                    setState(() {
-                      selectedImage = index;
-                    });
-                  },
-                  image: adjustImage(widget.list[index].image!.path!),
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class SmallProductImage extends StatefulWidget {
-  const SmallProductImage(
-      {super.key,
-      required this.isSelected,
-      required this.press,
-      required this.image});
-
-  final bool isSelected;
-  final VoidCallback press;
-  final String image;
-
-  @override
-  State<SmallProductImage> createState() => _SmallProductImageState();
-}
-
-class _SmallProductImageState extends State<SmallProductImage> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.press,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        margin: const EdgeInsets.only(right: 16),
-        padding: const EdgeInsets.all(8),
-        height: 48,
-        width: 48,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: Color(0xFFFF7643).withOpacity(widget.isSelected ? 1 : 0)),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(255, 53, 53, 53).withOpacity(0.15),
-              blurRadius: 5,
-              offset: const Offset(0, 4), // Soft drop shadow
-            ),
-          ],
-        ),
-        child: Image.network(widget.image),
       ),
     );
   }
@@ -426,7 +349,15 @@ class _ProductDescriptionState extends State<ProductDescription> {
                 );
               } else {
                 if (widget.product.isFavourite!) {
+
                   await widget.wishlistItemProvider.delete(widget.deleteId);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        duration: Duration(milliseconds: 500),
+                        content: Text(
+                            'Removed from Wishlist ❌')),
+                  );
                 } else {
                   var itemObj = await widget.wishlistItemProvider.add({
                     'productId': widget.product.id,
@@ -437,6 +368,13 @@ class _ProductDescriptionState extends State<ProductDescription> {
                     LoginResponse.currentCustomer!.wishlist?.wishlistItems
                         ?.add(itemObj);
                   });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        duration: Duration(milliseconds: 500),
+                        content: Text(
+                            'Added to Wishlist ❤️')),
+                  );
                 }
 
                 ;
@@ -504,163 +442,6 @@ class _ProductDescriptionState extends State<ProductDescription> {
           ),
         )
       ],
-    );
-  }
-}
-
-class ColorDots extends StatefulWidget {
-  final Product product;
-  int selectedColor;
-  ValueChanged<ProductColor> changeProductColor;
-
-  ColorDots(
-      {super.key,
-      required this.product,
-      required this.selectedColor,
-      required this.changeProductColor});
-
-  @override
-  State<ColorDots> createState() => _ColorDotsState();
-}
-
-class _ColorDotsState extends State<ColorDots> {
-  int quantity = 1;
-  int selectedColorMarker = 0;
-  @override
-  Widget build(BuildContext context) {
-    // Now this is fixed and only for demo
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          ...List.generate(
-            widget.product.productColors!.length,
-            (index) => GestureDetector(
-              onTap: () {
-                setState(() {
-                  widget.selectedColor = index;
-                  selectedColorMarker = index;
-                });
-                print("${widget.product.productColors![index].name}");
-                widget.changeProductColor(widget.product.productColors![index]);
-              },
-              child: ColorDot(
-                color:
-                    hexToColor(widget.product.productColors![index].hexCode!),
-                isSelected: index == selectedColorMarker,
-              ),
-            ),
-          ),
-          const Spacer(),
-          RoundedIconBtn(
-            icon: Icons.remove,
-            press: () {
-              setState(() {
-                if (quantity > 1) quantity--;
-              });
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              "$quantity",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          RoundedIconBtn(
-            icon: Icons.add,
-            showShadow: true,
-            press: () {
-              setState(() {
-                quantity++;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ColorDot extends StatefulWidget {
-  final Color color;
-  bool isSelected;
-
-  ColorDot({
-    Key? key,
-    required this.color,
-    required this.isSelected,
-  }) : super(key: key);
-
-  @override
-  State<ColorDot> createState() => _ColorDotState();
-}
-
-class _ColorDotState extends State<ColorDot> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 2),
-      padding: const EdgeInsets.all(8),
-      height: 40,
-      width: 40,
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border.all(
-            color: widget.isSelected
-                ? const Color(0xFFFF7643)
-                : Colors.transparent),
-        shape: BoxShape.circle,
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: widget.color,
-          shape: BoxShape.circle,
-        ),
-      ),
-    );
-  }
-}
-
-class RoundedIconBtn extends StatelessWidget {
-  const RoundedIconBtn({
-    Key? key,
-    required this.icon,
-    required this.press,
-    this.showShadow = false,
-  }) : super(key: key);
-
-  final IconData icon;
-  final GestureTapCancelCallback press;
-  final bool showShadow;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      width: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          if (showShadow)
-            BoxShadow(
-              offset: const Offset(0, 6),
-              blurRadius: 10,
-              color: const Color(0xFFB0B0B0).withOpacity(0.2),
-            ),
-        ],
-      ),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: const Color(0xFFFF7643),
-          padding: EdgeInsets.zero,
-          backgroundColor: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        ),
-        onPressed: press,
-        child: Icon(icon),
-      ),
     );
   }
 }

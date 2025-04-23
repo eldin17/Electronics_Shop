@@ -29,7 +29,17 @@ class SectionTitle extends StatelessWidget {
             ? TextButton(
                 onPressed: press,
                 style: TextButton.styleFrom(foregroundColor: Colors.grey),
-                child: const Text("See more"),
+                child: Row(
+                  children: [
+                    const Text("See more"),
+                    SizedBox(width: 5),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 12,
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
               )
             : Container(),
       ],

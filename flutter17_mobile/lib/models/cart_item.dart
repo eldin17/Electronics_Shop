@@ -27,17 +27,21 @@ class CartItem {
   int? id;
   int? quantity;
   int? productId;
-  int? shoppingCartId;
-  double? finalPrice;
   Product? product;
+  int? shoppingCartId;
+  int? productColorId;
+  ProductColor? productColor;
+  double? finalPrice;
   
   CartItem({    
     this.id,
     this.quantity,
     this.productId,
+    this.product,
     this.shoppingCartId,
+    this.productColorId,    
+    this.productColor,
     this.finalPrice,    
-    this.product,    
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) =>

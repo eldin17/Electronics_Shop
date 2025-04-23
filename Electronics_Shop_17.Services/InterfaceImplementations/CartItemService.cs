@@ -9,6 +9,7 @@ using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -16,6 +17,12 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
     {
         public CartItemService(DataContext context, IMapper mapper) : base(context, mapper)
         {
+        }
+
+        public override IQueryable<CartItem> AddInclude(IQueryable<CartItem> data)
+        {
+            data = data.Include(x => x.Product);
+            return base.AddInclude(data);
         }
 
         public override IQueryable<CartItem> AddFilter(IQueryable<CartItem> data, SearchCartItem? search)
