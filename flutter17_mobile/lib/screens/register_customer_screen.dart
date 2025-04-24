@@ -432,13 +432,20 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
               if (check == true) {
                 try {
                   var obj = await _customerProvider.add(requestData);
-                  if (obj != null) 
-                    LoginResponse.currentCustomer = obj;
+                  if (obj != null) LoginResponse.currentCustomer = obj;
                   LoginResponse.roleName = 'Customer';
                   LoginResponse.isCustomer = true;
                   LoginResponse.isSeller = false;
 
-                    var box = Hive.box('authBox');
+                  var box = Hive.box('authBox');
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: Duration(milliseconds: 1500),
+                      content: Text(
+                          '✅ All done ${obj.person?.firstName}! Your profile’s looking good.'),
+                    ),
+                  );
 
                   if (obj != null && widget.rememberMe) {
                     // await box.put('token', LoginResponse.token);
@@ -463,27 +470,35 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                   print("customer - ${box.get('isCustomer')}");
                   print("seller - ${box.get('isSeller')}");
 
-                  Navigator.of(context).pushReplacement(
-                    PageRouteBuilder(
-                      transitionDuration: Duration.zero,
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          WelcomeScreen(),
-                    ),
-                  );
+                  Future.delayed(Duration(milliseconds: 1500), () {
+                    Navigator.of(context).pushReplacement(
+                      PageRouteBuilder(
+                        transitionDuration: Duration.zero,
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            WelcomeScreen(),
+                      ),
+                    );
+                  });
+                  
                 } on Exception catch (e) {
-                  // TODO
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                            title: Text("Error"),
-                            content: Text(e.toString()),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text("Ok"),
-                              )
-                            ],
-                          ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: Duration(milliseconds: 1500),
+                      content: Text(
+                          '😕 Hmm, couldn’t save your info. Mind trying again?'),
+                    ),
+                  ); // showDialog(
+                  //     context: context,
+                  //     builder: (BuildContext context) => AlertDialog(
+                  //           title: Text("Error"),
+                  //           content: Text(e.toString()),
+                  //           actions: [
+                  //             TextButton(
+                  //               onPressed: () => Navigator.pop(context),
+                  //               child: Text("Ok"),
+                  //             )
+                  //           ],
+                  //         ));
                 }
               }
             },

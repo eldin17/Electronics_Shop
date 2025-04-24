@@ -11,6 +11,7 @@ import 'package:flutter17_mobile/screens/no_wishlist.dart';
 import 'package:flutter17_mobile/widgets/color_dots.dart';
 import 'package:flutter17_mobile/widgets/product_images.dart';
 import 'package:flutter17_mobile/widgets/success.dart';
+import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 import 'package:flutter17_mobile/widgets/top_rounded_corner.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -257,6 +258,8 @@ class ProductDescription extends StatefulWidget {
   final GestureTapCallback? pressOnSeeMore;
   final WishlistItemProvider wishlistItemProvider;
   int deleteId;
+  bool isVisibleSeeMore = false;
+
   @override
   State<ProductDescription> createState() => _ProductDescriptionState();
 }
@@ -349,14 +352,12 @@ class _ProductDescriptionState extends State<ProductDescription> {
                 );
               } else {
                 if (widget.product.isFavourite!) {
-
                   await widget.wishlistItemProvider.delete(widget.deleteId);
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                         duration: Duration(milliseconds: 500),
-                        content: Text(
-                            'Removed from Wishlist ❌')),
+                        content: Text('Removed from Wishlist ❌')),
                   );
                 } else {
                   var itemObj = await widget.wishlistItemProvider.add({
@@ -372,8 +373,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                         duration: Duration(milliseconds: 500),
-                        content: Text(
-                            'Added to Wishlist ❤️')),
+                        content: Text('Added to Wishlist ❤️')),
                   );
                 }
 
@@ -424,18 +424,42 @@ class _ProductDescriptionState extends State<ProductDescription> {
           ),
           child: GestureDetector(
             onTap: () {},
-            child: const Row(
+            child: Row(
               children: [
-                Text(
-                  "See More Detail",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600, color: Color(0xFFFF7643)),
-                ),
-                SizedBox(width: 5),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 12,
-                  color: Color(0xFFFF7643),
+                TextButton(
+                  onPressed: () {
+                    print("BTN - See More Detail");
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => Container(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: SeeMoreDetails(product: widget.product,),
+                      ),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Color(0xFFFF7643),
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: Row(
+                    children: [
+                      const Text("See More Detail"),
+                      SizedBox(width: 5),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: Color(0xFFFF7643),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

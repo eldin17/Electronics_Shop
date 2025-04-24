@@ -23,8 +23,8 @@ class Phone {
   int? rearCamerasCount;
   bool? hasUltrawideLens;
   bool? hasZoomLens;
-  int? mainCameraResolutionMP;
-  int? frontCameraResolutionMP;
+  int? mainCameraResolution;
+  int? frontCameraResolution;
 
   // Battery
   int? batteryCapacity;
@@ -64,8 +64,8 @@ class Phone {
     this.rearCamerasCount,
     this.hasUltrawideLens,
     this.hasZoomLens,
-    this.mainCameraResolutionMP,
-    this.frontCameraResolutionMP,
+    this.mainCameraResolution,
+    this.frontCameraResolution,
     this.batteryCapacity,
     this.supportsFastCharging,
     this.supportsWirelessCharging,

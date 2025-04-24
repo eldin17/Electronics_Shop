@@ -87,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             image: profileImage,
             imageUploadBtnPress: () {
               _selectImage();
-              print("HEPEKKKKKKK");
+              print("BTN - Image Upload");
             },
           ),
           _formBuilder(context),
@@ -146,34 +146,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
               print("formData -> $formData");
               responseObj = await _loginProvider
                   .register(RegisterModel.fromJson(formData));
+
+              if (responseObj != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(milliseconds: 1000),
+                    content:
+                        Text('🎉 Account created! Let the adventure begin 🌟'),
+                  ),
+                );
+              }
             } else {
               responseObj = await _loginProvider
                   .register(RegisterModel.fromJson(formData));
-              await _imageProvider.addSingleImage(responseObj.id!, _imageFile!);
-            }
 
-            Navigator.of(context).pushReplacement(
-              PageRouteBuilder(
-                transitionDuration: Duration.zero,
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    LoginScreen(),
-              ),
-            );
+              await _imageProvider.addSingleImage(responseObj.id!, _imageFile!);
+
+              if (responseObj != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(milliseconds: 1500),
+                    content:
+                        Text('🎉 Account created! Let the adventure begin 🌟'),
+                  ),
+                );
+              }
+            }
+            Future.delayed(Duration(milliseconds: 1500), () {
+              Navigator.of(context).pushReplacement(
+                PageRouteBuilder(
+                  transitionDuration: Duration.zero,
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      LoginScreen(),
+                ),
+              );
+            });
           } on Exception catch (e) {
-            // TODO
-            showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: Text("Error"),
-                content: Text(e.toString()),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text("Ok"),
-                  )
-                ],
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 1500),
+                content:
+                    Text('❌ Oops! Something went wrong. Please try again.'),
               ),
             );
+            // showDialog(
+            //   context: context,
+            //   builder: (BuildContext context) => AlertDialog(
+            //     title: Text("Error"),
+            //     content: Text(e.toString()),
+            //     actions: [
+            //       TextButton(
+            //         onPressed: () => Navigator.pop(context),
+            //         child: Text("Ok"),
+            //       )
+            //     ],
+            //   ),
+            // );
           }
         }
       },
