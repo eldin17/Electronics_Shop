@@ -13,6 +13,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public string Comment { get; set; }
         public virtual DtoCustomer Customer { get; set; }
         public int ProductId { get; set; }
+        public virtual DtoImage Image { get; set; }
 
     }
 }

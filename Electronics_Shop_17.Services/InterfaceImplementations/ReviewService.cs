@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
+using Electronics_Shop_17.Model.Helpers;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
@@ -19,9 +20,39 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
         }
 
+        public override List<DtoReview> ImageIncludeForReviews(List<DtoReview> list)
+        {
+            var userAccounts = _context.UserAccounts.Include(x=>x.Image).ToList();
+            foreach (var item in list) {
+                var obj = userAccounts.FirstOrDefault(x => x.Id == item.Customer.UserAccountId);
+                if (obj != null) { 
+                    item.Image = obj.Image == null ? null: _mapper.Map<DtoImage>(obj.Image);
+                }
+            }
+            list.OrderByDescending(x => x.Id);
+            return base.ImageIncludeForReviews(list);
+        }
+
         public override IQueryable<Review> AddInclude(IQueryable<Review> data)
         {
-            data = data.Include(x => x.Customer).ThenInclude(x => x.Person);
+            //data = data.Include(x => x.Customer).ThenInclude(x => x.Person);
+            data = data.Include(x => x.Customer)
+               .ThenInclude(x => x.Person)
+               .Select(x => new Review
+               {
+                   Id = x.Id,
+                   Rating = x.Rating,
+                   Comment = x.Comment,
+                   CustomerId = x.CustomerId,
+                   ProductId = x.ProductId,
+                   Customer = new Customer
+                   {
+                       Id = x.Customer.Id,
+                       Person = x.Customer.Person,
+                       UserAccountId = x.Customer.UserAccountId                       
+                   }
+                   
+               });
             return base.AddInclude(data);
         }
 

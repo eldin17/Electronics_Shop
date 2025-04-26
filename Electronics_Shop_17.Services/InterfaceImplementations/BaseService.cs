@@ -41,7 +41,14 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var tolist = await data.ToListAsync();
             var list = _mapper.Map<List<T>>(tolist);
 
+            list = ImageIncludeForReviews(list);
+
             return new Pagination<T>(list, totalItems);
+        }
+
+        public virtual List<T> ImageIncludeForReviews(List<T> list)
+        {
+            return list;
         }
 
         public virtual IQueryable<TDb> AddInclude(IQueryable<TDb> data)

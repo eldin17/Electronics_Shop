@@ -14,6 +14,9 @@ Review _$ReviewFromJson(Map<String, dynamic> json) => Review(
           ? null
           : Customer.fromJson(json['customer'] as Map<String, dynamic>),
       productId: (json['productId'] as num?)?.toInt(),
+      image: json['image'] == null
+          ? null
+          : Image.fromJson(json['image'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ReviewToJson(Review instance) => <String, dynamic>{
@@ -22,4 +25,5 @@ Map<String, dynamic> _$ReviewToJson(Review instance) => <String, dynamic>{
       'comment': instance.comment,
       'customer': instance.customer,
       'productId': instance.productId,
+      'image': instance.image,
     };

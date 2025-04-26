@@ -5,6 +5,7 @@ import 'package:flutter17_mobile/models/person.dart';
 import 'package:flutter17_mobile/models/user_account.dart';
 import 'package:flutter17_mobile/models/wishlist.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:flutter17_mobile/models/image.dart';
 
 part 'review.g.dart';
 
@@ -15,6 +16,7 @@ class Review {
   String? comment;
   Customer? customer;
   int? productId;
+  Image? image;
   
   Review({
     this.id,
@@ -22,6 +24,7 @@ class Review {
     this.comment,
     this.customer,
     this.productId,
+    this.image,
   });
 
   factory Review.fromJson(Map<String, dynamic> json) =>
