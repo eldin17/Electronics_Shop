@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class AccessoryDetails extends StatelessWidget {
   Product product;
@@ -26,22 +27,61 @@ class AccessoryDetails extends StatelessWidget {
                 ),
               ),
             ),
+            // Product title and description
             Text(
               "${product.brand} ${product.model}",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            Text("${product.description}",
-                style: TextStyle(fontStyle: FontStyle.italic)),
+            SizedBox(height: 5),
+            Text(
+              "${product.description}",
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            ),
             SizedBox(height: 10),
+
             Text(
               "Technical Specifications",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
             ),
-            SizedBox(height: 10),
-            Text("ACCESSORY"),
+            SizedBox(height: 15),
+            Card(
+              color: Colors.white,
+              elevation: 4,
+              margin: EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "General",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    showProperties(product),                    
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
+Widget showProperties(Product product){
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: product.accessory!.accessoryProperties!.map((property) {
+      return buildSpecificationRow(
+        property.propertyName ?? '',
+        property.propertyValue ?? '',
+      );
+    }).toList(),
+  );
 }

@@ -63,9 +63,9 @@ List<Map<String, dynamic>> categoriesFromUtils = [
       case "Camera":
         return "Camera";
       case "PC":
-        return"DesktopPC";
+        return"Desktop PC";
       case "Console":
-        return"GamingConsole";
+        return"Gaming Console";
       case "Laptop":
         return"Laptop";
       case "Phone":
@@ -85,9 +85,9 @@ List<Map<String, dynamic>> categoriesFromUtils = [
       case "Camera":
         return "Camera";
       case "PC":
-        return"DesktopPC";
+        return"Desktop PC";
       case "Console":
-        return"GamingConsole";
+        return"Gaming Console";
       case "Laptop":
         return"Laptop";
       case "Phone":
