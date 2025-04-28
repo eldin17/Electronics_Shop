@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/details_screen_section.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class CameraDetails extends StatelessWidget {
@@ -48,109 +49,81 @@ class CameraDetails extends StatelessWidget {
               ),
             ),
             SizedBox(height: 15),
-
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Sensor",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Megapixels", "${product.camera?.megapixels!.toInt()}"),
-                    buildSpecificationRow(
-                        "Sensor Type", "${product.camera?.sensorType}"),
-                    buildSpecificationRow(
-                        "Lens Mount", "${product.camera?.lensMount}"),
-                    buildSpecificationRow("Video Resolution",
-                        "${product.camera?.videoResolution}"),
-                  ],
-                ),
-              ),
-            ),
-
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Physical Characteristics",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Weight", "${product.camera?.weight} kg"),
-                    buildSpecificationRow(
-                        "Dimensions", "${product.camera?.dimensions} (cm)"),
-                  ],
-                ),
-              ),
-            ),
-
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Connectivity",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("WiFi",
-                        "${product.camera?.hasWiFi == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Bluetooth",
-                        "${product.camera?.hasBluetooth == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
-
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Battery",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Battery Type", "${product.camera?.batteryType}"),
-                    buildSpecificationRow(
-                        "Battery Life", "${product.camera?.batteryLife} mAh"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(sensor()),
+            detailsSection(physicalCharacteristics()),
+            detailsSection(connectivity()),
+            detailsSection(battery()),
           ],
         ),
       ),
+    );
+  }
+
+  Column battery() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Battery",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Battery Type", "${product.camera?.batteryType}"),
+        buildSpecificationRow(
+            "Battery Life", "${product.camera?.batteryLife} mAh"),
+      ],
+    );
+  }
+
+  Column connectivity() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Connectivity",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "WiFi", "${product.camera?.hasWiFi == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Bluetooth",
+            "${product.camera?.hasBluetooth == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+  Column physicalCharacteristics() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Physical Characteristics",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Weight", "${product.camera?.weight} kg"),
+        buildSpecificationRow(
+            "Dimensions", "${product.camera?.dimensions} (cm)"),
+      ],
+    );
+  }
+
+  Column sensor() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Sensor",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "Megapixels", "${product.camera?.megapixels!.toInt()}"),
+        buildSpecificationRow("Sensor Type", "${product.camera?.sensorType}"),
+        buildSpecificationRow("Lens Mount", "${product.camera?.lensMount}"),
+        buildSpecificationRow(
+            "Video Resolution", "${product.camera?.videoResolution}"),
+      ],
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/details_screen_section.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class TelevisionDetails extends StatelessWidget {
@@ -52,173 +53,158 @@ class TelevisionDetails extends StatelessWidget {
             SizedBox(height: 15),
 
             // Display
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Display",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Screen Size", "${product.television?.screenSize}"),
-                    buildSpecificationRow("Resolution",
-                        "${product.television?.screenResolution}"),
-                    buildSpecificationRow(
-                        "Screen Type", "${product.television?.screenType}"),
-                    buildSpecificationRow("Smart TV",
-                        "${product.television?.isSmartTV == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Refresh Rate",
-                        "${product.television?.refreshRate} Hz"),
-                    buildSpecificationRow("HDR Support",
-                        "${product.television?.supportsHDR == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(display()),
 
             // Audio
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Audio",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Speaker Output",
-                        "${product.television?.speakerOutputPower} W"),
-                    buildSpecificationRow("Dolby Atmos",
-                        "${product.television?.supportsDolbyAtmos == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(audio()),
+
+            
 
             // Connectivity
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Connectivity",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "HDMI Inputs", "${product.television?.hdmiInputs}"),
-                    buildSpecificationRow(
-                        "USB Ports", "${product.television?.usbPorts}"),
-                    buildSpecificationRow("Bluetooth",
-                        "${product.television?.hasBluetooth == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("WiFi",
-                        "${product.television?.hasWiFi == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(connectivity()),
+
+            
 
             // Features
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Features",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Operating System",
-                        "${product.television?.operatingSystem}"),
-                    buildSpecificationRow("Voice Control",
-                        "${product.television?.supportsVoiceControl == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Screen Mirroring",
-                        "${product.television?.hasScreenMirroring == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(features()),
 
+            
             // Physical Characteristics
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Physical Characteristics",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Weight", "${product.television?.weight} kg"),
-                    buildSpecificationRow(
-                        "Dimensions", "${product.television?.dimensions}"),
-                    buildSpecificationRow(
-                        "Stand Type", "${product.television?.standType}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(physicalCharacteristics()),
+
+            
 
             // Energy Efficiency
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Energy Efficiency",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Energy Rating", "${product.television?.energyRating}"),
-                    buildSpecificationRow("Power Consumption",
-                        "${product.television?.powerConsumption} W"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(energyEfficiency()),
+
+            
           ],
         ),
       ),
     );
+  }
+
+  Column energyEfficiency() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Energy Efficiency",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "Energy Rating", "${product.television?.energyRating}"),
+                  buildSpecificationRow("Power Consumption",
+                      "${product.television?.powerConsumption} W"),
+                ],
+              );
+  }
+
+  Column physicalCharacteristics() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Physical Characteristics",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "Weight", "${product.television?.weight} kg"),
+                  buildSpecificationRow(
+                      "Dimensions", "${product.television?.dimensions}"),
+                  buildSpecificationRow(
+                      "Stand Type", "${product.television?.standType}"),
+                ],
+              );
+  }
+
+  Column features() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Features",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow("Operating System",
+                      "${product.television?.operatingSystem}"),
+                  buildSpecificationRow("Voice Control",
+                      "${product.television?.supportsVoiceControl == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Screen Mirroring",
+                      "${product.television?.hasScreenMirroring == true ? 'Yes' : 'No'}"),
+                ],
+              );
+  }
+
+  Column connectivity() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Connectivity",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "HDMI Inputs", "${product.television?.hdmiInputs}"),
+                  buildSpecificationRow(
+                      "USB Ports", "${product.television?.usbPorts}"),
+                  buildSpecificationRow("Bluetooth",
+                      "${product.television?.hasBluetooth == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("WiFi",
+                      "${product.television?.hasWiFi == true ? 'Yes' : 'No'}"),
+                ],
+              );
+  }
+
+  Column audio() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Audio",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow("Speaker Output",
+                      "${product.television?.speakerOutputPower} W"),
+                  buildSpecificationRow("Dolby Atmos",
+                      "${product.television?.supportsDolbyAtmos == true ? 'Yes' : 'No'}"),
+                ],
+              );
+  }
+
+  Column display() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Display",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "Screen Size", "${product.television?.screenSize}"),
+                  buildSpecificationRow("Resolution",
+                      "${product.television?.screenResolution}"),
+                  buildSpecificationRow(
+                      "Screen Type", "${product.television?.screenType}"),
+                  buildSpecificationRow("Smart TV",
+                      "${product.television?.isSmartTV == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Refresh Rate",
+                      "${product.television?.refreshRate} Hz"),
+                  buildSpecificationRow("HDR Support",
+                      "${product.television?.supportsHDR == true ? 'Yes' : 'No'}"),
+                ],
+              );
   }
 }

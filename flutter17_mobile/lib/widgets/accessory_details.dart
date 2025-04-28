@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/details_screen_section.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class AccessoryDetails extends StatelessWidget {
@@ -48,33 +49,29 @@ class AccessoryDetails extends StatelessWidget {
               ),
             ),
             SizedBox(height: 15),
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "General",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    showProperties(product),                    
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(general()),
           ],
         ),
       ),
     );
   }
+
+  Column general() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "General",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        showProperties(product),
+      ],
+    );
+  }
 }
-Widget showProperties(Product product){
+
+Widget showProperties(Product product) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: product.accessory!.accessoryProperties!.map((property) {

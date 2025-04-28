@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/details_screen_section.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class GamingConsoleDetails extends StatelessWidget {
@@ -51,171 +52,155 @@ class GamingConsoleDetails extends StatelessWidget {
             SizedBox(height: 15),
 
             // General Information
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "General Information",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Processor", "${product.gamingConsole?.processor}"),
-                    buildSpecificationRow("Graphics Processor",
-                        "${product.gamingConsole?.graphicsProcessor}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(generalInfo()),
+            
 
             // Performance
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Performance",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "RAM", "${product.gamingConsole?.ram} GB"),
-                    buildSpecificationRow("Storage Type",
-                        "${product.gamingConsole?.storageType}"),
-                    buildSpecificationRow("Storage Capacity",
-                        "${product.gamingConsole?.storageCapacity} GB"),
-                    buildSpecificationRow("Max Resolution",
-                        "${product.gamingConsole?.maxResolution}"),
-                    buildSpecificationRow(
-                        "Max FPS", "${product.gamingConsole?.maxFPS}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(performance()),
+
+            
 
             // Connectivity
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Connectivity",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "USB Ports", "${product.gamingConsole?.usbPorts}"),
-                    buildSpecificationRow("WiFi",
-                        "${product.gamingConsole?.hasWiFi == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Bluetooth",
-                        "${product.gamingConsole?.hasBluetooth == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Ethernet Port",
-                        "${product.gamingConsole?.hasEthernetPort == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("External Storage",
-                        "${product.gamingConsole?.supportsExternalStorage == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(connectivity()),
+            
 
             // Features
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Features",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("VR",
-                        "${product.gamingConsole?.supportsVR == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Physical Media Drive",
-                        "${product.gamingConsole?.hasPhysicalMediaDrive == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Portable",
-                        "${product.gamingConsole?.isPortable == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(features()),
+            
 
             // Additional Features
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Additional Features",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Controller Type",
-                        "${product.gamingConsole?.controllerType}"),
-                    buildSpecificationRow("Backward Compatibility",
-                        "${product.gamingConsole?.supportsBackwardCompatibility == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Online Service",
-                        "${product.gamingConsole?.onlineService}"),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Physical Characteristics",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Weight", "${product.gamingConsole?.weight} kg"),
-                    buildSpecificationRow(
-                        "Dimensions", "${product.gamingConsole?.dimensions}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(additionalFeatures()),
+
+            detailsSection(physicalCharacteristics()),
+            
+            
           ],
         ),
       ),
     );
+  }
+
+  Column physicalCharacteristics() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Physical Characteristics",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "Weight", "${product.gamingConsole?.weight} kg"),
+                  buildSpecificationRow(
+                      "Dimensions", "${product.gamingConsole?.dimensions}"),
+                ],
+              );
+  }
+
+  Column additionalFeatures() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Additional Features",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow("Controller Type",
+                      "${product.gamingConsole?.controllerType}"),
+                  buildSpecificationRow("Backward Compatibility",
+                      "${product.gamingConsole?.supportsBackwardCompatibility == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Online Service",
+                      "${product.gamingConsole?.onlineService}"),
+                ],
+              );
+  }
+
+  Column features() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Features",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow("VR",
+                      "${product.gamingConsole?.supportsVR == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Physical Media Drive",
+                      "${product.gamingConsole?.hasPhysicalMediaDrive == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Portable",
+                      "${product.gamingConsole?.isPortable == true ? 'Yes' : 'No'}"),
+                ],
+              );
+  }
+
+  Column connectivity() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Connectivity",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "USB Ports", "${product.gamingConsole?.usbPorts}"),
+                  buildSpecificationRow("WiFi",
+                      "${product.gamingConsole?.hasWiFi == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Bluetooth",
+                      "${product.gamingConsole?.hasBluetooth == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("Ethernet Port",
+                      "${product.gamingConsole?.hasEthernetPort == true ? 'Yes' : 'No'}"),
+                  buildSpecificationRow("External Storage",
+                      "${product.gamingConsole?.supportsExternalStorage == true ? 'Yes' : 'No'}"),
+                ],
+              );
+  }
+
+  Column performance() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Performance",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "RAM", "${product.gamingConsole?.ram} GB"),
+                  buildSpecificationRow("Storage Type",
+                      "${product.gamingConsole?.storageType}"),
+                  buildSpecificationRow("Storage Capacity",
+                      "${product.gamingConsole?.storageCapacity} GB"),
+                  buildSpecificationRow("Max Resolution",
+                      "${product.gamingConsole?.maxResolution}"),
+                  buildSpecificationRow(
+                      "Max FPS", "${product.gamingConsole?.maxFPS}"),
+                ],
+              );
+  }
+
+  Column generalInfo() {
+    return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "General Information",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  buildSpecificationRow(
+                      "Processor", "${product.gamingConsole?.processor}"),
+                  buildSpecificationRow("Graphics Processor",
+                      "${product.gamingConsole?.graphicsProcessor}"),
+                ],
+              );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/details_screen_section.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class DesktopPCDetails extends StatelessWidget {
@@ -48,164 +49,118 @@ class DesktopPCDetails extends StatelessWidget {
               ),
             ),
             SizedBox(height: 15),
-
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "General Information",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Processor", "${product.desktopPC?.processor}"),
-                    buildSpecificationRow("RAM",
-                        "${product.desktopPC?.ram} GB"),
-                    buildSpecificationRow(
-                        "Storage Type", "${product.desktopPC?.storageType}"),
-                    buildSpecificationRow(
-                        "Storage Capacity", "${product.desktopPC?.storageCapacity} GB"),
-                  buildSpecificationRow(
-                        "Graphics Card", "${product.desktopPC?.graphicsCard}"),
-                  buildSpecificationRow(
-                        "Operating System", "${product.desktopPC?.operatingSystem}"),
-                  
-                  ],
-                ),
-              ),
-            ),
-            Text("Processor - ${product.desktopPC?.processor}"),
-            Text("RAM - ${product.desktopPC?.ram} GB"),
-            Text("Storage Type - ${product.desktopPC?.storageType}"),
-            Text("Storage Capacity - ${product.desktopPC?.storageCapacity} GB"),
-            Text("Graphics Card - ${product.desktopPC?.graphicsCard}"),
-            Text("Operating System - ${product.desktopPC?.operatingSystem}"),
-
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Physical Characteristics",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Form Factor", "${product.desktopPC?.formFactor}"),
-                    buildSpecificationRow("Weight",
-                        "${product.desktopPC?.weight} kg"),
-                    buildSpecificationRow(
-                        "Dimensions", "${product.desktopPC?.dimensions}"),
-                    ],
-                ),
-              ),
-            ),
-            
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Connectivity",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "USB Ports", "${product.desktopPC?.usbPorts}"),
-                    buildSpecificationRow("WiFi",
-                        "${product.desktopPC?.hasWiFi == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Bluetooth",
-                        "${product.desktopPC?.hasBluetooth == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Power Supply",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Power Supply Wattage",
-                        "${product.desktopPC?.powerSupplyWattage} W"),
-                    ],
-                ),
-              ),
-            ),
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Cooling",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Cooling Type", "${product.desktopPC?.coolingType}"),
-                    ],
-                ),
-              ),
-            ),
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Additional Features",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    
-                    buildSpecificationRow("Has RGB Lighting",
-                        "${product.desktopPC?.hasRGBLighting == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(generalInfo()),
+            detailsSection(physicalCharacteristics()),
+            detailsSection(connectivity()),
+            detailsSection(powerSupply()),
+            detailsSection(cooling()),
+            detailsSection(additionalFeatures()),
           ],
         ),
       ),
+    );
+  }
+
+  Column additionalFeatures() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Additional Features",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Has RGB Lighting",
+            "${product.desktopPC?.hasRGBLighting == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+  Column cooling() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Cooling",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "Cooling Type", "${product.desktopPC?.coolingType}"),
+      ],
+    );
+  }
+
+  Column powerSupply() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Power Supply",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Power Supply Wattage",
+            "${product.desktopPC?.powerSupplyWattage} W"),
+      ],
+    );
+  }
+
+  Column connectivity() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Connectivity",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("USB Ports", "${product.desktopPC?.usbPorts}"),
+        buildSpecificationRow(
+            "WiFi", "${product.desktopPC?.hasWiFi == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Bluetooth",
+            "${product.desktopPC?.hasBluetooth == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+  Column physicalCharacteristics() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Physical Characteristics",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "Form Factor", "${product.desktopPC?.formFactor}"),
+        buildSpecificationRow("Weight", "${product.desktopPC?.weight} kg"),
+        buildSpecificationRow("Dimensions", "${product.desktopPC?.dimensions}"),
+      ],
+    );
+  }
+
+  Column generalInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "General Information",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Processor", "${product.desktopPC?.processor}"),
+        buildSpecificationRow("RAM", "${product.desktopPC?.ram} GB"),
+        buildSpecificationRow(
+            "Storage Type", "${product.desktopPC?.storageType}"),
+        buildSpecificationRow(
+            "Storage Capacity", "${product.desktopPC?.storageCapacity} GB"),
+        buildSpecificationRow(
+            "Graphics Card", "${product.desktopPC?.graphicsCard}"),
+        buildSpecificationRow(
+            "Operating System", "${product.desktopPC?.operatingSystem}"),
+      ],
     );
   }
 }

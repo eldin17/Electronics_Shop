@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/providers/coupon_provider.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/providers/discount_provider.dart';
 import 'package:flutter17_mobile/providers/image_upload_provider.dart';
@@ -33,6 +34,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingCartItemProvider()),
         ChangeNotifierProvider(create: (_) => ReviewsProvider()),
+        ChangeNotifierProvider(create: (_) => CouponProvider()),
 
       ],
       child: const MyApp(),

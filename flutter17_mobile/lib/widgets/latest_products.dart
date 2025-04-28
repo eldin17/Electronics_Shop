@@ -46,6 +46,7 @@ class _LatestProductsState extends State<LatestProducts> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ...List.generate(
                 widget.products.length < 4 ? widget.products.length : 4,

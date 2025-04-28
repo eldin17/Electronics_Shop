@@ -11,5 +11,6 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface ICouponService : IBaseServiceSoftDelete<DtoCoupon,SearchCoupon,AddCoupon,UpdateCoupon>
     {
+        Task<DtoCoupon> CouponCheck(string couponCode, int customerId, double purchaseAmount);
     }
 }

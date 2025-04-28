@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/models/product.dart';
+import 'package:flutter17_mobile/widgets/details_screen_section.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 
 class TabletDetails extends StatelessWidget {
@@ -50,206 +51,168 @@ class TabletDetails extends StatelessWidget {
               ),
             ),
             SizedBox(height: 15),
+
             // Display
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Display",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Screen Size", "${product.tablet?.screenSize}"),
-                    buildSpecificationRow("Screen Resolution",
-                        "${product.tablet?.screenResolution}"),
-                    buildSpecificationRow(
-                        "Screen Type", "${product.tablet?.screenType}"),
-                    buildSpecificationRow(
-                        "Refresh Rate", "${product.tablet?.refreshRate} Hz"),
-                  ],
-                ),
-              ),
-            ),
+            detailsSection(display()),
 
-            // Performance
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Performance",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Processor", "${product.tablet?.processor}"),
-                    buildSpecificationRow("RAM", "${product.tablet?.ram} GB"),
-                    buildSpecificationRow(
-                        "Storage", "${product.tablet?.storageCapacity} GB"),
-                    buildSpecificationRow("Expandable Storage",
-                        "${product.tablet?.supportsExpandableStorage == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+// Performance
+            detailsSection(performance()),
 
-            // Camera
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Camera",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Rear Camera",
-                        "${product.tablet?.rearCameraResolution}"),
-                    buildSpecificationRow("Front Camera",
-                        "${product.tablet?.frontCameraResolution}"),
-                  ],
-                ),
-              ),
-            ),
+// Camera
+            detailsSection(camera()),
 
-            // Battery
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Battery",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Battery Capacity",
-                        "${product.tablet?.batteryCapacity} mAh"),
-                    buildSpecificationRow("Battery Life",
-                        "${product.tablet?.estimatedBatteryLife} hours"),
-                    buildSpecificationRow("Fast Charging",
-                        "${product.tablet?.supportsFastCharging == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Wireless Charging",
-                        "${product.tablet?.supportsWirelessCharging == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+// Battery
+            detailsSection(battery()),
 
-            // Connectivity
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Connectivity",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("5G Support",
-                        "${product.tablet?.supports5G == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("WiFi 6",
-                        "${product.tablet?.hasWiFi6 == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Bluetooth",
-                        "${product.tablet?.hasBluetooth == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Cellular",
-                        "${product.tablet?.hasCellular == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+// Connectivity
+            detailsSection(connectivity()),
 
-            // Physical Characteristics
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Physical Characteristics",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow(
-                        "Weight", "${product.tablet?.weight} g"),
-                    buildSpecificationRow(
-                        "Dimensions", "${product.tablet?.dimensions}"),
-                    buildSpecificationRow(
-                        "Build Material", "${product.tablet?.buildMaterial}"),
-                  ],
-                ),
-              ),
-            ),
-
-            // Additional Features
-            Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: EdgeInsets.only(bottom: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Additional Features",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    buildSpecificationRow("Operating System",
-                        "${product.tablet?.operatingSystem}"),
-                    buildSpecificationRow("Stylus Support",
-                        "${product.tablet?.supportsStylus == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Fingerprint Sensor",
-                        "${product.tablet?.hasFingerprintSensor == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Face Recognition",
-                        "${product.tablet?.hasFaceRecognition == true ? 'Yes' : 'No'}"),
-                    buildSpecificationRow("Water Resistant",
-                        "${product.tablet?.isWaterResistant == true ? 'Yes' : 'No'}"),
-                  ],
-                ),
-              ),
-            ),
+// Physical Characteristics
+            detailsSection(physicalCharacteristics()),
+// Additional Features
+            detailsSection(additionalFeatures()),
           ],
         ),
       ),
+    );
+  }
+
+  Column display() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Display",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Screen Size", "${product.tablet?.screenSize}"),
+        buildSpecificationRow(
+            "Screen Resolution", "${product.tablet?.screenResolution}"),
+        buildSpecificationRow("Screen Type", "${product.tablet?.screenType}"),
+        buildSpecificationRow(
+            "Refresh Rate", "${product.tablet?.refreshRate} Hz"),
+      ],
+    );
+  }
+
+  Column performance() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Performance",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Processor", "${product.tablet?.processor}"),
+        buildSpecificationRow("RAM", "${product.tablet?.ram} GB"),
+        buildSpecificationRow(
+            "Storage", "${product.tablet?.storageCapacity} GB"),
+        buildSpecificationRow("Expandable Storage",
+            "${product.tablet?.supportsExpandableStorage == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+  Column camera() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Camera",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "Rear Camera", "${product.tablet?.rearCameraResolution}"),
+        buildSpecificationRow(
+            "Front Camera", "${product.tablet?.frontCameraResolution}"),
+      ],
+    );
+  }
+
+  Column battery() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Battery",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "Battery Capacity", "${product.tablet?.batteryCapacity} mAh"),
+        buildSpecificationRow(
+            "Battery Life", "${product.tablet?.estimatedBatteryLife} hours"),
+        buildSpecificationRow("Fast Charging",
+            "${product.tablet?.supportsFastCharging == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Wireless Charging",
+            "${product.tablet?.supportsWirelessCharging == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+  Column connectivity() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Connectivity",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("5G Support",
+            "${product.tablet?.supports5G == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow(
+            "WiFi 6", "${product.tablet?.hasWiFi6 == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Bluetooth",
+            "${product.tablet?.hasBluetooth == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Cellular",
+            "${product.tablet?.hasCellular == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+  Column additionalFeatures() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Additional Features",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow(
+            "Operating System", "${product.tablet?.operatingSystem}"),
+        buildSpecificationRow("Stylus Support",
+            "${product.tablet?.supportsStylus == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Fingerprint Sensor",
+            "${product.tablet?.hasFingerprintSensor == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Face Recognition",
+            "${product.tablet?.hasFaceRecognition == true ? 'Yes' : 'No'}"),
+        buildSpecificationRow("Water Resistant",
+            "${product.tablet?.isWaterResistant == true ? 'Yes' : 'No'}"),
+      ],
+    );
+  }
+
+
+
+  Column physicalCharacteristics() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Physical Characteristics",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        buildSpecificationRow("Weight", "${product.tablet?.weight} g"),
+        buildSpecificationRow("Dimensions", "${product.tablet?.dimensions}"),
+        buildSpecificationRow(
+            "Build Material", "${product.tablet?.buildMaterial}"),
+      ],
     );
   }
 }

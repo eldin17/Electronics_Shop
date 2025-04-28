@@ -14,5 +14,12 @@ namespace Electronics_Shop_17.Controllers
         public CouponController(ICouponService service) : base(service)
         {
         }
+
+        [HttpGet("CouponCheck")]
+        public async Task<DtoCoupon> CouponCheck(string couponCode, int customerId, double purchaseAmount)
+        {
+            return await (_service as ICouponService).CouponCheck(couponCode, customerId, purchaseAmount);
+        }
+
     }
 }
