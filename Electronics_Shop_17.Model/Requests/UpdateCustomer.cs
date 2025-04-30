@@ -13,5 +13,6 @@ namespace Electronics_Shop_17.Model.Requests
         public virtual List<UpdateAdress>? Adresses { get; set; }
         public virtual List<UpdatePaymentMethod>? PaymentMethods { get; set; }
         public bool? isDeleted { get; set; }
+        public virtual UpdatePerson Person { get; set; }
     }
 }

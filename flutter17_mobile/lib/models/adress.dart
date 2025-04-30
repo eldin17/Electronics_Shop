@@ -6,6 +6,7 @@ part 'adress.g.dart';
 class Adress {
   int? id;
   String? street;
+  String? city;
   String? country;
   String? postalCode;
   bool? isDeleted;
@@ -13,6 +14,7 @@ class Adress {
   Adress({
     this.id,
     this.street,
+    this.city,
     this.country,
     this.postalCode,
     this.isDeleted,

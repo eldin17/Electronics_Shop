@@ -419,6 +419,10 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.UsageCount, opt => opt.Condition(src => src.UsageCount != null));
 
             CreateMap<UserAccount, DtoUserAccount>().ReverseMap();
+            CreateMap<UserAccount, AddUserAcc>().ReverseMap();
+            CreateMap<UserAccount, UpdateUserAcc>().ReverseMap()
+                .ForMember(dest => dest.Username, opt => opt.Condition(src => src.Username != null))
+            .ForMember(dest => dest.Email, opt => opt.Condition(src => src.Email != null));
 
             CreateMap<Image, DtoImage>().ReverseMap();
 

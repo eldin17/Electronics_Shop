@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Helpers;
+using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ namespace Electronics_Shop_17.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserAccountController : BaseController<DtoUserAccount, SearchUserAccount>
+    public class UserAccountController : BaseCRUDController<DtoUserAccount, SearchUserAccount,AddUserAcc,UpdateUserAcc>
     {
         public UserAccountController(IUserAccountService service) : base(service)
         {
@@ -75,6 +76,24 @@ namespace Electronics_Shop_17.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound($"User with ID {id} not found.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPut("resetPW")]
+        public async Task<ActionResult<DtoUserAccount>> ResetPW(ResetPW obj)
+        {
+            try
+            {
+                var result = await (_service as IUserAccountService).ResetPW(obj);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"User with ID {obj.UserAccId} not found.");
             }
             catch (Exception ex)
             {

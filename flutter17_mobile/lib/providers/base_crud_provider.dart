@@ -47,7 +47,6 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
     var uri = Uri.parse(url);
     var objEncoded = jsonEncode(obj);
     var body = objEncoded;
-
     try {
       var response = await http.put(
         uri,

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Helpers;
+using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
@@ -20,7 +21,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
-    public class UserAccountService : BaseService<DtoUserAccount,UserAccount,SearchUserAccount>, IUserAccountService
+    public class UserAccountService : BaseServiceCRUD<DtoUserAccount,UserAccount,SearchUserAccount,AddUserAcc,UpdateUserAcc>, IUserAccountService
     {
         DataContext _context;
         IMapper _mapper;
@@ -96,6 +97,31 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 pwHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pw));
             }
         }
+
+        public async Task<DtoUserAccount> ResetPW(ResetPW obj)
+        {
+            if (obj == null || string.IsNullOrWhiteSpace(obj.NewPassword) || string.IsNullOrWhiteSpace(obj.OldPassword))
+            {
+                throw new ArgumentException();
+            }
+
+            var dbObj = await _context.UserAccounts.FindAsync(obj.UserAccId);
+
+            if (dbObj == null || !VerifyPasswordHash(obj.OldPassword, dbObj.PasswordHash, dbObj.PasswordSalt) || dbObj.isDeactivated)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            CreatePasswordHash(obj.NewPassword, out byte[] pwHash, out byte[] pwSalt);
+
+            dbObj.PasswordHash = pwHash;
+            dbObj.PasswordSalt = pwSalt;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<DtoUserAccount>(dbObj);
+        }
+
         public async Task<DtoLogin> Login(LoginRequest obj)
         {
             if (obj == null || string.IsNullOrWhiteSpace(obj.Username) || string.IsNullOrWhiteSpace(obj.Password))
@@ -106,9 +132,14 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var dbObj = _context.UserAccounts.Include(x => x.Role).Include(x=>x.Customer).Include(x => x.Seller).SingleOrDefault(x => x.Username == obj.Username);            
             
 
-            if (dbObj == null || !VerifyPasswordHash(obj.Password, dbObj.PasswordHash, dbObj.PasswordSalt) || dbObj.isDeactivated)
+            if (dbObj == null || !VerifyPasswordHash(obj.Password, dbObj.PasswordHash, dbObj.PasswordSalt))
             {
                 throw new UnauthorizedAccessException();
+            }
+
+            if (dbObj.isDeactivated)
+            {
+                Reactivate(dbObj.Id);
             }
 
             if (dbObj.Customer != null)            
@@ -198,5 +229,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             return _mapper.Map<DtoUserAccount>(obj);
         }
+
+        
     }
 }

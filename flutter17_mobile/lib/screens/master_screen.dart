@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/models/shopping_cart.dart';
-import 'package:flutter17_mobile/screens/home2.dart';
+import 'package:flutter17_mobile/screens/profile_screen.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/shopping_cart_screen.dart';
 import 'package:flutter17_mobile/screens/wishlist_screen.dart';
@@ -78,7 +78,7 @@ class _MasterScreenState extends State<MasterScreen> {
         );
         break;
       case 3:
-        page = HomeScreen2();
+        page = ProfileScreen();
         break;
       default:
         page = HomeScreen();

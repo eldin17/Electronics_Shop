@@ -4,6 +4,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/models/user_account.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/login_screen.dart';
@@ -15,17 +16,15 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-class RegisterCustomerScreen extends StatefulWidget {
-  bool rememberMe;
-  int UserAccountId;
-  RegisterCustomerScreen(
-      {super.key, required this.UserAccountId, required this.rememberMe});
+class PersonalInfoScreen extends StatefulWidget {
+  UserAccount userAcc;
+  PersonalInfoScreen({super.key, required this.userAcc});
 
   @override
-  State<RegisterCustomerScreen> createState() => _RegisterCustomerScreenState();
+  State<PersonalInfoScreen> createState() => _RegisterCustomerScreenState();
 }
 
-class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
+class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
   final _formKeyRegisterCustomer = GlobalKey<FormBuilderState>();
   Map<String, dynamic> _initialValueRegisterCustomer = {};
   late CustomerProvider _customerProvider;
@@ -42,8 +41,8 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _initialValueRegisterCustomer = {
-      'userAccountId': widget.UserAccountId,
       'adresses': [
         {
           'street': "",
@@ -63,7 +62,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           'customerId': 0,
         }
       ],
-      'personId': 0,
+      'personId': LoginResponse.currentCustomer!.person!.id,
       'person': {
         'firstName': "",
         'lastName': "",
@@ -74,24 +73,18 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Center(child: const Text("Finish Setup")),
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
           child: Padding(
-            padding: isSmallScreen
-                ? const EdgeInsets.symmetric(horizontal: 16)
-                : const EdgeInsets.all(50),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SingleChildScrollView(
-              child:
-                  isSmallScreen ? smallScreen(context) : largeScreen(context),
+              child: smallScreen(context),
             ),
           ),
         ),
@@ -109,55 +102,14 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
         SizedBox(height: MediaQuery.of(context).size.height * 0.05),
         _SignInForm(),
         SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-        const HasAccountText(),
         SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-      ],
-    );
-  }
-
-  Column largeScreen(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  _headline(context),
-                  const SizedBox(height: 8),
-                  _description(context),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.15),
-                  Text(
-                    "Sign In",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall!
-                        .copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                  _SignInForm(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                  const NoAccountText(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                ],
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
   Text _description(BuildContext context) {
     return Text(
-      "Let’s finalize your profile! Fill in the last few details, and you’ll be all set to explore everything we have to offer.",
+      "Need to make a change? Update your personal details below and keep your profile up to date.",
       textAlign: TextAlign.center,
       style: TextStyle(
         color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.64),
@@ -167,7 +119,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
 
   Text _headline(BuildContext context) {
     return Text(
-      "Almost There!",
+      "Update Your Info",
       style: Theme.of(context)
           .textTheme
           .headlineSmall!
@@ -184,6 +136,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
+              initialValue: LoginResponse.currentCustomer?.person?.firstName,
               name: 'person.firstName',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -214,6 +167,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
+              initialValue: LoginResponse.currentCustomer?.person?.lastName,
               name: 'person.lastName',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -244,6 +198,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderDateTimePicker(
+              initialValue: LoginResponse.currentCustomer?.person?.dateOfBirth,
               name: 'person.dateOfBirth',
               controller: dateController,
               inputType: InputType.date,
@@ -278,6 +233,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderField(
+              initialValue: LoginResponse.currentCustomer?.adresses?[0].country,
               name: 'adresses[0].country',
               validator: (value) {
                 if (value == null) {
@@ -325,6 +281,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
+              initialValue: LoginResponse.currentCustomer?.adresses?[0].city,
               name: 'adresses[0].city',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -355,6 +312,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
+              initialValue: LoginResponse.currentCustomer?.adresses?[0].street,
               name: 'adresses[0].street',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -385,6 +343,8 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
+              initialValue:
+                  LoginResponse.currentCustomer?.adresses?[0].postalCode,
               name: 'adresses[0].postalCode',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -431,55 +391,22 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
               print("${jsonEncode(requestData)}");
               if (check == true) {
                 try {
-                  var obj = await _customerProvider.add(requestData);
-                  if (obj != null) LoginResponse.currentCustomer = obj;
-                  LoginResponse.roleName = 'Customer';
-                  LoginResponse.isCustomer = true;
-                  LoginResponse.isSeller = false;
-
-                  var box = Hive.box('authBox');
+                  var obj = await _customerProvider.update(
+                      LoginResponse.currentCustomer!.id!, requestData);
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       duration: Duration(milliseconds: 1500),
                       content: Text(
-                          '✅ All done ${obj.person?.firstName}! Your profile’s looking good.'),
+                          '✅ Nicely done, ${obj.person?.firstName}! Everything’s up to date.'),
                     ),
                   );
 
-                  if (obj != null && widget.rememberMe) {
-                    // await box.put('token', LoginResponse.token);
-                    // await box.put('userId', LoginResponse.userId);
-
-                    await box.put('roleName', 'Customer');
-                    await box.put('isCustomer', true);
-                    await box.put('isSeller', false);
-                  }
-                  print("******FROM REGISTER CUSTOMER******");
-                  print(LoginResponse.token);
-                  print(LoginResponse.userId);
-                  print(LoginResponse.roleName);
-                  print("customer - ${LoginResponse.isCustomer}");
-                  print("seller - ${LoginResponse.isSeller}");
-                  print("current - ${LoginResponse.currentCustomer?.id}");
-
-                  print("******FROM AUTH_BOX******");
-                  print(box.get('token'));
-                  print(box.get('userId'));
-                  print(box.get('roleId'));
-                  print("customer - ${box.get('isCustomer')}");
-                  print("seller - ${box.get('isSeller')}");
-
-                  Future.delayed(Duration(milliseconds: 1500), () {
-                    Navigator.of(context).pushReplacement(
-                      PageRouteBuilder(
-                        transitionDuration: Duration.zero,
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            WelcomeScreen(),
-                      ),
-                    );
+                  setState(() {
+                    LoginResponse.currentCustomer = obj;
                   });
-                  
+
+                  Navigator.pop(context);
                 } on Exception catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -511,7 +438,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(16)),
               ),
             ),
-            child: const Text("Confirm"),
+            child: const Text("Update Info"),
           )
         ],
       ),
@@ -550,38 +477,4 @@ const authOutlineInputBorder = OutlineInputBorder(
   borderRadius: BorderRadius.all(Radius.circular(100)),
 );
 
-class HasAccountText extends StatelessWidget {
-  const HasAccountText({
-    Key? key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(
-          "Already have an account? ",
-          style: TextStyle(color: Color(0xFF757575)),
-        ),
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushReplacement(
-              PageRouteBuilder(
-                transitionDuration: Duration.zero,
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    LoginScreen(),
-              ),
-            );
-          },
-          child: const Text(
-            "Sign In",
-            style: TextStyle(
-              color: Color(0xFFFF7643),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
