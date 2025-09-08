@@ -1,0 +1,27 @@
+<h2>Reactive Form Login</h2>
+
+<form #nesto="ngForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+  <div>
+    <label>Username:</label><br>
+    <input type="text" formControlName="username">
+    <div class="error" *ngIf="username?.invalid && username?.touched">
+      Username is required.
+    </div>
+  </div>
+
+  <div>
+    <label>Password:</label><br>
+    <input type="password" formControlName="password">
+    <div class="error" *ngIf="password?.invalid && password?.touched">
+      Password is required.
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="loading">
+    {{ loading ? 'Logging in...' : 'Login' }}
+  </button>
+
+</form>
+
+<p class="message">{{ message }}</p>

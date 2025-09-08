@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
+using Electronics_Shop_17.Model.Helpers;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -53,6 +55,33 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.isDeleted == search.isDeleted);
             }
             return base.AddFilter(data, search);
+        }
+
+        public override async Task<DtoPaymentMethod> Add(AddPaymentMethod addRequest)
+        {
+            var dbobj = await _context.PaymentMethods.FirstOrDefaultAsync(x => x.CustomerId == addRequest.CustomerId && x.Type == addRequest.Type);
+            if(dbobj != null)
+            {
+                dbobj.isDeleted = false;
+                await _context.SaveChangesAsync();
+                return _mapper.Map<DtoPaymentMethod>(dbobj);
+            }
+            return await base.Add(addRequest);
+        }
+
+        public async Task<DtoPaymentMethod> FindAndDelete(PayMethDel obj)
+        {
+            if (obj != null)
+            {
+                var dbobj = await _context.PaymentMethods.FirstOrDefaultAsync(x=>x.CustomerId == obj.CustomerId && x.Type == obj.Type);
+                if (obj!=null)
+                {
+                        dbobj.isDeleted = true;
+                    await _context.SaveChangesAsync();
+                    return _mapper.Map<DtoPaymentMethod>(dbobj);
+                }
+            }
+            return new DtoPaymentMethod();
         }
     }
 }

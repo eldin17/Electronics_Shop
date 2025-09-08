@@ -2,150 +2,110 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
-import 'package:flutter17_mobile/models/customer.dart';
+import 'package:flutter17_mobile/models/cart_item.dart';
 import 'package:flutter17_mobile/models/payment_method.dart';
-import 'package:flutter17_mobile/models/product.dart';
-import 'package:flutter17_mobile/models/search_result.dart';
-import 'package:flutter17_mobile/providers/customer_provider.dart';
-import 'package:flutter17_mobile/providers/product_provider.dart';
-import 'package:flutter17_mobile/screens/home_screen.dart';
-import 'package:flutter17_mobile/screens/no_products.dart';
+import 'package:flutter17_mobile/models/shopping_cart.dart';
+import 'package:flutter17_mobile/providers/coupon_provider.dart';
+import 'package:flutter17_mobile/providers/payment_methods_provider.dart';
+import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
+import 'package:flutter17_mobile/providers/shopping_cart_provider.dart';
+import 'package:flutter17_mobile/screens/no_cart.dart';
 import 'package:flutter17_mobile/screens/product_details_screen.dart';
-import 'package:flutter17_mobile/widgets/btn_counter.dart';
+import 'package:flutter17_mobile/widgets/add_coupon.dart';
+import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter17_mobile/widgets/payment_method_card.dart';
-import 'package:flutter17_mobile/widgets/product_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {
-  String searchBox;
-  bool fromLatest;
-  bool fromOnDiscount;
-  bool showScreenIfEmpty;
-
-  String category;
-
-  PaymentMethodsScreen({
-    super.key,
-    this.fromLatest = false,
-    this.fromOnDiscount = false,
-    this.showScreenIfEmpty = false,
-    this.category = "",
-    this.searchBox = "",
-  });
+  const PaymentMethodsScreen({super.key});
 
   @override
   State<PaymentMethodsScreen> createState() => _PaymentMethodsScreenState();
 }
 
 class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
-  late CustomerProvider _customerProvider;
-  List<PaymentMethod> paymentMethodsList = [];
-  bool isLoading = true;
-  late Customer test;
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
+  late PaymentMethodProvider _paymentMethodProvider;
+
+  List<PaymentMethod> listPaymentMethods = [
+    PaymentMethod(
+      id: 1,
+      type: 'Cash on Delivery',
+      provider: 'Internal',
+      key: 'cash_cod',
+      isDefault: true,
+      isDeleted: false,
+    ),
+    PaymentMethod(
+      id: 2,
+      type: 'Card on Delivery',
+      provider: 'POS Terminal',
+      key: 'card_cod',
+      isDefault: false,
+      isDeleted: false,
+    ),
+    PaymentMethod(
+      id: 3,
+      type: 'Stripe Online',
+      provider: 'Stripe',
+      key: 'stripe_online',
+      expiryDate: null,
+      isDefault: false,
+      isDeleted: false,
+    ),
+  ];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _customerProvider = context.read<CustomerProvider>();
-    initForm();
+    _paymentMethodProvider = context.read<PaymentMethodProvider>();
+
+      initForm();
+    
   }
 
   Future initForm() async {
-    var obj = await _customerProvider
-        .getById(LoginResponse.currentCustomer!.id!);
+    
 
     setState(() {
       
-      test = obj;
-      
-      paymentMethodsList = test.paymentMethods!;
-      isLoading = false;
     });
-  }  
+  }
 
-  
-
-  
+  Future removeItem(int id) async {
+    await _paymentMethodProvider.delete(id);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return widget.showScreenIfEmpty && paymentMethodsList.length < 1
-        ? !isLoading
-            ? EmptyNotificationsScreen()
-            : Container()
-        : !isLoading
-            ? testING(context)
-            : Container();
-  }
-
-  Scaffold testING(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        //title: Center(child: const Text("Products")),
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: EdgeInsets.zero,
-              elevation: 0,
-              backgroundColor: const Color(0xFFF5F6F9),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              color: Colors.black,
-              size: 20,
-            ),
-          ),
+        backgroundColor: Colors.white,
+        title: Column(
+          children: [],
         ),
-        actions: [],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 20,
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListView.builder(
+                itemCount: 3,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: PaymentMethodCard(paymentMethod: listPaymentMethods[index]),
+                ),
               ),
-              listContents(),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Expanded listContents() {
-    return Expanded(
-      child: GridView.builder(
-        itemCount: paymentMethodsList.length,
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          childAspectRatio: 0.7,
-          mainAxisSpacing: 20,
-          crossAxisSpacing: 16,
-        ),
-        itemBuilder: (context, index) => PaymentMethodCard(
-          align: Alignment.topRight,
-          paymentMethod: paymentMethodsList[index],
-          onPress: () {
-            
-          },
-        ),
+          const Text("🔒 Your data is secure."),
+          const SizedBox(height: 350,)
+        ],
       ),
     );
   }
 }
+
+

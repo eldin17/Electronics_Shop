@@ -32,6 +32,10 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             var dbObj = await _context.Set<TDb>().FindAsync(id);
 
+            if(dbObj==null)
+                throw new KeyNotFoundException($"No record found with Id: {id}");
+
+
             _context.Set<TDb>().Remove(dbObj);
 
             await _context.SaveChangesAsync();
@@ -46,6 +50,9 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         public virtual async Task<T> Update(int id, TUpdate updateRequest)
         {
             var dbObj = await _context.Set<TDb>().FindAsync(id);
+
+            if (dbObj == null)
+                throw new KeyNotFoundException($"No record found with Id: {id}");
 
             _mapper.Map(updateRequest, dbObj);
 

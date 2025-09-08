@@ -142,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  LoginResponse.currentCustomer!.paymentMethods!.isEmpty ? NoPaymentMethodsScreen():PaymentMethodsScreen(),
+                                  PaymentMethodsScreen(),
                         ),
                       );
                     },

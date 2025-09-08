@@ -49,21 +49,7 @@ namespace Electronics_Shop_17.Services
             var dtoProduct = _mapper.Map<DtoProduct>(product);
             dtoProduct.FinalPrice = product.Price;
 
-            var discounts = await _context.Discounts
-                .Where(d => product.ProductDiscounts.Select(pd => pd.DiscountId).Contains(d.Id) &&
-                    d.IsActive &&
-                    DateTime.UtcNow >= d.StartDate &&
-                    DateTime.UtcNow <= d.EndDate)
-                    .ToListAsync();
-
-            foreach (var discount in discounts)
-            {
-                dtoProduct.FinalPrice -= discount.Amount;
-                if ((double)dtoProduct.FinalPrice < (double)product.Price * 0.6)
-                    throw new InvalidOperationException("There has been a mistake with discounts for this product");
-            }
-
-            return dtoProduct;
+            return await PriceCheck(dtoProduct);
         }
 
 
