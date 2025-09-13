@@ -89,11 +89,11 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return await state.Update(id, updateRequest);
         }
 
-        public async Task<DtoOrderSuggestion> Confirm(int id, string? paymentId = null, string? paymentIntent = null)
+        public async Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null)
         {
             var dbObj = await _context.Orders.FindAsync(id);
             var state = _baseOrderState.GetState(dbObj.StateMachine);
-            return await state.Confirm(id, paymentId, paymentIntent);
+            return await state.Confirm(id, cartId, paymentId, paymentIntent);
         }
 
         public async Task<DtoOrder> BackToDraft(int id)
@@ -116,17 +116,19 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var state = _baseOrderState.GetState(dbObj.StateMachine);
             return await state.RemoveItem(id, itemId);
         }
+        
+        public async Task<DtoOrderSuggestion> CheckAndActivate(CheckAndActivateReq req)
+        {
+            var dbObj = await _context.Orders.FindAsync(req.OrderId);
 
-        public async Task<DtoOrder> Activate(int id)
-        {
-            var dbObj = await _context.Orders.FindAsync(id);
             var state = _baseOrderState.GetState(dbObj.StateMachine);
-            return await state.Activate(id);
-        }
-        public async Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request)
+            return await state.CheckAndActivate(req);
+        }        
+
+        public async Task<DtoOrder> AddByCart(AddByCartReq request)
         {
-            var state = _baseOrderState.GetState(request.StateMachine);
-            return await state.CheckAndAdd(request);
+            var state = _baseOrderState.GetState("Initial");
+            return await state.AddByCart(request);
         }
 
         public async Task<DtoOrder> ApplyCoupon(int id, int couponId)
@@ -135,6 +137,29 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var state = _baseOrderState.GetState(dbObj.StateMachine);
             return await state.ApplyCoupon(id, couponId);
         }
+
+        public async Task<DtoOrder> DeleteOrderAndCoupon(int id)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.DeleteOrderAndCoupon(id);
+        }
+
+        // nesto ovako
+        //public async override Task<DtoShoppingCart> GetById(int id)
+        //{
+        //    var dbShoppingCart = await base.GetById(id);
+        //    if (dbShoppingCart != null && dbShoppingCart.CartItems.IsNullOrEmpty())
+        //        return dbShoppingCart;
+
+        //    foreach (var item in dbShoppingCart.CartItems)
+        //    {
+        //        item.Product = await _productService.GetByIdWithChecks(dbShoppingCart.CustomerId, item.Product.Id);
+        //    }
+
+        //    return dbShoppingCart;
+        //}
+
     }
 
 

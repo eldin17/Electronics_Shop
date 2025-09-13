@@ -330,6 +330,14 @@ namespace Electronics_Shop_17.Services
             .ForMember(dest => dest.PaymentMethodId, opt => opt.Condition(src => src.PaymentMethodId != null))
             .ForMember(dest => dest.OrderItems, opt => opt.Condition(src => src.OrderItems != null));
 
+
+            CreateMap<DtoShoppingCart, AddOrder>()
+            .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.CartItems))
+            .ReverseMap();
+            CreateMap<DtoCartItem, AddOrderItem>().ReverseMap();
+
+
+
             CreateMap<PaymentMethod, DtoPaymentMethod>().ReverseMap();
             CreateMap<PaymentMethod, AddPaymentMethod>().ReverseMap();
             CreateMap<PaymentMethod, UpdatePaymentMethod>().ReverseMap()

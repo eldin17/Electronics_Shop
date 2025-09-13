@@ -15,6 +15,7 @@ ShoppingCart _$ShoppingCartFromJson(Map<String, dynamic> json) => ShoppingCart(
       cartItems: (json['cartItems'] as List<dynamic>?)
           ?.map((e) => CartItem.fromJson(e as Map<String, dynamic>))
           .toList(),
+      totalAmount: (json['totalAmount'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$ShoppingCartToJson(ShoppingCart instance) =>
@@ -23,4 +24,5 @@ Map<String, dynamic> _$ShoppingCartToJson(ShoppingCart instance) =>
       'customerId': instance.customerId,
       'dateCreated': instance.dateCreated?.toIso8601String(),
       'cartItems': instance.cartItems,
+      'totalAmount': instance.totalAmount,
     };

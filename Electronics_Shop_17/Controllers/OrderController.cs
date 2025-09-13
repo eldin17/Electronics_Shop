@@ -18,7 +18,7 @@ namespace Electronics_Shop_17.Controllers
         [HttpPatch("Confirm/{id}")]
         public virtual async Task<DtoOrderSuggestion> Confirm(int id, [FromBody] AddPaymentInfo? payment = null)
         {            
-            return await (_service as IOrderService).Confirm(id, payment?.PaymentId, payment?.PaymentIntent);
+            return await (_service as IOrderService).Confirm(id, payment.CartId, payment?.PaymentId, payment?.PaymentIntent);
         }
         [HttpPatch("BackToDraft/{id}")]
         public virtual async Task<DtoOrder> BackToDraft(int id)
@@ -35,16 +35,13 @@ namespace Electronics_Shop_17.Controllers
         {
             return await (_service as IOrderService).RemoveItem(id, itemId);
         }
-        [HttpPatch("Activate/{id}")]
-        public virtual async Task<DtoOrder> Activate(int id)
+        
+        [HttpPost("CheckAndActivate")]
+        public virtual async Task<DtoOrderSuggestion> CheckAndActivate(CheckAndActivateReq req)
         {
-            return await (_service as IOrderService).Activate(id);
+            return await (_service as IOrderService).CheckAndActivate(req);
         }
-        [HttpPost("CheckAndAdd")]
-        public virtual async Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request)
-        {
-            return await (_service as IOrderService).CheckAndAdd(request);
-        }
+        
         [HttpPatch("ApplyCoupon/{id}")]
         public virtual async Task<DtoOrder> ApplyCoupon(int id, int couponId)
         {
@@ -54,6 +51,16 @@ namespace Electronics_Shop_17.Controllers
         public virtual async Task<List<string>> AllowedActionsInState(int id)
         {
             return await (_service as IOrderService).AllowedActionsInState(id);
+        }
+        [HttpPost("AddByCart")]
+        public virtual async Task<DtoOrder> AddByCart(AddByCartReq request)
+        {
+            return await (_service as IOrderService).AddByCart(request);
+        }
+        [HttpDelete("DeleteOrderAndCoupon/{id}")]
+        public virtual async Task<DtoOrder> DeleteOrderAndCoupon(int id)
+        {
+            return await (_service as IOrderService).DeleteOrderAndCoupon(id);
         }
     }
 }

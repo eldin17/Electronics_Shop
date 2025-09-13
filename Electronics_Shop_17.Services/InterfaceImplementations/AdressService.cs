@@ -44,6 +44,10 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             {
                 data = data.Where(x => x.PersonId == search.PersonId);
             }
+            if (search.CustomerId != null)
+            {
+                data = data.Where(x => x.CustomerId == search.CustomerId);
+            }
             if (search.isDeleted != null)
             {
                 data = data.Where(x => x.isDeleted == search.isDeleted);

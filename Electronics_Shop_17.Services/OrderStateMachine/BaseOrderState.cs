@@ -28,6 +28,9 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         {
             switch (state)
             {
+                case "Initial":
+                    return _serviceProvider.GetService<InitialOrderState>();
+                    break;
                 case "Draft":
                     return _serviceProvider.GetService<DraftOrderState>();
                     break;
@@ -50,15 +53,23 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
             return new List<string>();
         }
 
-        public virtual async Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request)
+        public virtual async Task<DtoOrderSuggestion> CheckAndActivate(CheckAndActivateReq req)
         {
             throw new Exception("Action Not Allowed :(");
         }
-        public virtual async Task<DtoOrderSuggestion> Confirm(int id, string? paymentId = null, string? paymentIntent = null)
+        public virtual async Task<DtoOrder> Add(DtoShoppingCart request)
+        {
+            throw new Exception("Action Not Allowed :(");
+        }
+        public virtual async Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null)
         {            
             throw new Exception("Action Not Allowed :(");
         }
         public virtual async Task<DtoOrder> Delete(int id)
+        {
+            throw new Exception("Action Not Allowed :(");
+        }
+        public virtual async Task<DtoOrder> DeleteOrderAndCoupon(int id)
         {
             throw new Exception("Action Not Allowed :(");
         }
@@ -81,12 +92,12 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         public virtual async Task<DtoOrder> Update(int id, UpdateOrder request)
         {
             throw new Exception("Action Not Allowed :(");
-        }
-        public virtual async Task<DtoOrder> Activate(int id)
+        }       
+        public virtual async Task<DtoOrder> ApplyCoupon(int id, int couponId)
         {
             throw new Exception("Action Not Allowed :(");
         }
-        public virtual async Task<DtoOrder> ApplyCoupon(int id, int couponId)
+        public virtual async Task<DtoOrder> AddByCart(AddByCartReq request)
         {
             throw new Exception("Action Not Allowed :(");
         }

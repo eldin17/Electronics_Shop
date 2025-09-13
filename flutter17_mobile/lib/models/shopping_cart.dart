@@ -9,12 +9,14 @@ class ShoppingCart {
   int? customerId;
   DateTime? dateCreated;
   List<CartItem>? cartItems;
+  double? totalAmount;
 
   ShoppingCart({
     this.id,
-    this.customerId,
+    this.customerId, 
     this.dateCreated,
     this.cartItems,
+    this.totalAmount,
   });
 
   factory ShoppingCart.fromJson(Map<String, dynamic> json) => _$ShoppingCartFromJson(json);

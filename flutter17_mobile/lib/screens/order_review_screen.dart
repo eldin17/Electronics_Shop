@@ -3,102 +3,98 @@ import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/cart_item.dart';
+import 'package:flutter17_mobile/models/order.dart';
 import 'package:flutter17_mobile/models/shopping_cart.dart';
-import 'package:flutter17_mobile/providers/coupon_provider.dart';
 import 'package:flutter17_mobile/providers/order_provider.dart';
-import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
-import 'package:flutter17_mobile/providers/shopping_cart_provider.dart';
 import 'package:flutter17_mobile/screens/no_cart.dart';
 import 'package:flutter17_mobile/screens/payment_methods_select.dart';
 import 'package:flutter17_mobile/screens/product_details_screen.dart';
+import 'package:flutter17_mobile/screens/shopping_cart_screen.dart';
 import 'package:flutter17_mobile/widgets/add_coupon.dart';
+import 'package:flutter17_mobile/widgets/fail.dart';
 import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../models/coupon.dart';
+import '../models/order_item.dart';
+import '../providers/order_item_provider.dart';
+import '../widgets/success.dart';
 
-class ShoppingCartScreen extends StatefulWidget {
-  const ShoppingCartScreen({super.key});
+class OrderReviewScreen extends StatefulWidget {
+  Order currentOrder;
+  bool orderSuggestion;
+  OrderReviewScreen(
+      {super.key, required this.currentOrder, required this.orderSuggestion});
 
   @override
-  State<ShoppingCartScreen> createState() => _ShoppingCartScreenState();
+  State<OrderReviewScreen> createState() => _OrderReviewScreenState();
 }
 
-class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
-  late ShoppingCart currentUserShoppingCart;
-  late ShoppingCartProvider _shoppingCartProvider;
-  late ShoppingCartItemProvider _shoppingCartItemProvider;
+class _OrderReviewScreenState extends State<OrderReviewScreen> {
+  late OrderProvider _orderProvider;
+  late OrderItemProvider _orderItemProvider;
 
   bool isLoading = true;
   double totalPrice = 0;
-  late CouponProvider _couponProvider;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _shoppingCartProvider = context.read<ShoppingCartProvider>();
-    _shoppingCartItemProvider = context.read<ShoppingCartItemProvider>();
-    _couponProvider = context.read<CouponProvider>();
+    _orderProvider = context.read<OrderProvider>();
+    _orderItemProvider = context.read<OrderItemProvider>();
 
     if (LoginResponse.currentCustomer!.shoppingCart != null) {
       initForm();
     } else {
-      currentUserShoppingCart = ShoppingCart();
       isLoading = false;
     }
   }
 
   Future initForm() async {
-    var shoppingCartObj = await _shoppingCartProvider
-        .getById(LoginResponse.currentCustomer!.shoppingCart!.id!);
-
     setState(() {
-      currentUserShoppingCart = shoppingCartObj;
-
-      if (currentUserShoppingCart.cartItems != null) {
-        for (var element in currentUserShoppingCart.cartItems!) {
-          element.finalPrice = element.product?.finalPrice;
-
-          totalPrice += element.finalPrice! * element.quantity!;
-        }
-      }
-
+      totalPrice = widget.currentOrder.finalTotalAmount!;
       isLoading = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: Duration(milliseconds: 1500),
-        content: Text('💡  Swipe left to remove items'),
-        backgroundColor: Color.fromARGB(255, 158, 158, 158),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(milliseconds: 1500),
+          content: Text('💡  Swipe left to remove items'),
+          backgroundColor: Color.fromARGB(255, 158, 158, 158),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          margin: EdgeInsets.only(left: 20, right: 20, bottom: 155),
         ),
-        margin: EdgeInsets.only(left: 20, right: 20, bottom: 155),
-      ),
-    );
+      );
+    });
   }
 
   Future removeItem(int id) async {
-    await _shoppingCartItemProvider.delete(id);
+    await _orderItemProvider.delete(id);
   }
 
   @override
   Widget build(BuildContext context) {
-    return !isLoading 
+    return !isLoading && widget.currentOrder.orderItems != null
         ? Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
               title: Column(
                 children: [
-                  const Text(
-                    "Your Shopping Cart",
-                    style: TextStyle(color: Colors.black),
-                  ),
+                  !widget.orderSuggestion
+                      ? const Text(
+                          "Review Your Order",
+                          style: TextStyle(color: Colors.black),
+                        )
+                      : const Text(
+                          "Try This Instead",
+                          style: TextStyle(color: Colors.black),
+                        ),
                   Text(
-                    "${currentUserShoppingCart.cartItems?.length ?? 0} items",
+                    "${widget.currentOrder.orderItems?.length ?? 0} items",
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -107,22 +103,21 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             body: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView.builder(
-                itemCount: currentUserShoppingCart.cartItems?.length ?? 0,
+                itemCount: widget.currentOrder.orderItems?.length ?? 0,
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Dismissible(
-                    key: Key(currentUserShoppingCart.cartItems![index].id
-                        .toString()),
+                    key: Key(
+                        widget.currentOrder.orderItems![index].id.toString()),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
-                      var deletedItem =
-                          currentUserShoppingCart.cartItems![index];
+                      var deletedItem = widget.currentOrder.orderItems![index];
 
                       Future.delayed(Duration.zero, () {
                         setState(() {
                           totalPrice -=
                               deletedItem.finalPrice! * deletedItem.quantity!;
-                          currentUserShoppingCart.cartItems!.removeAt(index);
+                          widget.currentOrder.orderItems!.removeAt(index);
                         });
 
                         removeItem(deletedItem.id!);
@@ -148,16 +143,16 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         ],
                       ),
                     ),
-                    child: CartCard(
-                        cartItem: currentUserShoppingCart.cartItems![index]),
+                    child: OrderCard(
+                        orderItem: widget.currentOrder.orderItems![index],
+                        totalPrice: totalPrice),
                   ),
                 ),
               ),
             ),
             bottomNavigationBar: CheckoutCard(
-              total: totalPrice,
-              couponProvider: _couponProvider,
-              cartObj: currentUserShoppingCart,
+              total: totalPrice ?? 0,
+              orderObj: widget.currentOrder,
             ),
           )
         : !isLoading
@@ -166,28 +161,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 }
 
-class CartCard extends StatefulWidget {
-  const CartCard({
+class OrderCard extends StatefulWidget {
+  OrderCard({
     Key? key,
-    required this.cartItem,
+    required this.orderItem,
+    required this.totalPrice,
   }) : super(key: key);
 
-  final CartItem cartItem;
+  final OrderItem orderItem;
+  double totalPrice;
 
   @override
-  State<CartCard> createState() => _CartCardState();
+  State<OrderCard> createState() => _OrderCardState();
 }
 
-class _CartCardState extends State<CartCard> {
+class _OrderCardState extends State<OrderCard> {
   String imageToShow = "";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    imageToShow = widget.cartItem.product!.productImages!
+    imageToShow = widget.orderItem.product!.productImages!
         .where((element) =>
-            element.productColor!.id == widget.cartItem.productColorId)
+            element.productColor!.id == widget.orderItem.productColorId)
         .first
         .image!
         .path!;
@@ -209,8 +206,9 @@ class _CartCardState extends State<CartCard> {
               },
               pageBuilder: (context, animation, secondaryAnimation) =>
                   ProductDetailsScreen(
-                    selectedProduct: widget.cartItem.product!,
-                    selectedProductColor123: widget.cartItem.productColor,
+                    selectedProduct: widget.orderItem.product!,
+                    selectedProductColor123: widget.orderItem.productColor,
+                    productId: widget.orderItem.product!.id!,
                   )),
         );
       },
@@ -247,7 +245,7 @@ class _CartCardState extends State<CartCard> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: Text(
-                  "${widget.cartItem.product!.brand!} ${widget.cartItem.product!.model!}",
+                  "${widget.orderItem.product!.brand!} ${widget.orderItem.product!.model!}",
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.black, fontSize: 18),
@@ -257,8 +255,7 @@ class _CartCardState extends State<CartCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  widget.cartItem.product!.finalPrice ==
-                          widget.cartItem.product!.price
+                  widget.orderItem.finalPrice == widget.orderItem.price
                       ? RichText(
                           text: TextSpan(
                             style: const TextStyle(
@@ -268,10 +265,9 @@ class _CartCardState extends State<CartCard> {
                             ),
                             children: [
                               TextSpan(
-                                  text:
-                                      "${widget.cartItem.product!.finalPrice}€     "),
+                                  text: "${widget.orderItem.finalPrice}€     "),
                               TextSpan(
-                                text: "x${widget.cartItem.quantity}",
+                                text: "x${widget.orderItem.quantity}",
                                 style: const TextStyle(
                                   color: Colors
                                       .grey, // <- different color for quantity
@@ -286,7 +282,7 @@ class _CartCardState extends State<CartCard> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "${widget.cartItem.product!.price}€",
+                                "${widget.orderItem.price}€",
                                 style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -304,18 +300,16 @@ class _CartCardState extends State<CartCard> {
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Color.fromARGB(
-                                        255, 255, 118, 67), // default color
+                                    color: Color.fromARGB(255, 255, 118, 67),
                                   ),
                                   children: [
                                     TextSpan(
                                         text:
-                                            "${widget.cartItem.product!.finalPrice}€     "),
+                                            "${widget.orderItem.finalPrice}€     "),
                                     TextSpan(
-                                      text: "x${widget.cartItem.quantity}",
+                                      text: "x${widget.orderItem.quantity}",
                                       style: const TextStyle(
-                                        color: Colors
-                                            .grey, // <- different color for quantity
+                                        color: Colors.grey,
                                       ),
                                     ),
                                   ],
@@ -334,28 +328,18 @@ class _CartCardState extends State<CartCard> {
   }
 }
 
-class CheckoutCard extends StatefulWidget {  
-  ShoppingCart cartObj;
+class CheckoutCard extends StatefulWidget {
+  Order orderObj;
   double total;
-  CheckoutCard(
-      {Key? key,
-      required this.total,
-      required this.couponProvider,
-      
-      required this.cartObj
-      })
+  CheckoutCard({Key? key, required this.total, required this.orderObj})
       : super(key: key);
-  TextEditingController _couponController = TextEditingController();
-  CouponProvider couponProvider;
 
   @override
   State<CheckoutCard> createState() => _CheckoutCardState();
 }
 
 class _CheckoutCardState extends State<CheckoutCard> {
-  String couponCode = "";
   late OrderProvider _orderProvider;
-  Coupon? appliedCoupon;
   @override
   void initState() {
     super.initState();
@@ -402,89 +386,44 @@ class _CheckoutCardState extends State<CheckoutCard> {
                   child: SvgPicture.string(receiptIcon),
                 ),
                 const Spacer(),
-                couponCode == ""
-                    ? TextButton(
-                        onPressed: () async {
-                          print("BTN - Add coupon code");
-                          showCouponPopup(
-                            context,
-                            widget._couponController,
-                            () async {
-                              print(
-                                  "Controller: ${widget._couponController.text}");
-                              var obj =
-                                  await widget.couponProvider.couponCheck(obj: {
-                                'couponCode': widget._couponController.text,
-                                'customerId': LoginResponse.currentCustomer!.id,
-                                'purchaseAmount': widget.total
-                              });
-                              if (obj.id! > 0) {
-                                setState(() {
-                                  couponCode = widget._couponController.text;
-                                  widget.total -= obj.discountAmount ?? 0;
-                                  appliedCoupon = obj;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    duration: Duration(milliseconds: 2000),
-                                    content: Text(
-                                        '🎉 Woohoo! You\'ve got ${obj.discountAmount}€ off! 🤑 Enjoy the savings and happy shopping! 🛍️✨'),
-                                    backgroundColor:
-                                        Color.fromARGB(255, 158, 158, 158),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    margin: EdgeInsets.only(
-                                        left: 20, right: 20, bottom: 155),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    duration: Duration(milliseconds: 2000),
-                                    content: Text(
-                                        'Oops! 🚫 That coupon code doesn\'t look right. Double-check and try again! 🕵️‍♂️✨'),
-                                    backgroundColor:
-                                        Color.fromARGB(255, 158, 158, 158),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    margin: EdgeInsets.only(
-                                        left: 20, right: 20, bottom: 155),
-                                  ),
-                                );
-                              }
-                            },
-                          );
-                        },
-                        style:
-                            TextButton.styleFrom(foregroundColor: Colors.grey),
-                        child: Row(
-                          children: [
-                            const Text("Add coupon code"),
-                            SizedBox(width: 5),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 12,
-                              color: Colors.grey,
-                            ),
-                          ],
+                TextButton(
+                  onPressed: () async {
+                    print("BTN - CANCEL order");
+
+                    var obj = await _orderProvider
+                        .deleteOrderAndCoupon(widget.orderObj.id!);
+
+                    showFailPopup(context, "Order Canceled!");
+
+                    Future.delayed(const Duration(milliseconds: 600), () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 150),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                                opacity: animation, child: child);
+                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  ShoppingCartScreen(),
                         ),
-                      )
-                    : Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: const Text(
-                              "Coupon Applied!",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                          SizedBox(width: 5),
-                        ],
+                      );
+                    });
+                  },
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                  child: Row(
+                    children: [
+                      const Text("Cancel order"),
+                      SizedBox(width: 5),
+                      Icon(
+                        Icons.cancel_rounded,
+                        size: 15,
+                        color: Colors.grey,
                       ),
+                    ],
+                  ),
+                )
               ],
             ),
             const SizedBox(height: 16),
@@ -505,37 +444,60 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: (widget.cartObj.cartItems?.length==0)
+                    onPressed: (widget.orderObj.orderItems?.length == 0)
                         ? null // disables the button if no items
                         : () async {
-                      print("BTN - Check Out - ${widget.total}€");
+                            print("CONFIRM Method CALL");
 
-                      print("addFromCart Method CALL");
+                            var obj = await _orderProvider.confirmOrder(
+                                widget.orderObj.id!,
+                                LoginResponse
+                                    .currentCustomer!.shoppingCart!.id!);
 
-                      var draftOrder = await _orderProvider.addFromCart({
-                        'cartId': widget.cartObj.id,
-                        'couponId':
-                            appliedCoupon == null ? null : appliedCoupon?.id,
-                      });
-                      draftOrder.totalAmount = widget.total;
+                            if (obj.newOrder == null) {
+                              showSuccessPopup(
+                                  context, "Your order is on its way!");
+                              setState(() {});
+                              Future.delayed(const Duration(milliseconds: 600),
+                                  () {
+                                Navigator.of(context).push(
+                                  PageRouteBuilder(
+                                    transitionDuration:
+                                        const Duration(milliseconds: 150),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return FadeTransition(
+                                          opacity: animation, child: child);
+                                    },
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        ShoppingCartScreen(),
+                                  ),
+                                );
+                              });
+                            } else {
+                              setState(() {
+                                widget.orderObj = obj.newOrder!;
+                              });
 
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 150),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: Duration(milliseconds: 2000),
+                                  content: Text(
+                                    "⚠️ Cart updated! Some items changed in price or availability while you were checking out. We've refreshed your order — please review the updated suggestion before confirming again.",
+                                  ),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 158, 158, 158),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  margin: EdgeInsets.only(
+                                      left: 20, right: 20, bottom: 155),
+                                ),
+                              );
+                            }
                           },
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  PaymentMethodsSelectScreen(
-                                      draftOrder: draftOrder),
-                        ),
-                      );
-                    },
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       backgroundColor: const Color(0xFFFF7643),
@@ -545,9 +507,9 @@ class _CheckoutCardState extends State<CheckoutCard> {
                         borderRadius: BorderRadius.all(Radius.circular(16)),
                       ),
                     ),
-                    child: const Text("Check Out"),
+                    child: const Text("Confirm"),
                   ),
-                ),
+                )
               ],
             ),
           ],

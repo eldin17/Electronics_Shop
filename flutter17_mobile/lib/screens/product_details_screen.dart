@@ -4,12 +4,14 @@ import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/product_color.dart';
 import 'package:flutter17_mobile/models/product_image.dart';
+import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
 import 'package:flutter17_mobile/screens/no_cart.dart';
 import 'package:flutter17_mobile/screens/no_wishlist.dart';
 import 'package:flutter17_mobile/screens/reviews_screen.dart';
 import 'package:flutter17_mobile/widgets/color_dots.dart';
+import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter17_mobile/widgets/product_images.dart';
 import 'package:flutter17_mobile/widgets/success.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
@@ -18,10 +20,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
+  int? productId;
   Product selectedProduct;
   late ProductColor? selectedProductColor123;
   ProductDetailsScreen(
-      {super.key, required this.selectedProduct, this.selectedProductColor123});
+      {super.key,
+      required this.selectedProduct,
+      this.selectedProductColor123,
+      this.productId});
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -33,15 +39,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late List<ProductImage> imageList;
   late WishlistItemProvider _wishlistItemProvider;
   late ShoppingCartItemProvider _shoppingCartItemProvider;
+  late ProductProvider _productProvider;
   var wishlistItemId = 0;
   var quantityInfo = 1;
-
+  bool isLoading = true;
   @override
   void initState() {
     // TODO: implement initState
 
     _wishlistItemProvider = context.read<WishlistItemProvider>();
     _shoppingCartItemProvider = context.read<ShoppingCartItemProvider>();
+    _productProvider = context.read<ProductProvider>();
 
     if (LoginResponse.currentCustomer?.wishlist != null) {
       var obj = LoginResponse.currentCustomer!.wishlist!.wishlistItems?.where(
@@ -67,6 +75,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     print("init ${selectedProductColor.name}");
     print("init ${wishlistItemId}");
+    initForm();
+  }
+
+  Future initForm() async {
+    late Product obj;
+    if (widget.productId != null) {
+      obj = await _productProvider.getByIdWithChecks(
+          LoginResponse.currentCustomer!.id!, widget.productId!);
+    } else
+      obj = Product();
+
+    setState(() {
+      if (obj.id!=null) widget.selectedProduct = obj;
+
+      isLoading = false;
+    });
   }
 
   void imagesColorPickChange() {
@@ -81,193 +105,196 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final product = widget.selectedProduct;
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFFF5F6F9),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: EdgeInsets.zero,
+    return isLoading
+        ? LoadingScreen()
+        : Scaffold(
+            extendBody: true,
+            extendBodyBehindAppBar: true,
+            backgroundColor: const Color(0xFFF5F6F9),
+            appBar: AppBar(
+              backgroundColor: Colors.white,
               elevation: 0,
-              backgroundColor: const Color(0xFFF5F6F9),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              color: Colors.black,
-              size: 20,
-            ),
-          ),
-        ),
-        actions: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  print("BTN - See Reviews");
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                      transitionDuration: Duration(milliseconds: 150),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          ReviewsScreen(
-                        product: product,
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(right: 20),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F6F9),
-                    borderRadius: BorderRadius.circular(14),
+              leading: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: EdgeInsets.zero,
+                    elevation: 0,
+                    backgroundColor: const Color(0xFFF5F6F9),
                   ),
-                  child: Row(
-                    children: [
-                      Text(
-                        product.reviewScoreAvg!.toStringAsFixed(1),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      SvgPicture.string(starIcon),
-                    ],
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.black,
+                    size: 20,
                   ),
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
-      body: ListView(
-        children: [
-          ProductImages(
-            list: imageList,
-          ),
-          TopRoundedContainer(
-            color: Colors.white,
-            child: Column(
+              actions: [
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        print("BTN - See Reviews");
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            transitionDuration: Duration(milliseconds: 150),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ReviewsScreen(
+                              product: product,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F6F9),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              product.reviewScoreAvg!.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            SvgPicture.string(starIcon),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            body: ListView(
               children: [
-                ProductDescription(
-                  deleteId: wishlistItemId,
-                  wishlistItemProvider: _wishlistItemProvider,
-                  product: product,
-                  pressOnSeeMore: () {
-                    print("asvjitwubet");
-                  },
+                ProductImages(
+                  list: imageList,
                 ),
                 TopRoundedContainer(
-                  color: const Color(0xFFF6F7F9),
+                  color: Colors.white,
                   child: Column(
                     children: [
-                      ColorDots(
+                      ProductDescription(
+                        deleteId: wishlistItemId,
+                        wishlistItemProvider: _wishlistItemProvider,
                         product: product,
-                        selectedColor: selectedColor2,
-                        changeProductColor: (value) {
-                          setState(() {
-                            selectedProductColor = value;
-                            imagesColorPickChange();
-                            print("setState ${selectedProductColor.name}");
-                          });
-                        },
-                        changeQuantity: (value) {
-                          setState(() {
-                            quantityInfo = value;
-
-                            print("quantityInfo - ${quantityInfo}");
-                          });
+                        pressOnSeeMore: () {
+                          print("asvjitwubet");
                         },
                       ),
-                      
+                      TopRoundedContainer(
+                        color: const Color(0xFFF6F7F9),
+                        child: Column(
+                          children: [
+                            ColorDots(
+                              product: product,
+                              selectedColor: selectedColor2,
+                              changeProductColor: (value) {
+                                setState(() {
+                                  selectedProductColor = value;
+                                  imagesColorPickChange();
+                                  print(
+                                      "setState ${selectedProductColor.name}");
+                                });
+                              },
+                              changeQuantity: (value) {
+                                setState(() {
+                                  quantityInfo = value;
+
+                                  print("quantityInfo - ${quantityInfo}");
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: TopRoundedContainer(
-        color: Colors.white,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: const Color(0xFFFF7643),
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                ),
-              ),
-              onPressed: () async {
-                if (LoginResponse.currentCustomer!.shoppingCart != null) {
-                  var cartItemObj = await _shoppingCartItemProvider.add({
-                    'quantity': quantityInfo,
-                    'productId': widget.selectedProduct.id,
-                    'shoppingCartId':
-                        LoginResponse.currentCustomer!.shoppingCart!.id,
-                    'productColorId': selectedProductColor.id,
-                  });
-
-                  if (cartItemObj != null) {
-                    // ScaffoldMessenger.of(context).showSnackBar(
-                    //     SnackBar(
-                    //       duration: Duration(milliseconds: 500),
-                    //         content: Text(
-                    //             '${widget.selectedProduct.brand} ${widget.selectedProduct.model} added to Cart!')),
-                    //   );
-                    showSuccessPopup(context, "Added to Cart!");
-                  }
-                } else {
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                      transitionDuration: Duration(milliseconds: 150),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          NoCartScreen(
-                        productObj: widget.selectedProduct,
+            bottomNavigationBar: TopRoundedContainer(
+              color: Colors.white,
+              child: SafeArea(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: const Color(0xFFFF7643),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
                       ),
                     ),
-                  );
-                }
-              },
-              child: const Text("Add To Cart"),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+                    onPressed: () async {
+                      if (LoginResponse.currentCustomer!.shoppingCart != null) {
+                        var cartItemObj = await _shoppingCartItemProvider.add({
+                          'quantity': quantityInfo,
+                          'productId': widget.selectedProduct.id,
+                          'shoppingCartId':
+                              LoginResponse.currentCustomer!.shoppingCart!.id,
+                          'productColorId': selectedProductColor.id,
+                        });
 
-  
+                        if (cartItemObj != null) {
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //     SnackBar(
+                          //       duration: Duration(milliseconds: 500),
+                          //         content: Text(
+                          //             '${widget.selectedProduct.brand} ${widget.selectedProduct.model} added to Cart!')),
+                          //   );
+                          showSuccessPopup(context, "Added to Cart!");
+                        }
+                      } else {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            transitionDuration: Duration(milliseconds: 150),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    NoCartScreen(
+                              productObj: widget.selectedProduct,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text("Add To Cart"),
+                  ),
+                ),
+              ),
+            ),
+          );
+  }
 }
 
 class ProductDescription extends StatefulWidget {
@@ -471,80 +498,79 @@ class _ProductDescriptionState extends State<ProductDescription> {
 
   TextButton _seeMoreBtn(BuildContext context) {
     return TextButton(
-                onPressed: () {
-                  print("BTN - See More Detail");
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    builder: (context) => Container(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: SeeMoreDetails(
-                        product: widget.product,
-                      ),
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Color(0xFFFF7643),
-                  padding: EdgeInsets.zero,
-                ),
-                child: Row(
-                  children: [
-                    const Text("See More Detail"),
-                    SizedBox(width: 5),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: Color(0xFFFF7643),
-                    ),
-                  ],
-                ),
-              );
+      onPressed: () {
+        print("BTN - See More Detail");
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => Container(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: SeeMoreDetails(
+              product: widget.product,
+            ),
+          ),
+        );
+      },
+      style: TextButton.styleFrom(
+        foregroundColor: Color(0xFFFF7643),
+        padding: EdgeInsets.zero,
+      ),
+      child: Row(
+        children: [
+          const Text("See More Detail"),
+          SizedBox(width: 5),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 12,
+            color: Color(0xFFFF7643),
+          ),
+        ],
+      ),
+    );
   }
 
-  TextButton _reviewsBtn(BuildContext context, Product product) {    
+  TextButton _reviewsBtn(BuildContext context, Product product) {
     return TextButton(
-                onPressed: () {
-                  print("BTN - See Reviews");
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                      transitionDuration: Duration(milliseconds: 150),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          ReviewsScreen(
-                        product: widget.product,
-                      ),
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Color(0xFFFF7643),
-                  padding: EdgeInsets.zero,
-                ),
-                child: Row(
-                  children: [
-                    const Text("Reviews"),
-                    // SizedBox(width: 5),
-                    // Icon(
-                    //   Icons.arrow_forward_ios,
-                    //   size: 12,
-                    //   color: Color(0xFFFF7643),
-                    // ),
-                  ],
-                ),
+      onPressed: () {
+        print("BTN - See Reviews");
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 150),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
               );
+            },
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                ReviewsScreen(
+              product: widget.product,
+            ),
+          ),
+        );
+      },
+      style: TextButton.styleFrom(
+        foregroundColor: Color(0xFFFF7643),
+        padding: EdgeInsets.zero,
+      ),
+      child: Row(
+        children: [
+          const Text("Reviews"),
+          // SizedBox(width: 5),
+          // Icon(
+          //   Icons.arrow_forward_ios,
+          //   size: 12,
+          //   color: Color(0xFFFF7643),
+          // ),
+        ],
+      ),
+    );
   }
 }

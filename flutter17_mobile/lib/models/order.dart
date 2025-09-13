@@ -16,6 +16,7 @@ class Order {
   Customer? customer;
   Adress? adress;
   Coupon? coupon;
+  int? couponId;
   PaymentMethod? paymentMethod;
   List<OrderItem>? orderItems;
 
@@ -27,6 +28,7 @@ class Order {
     this.customer,
     this.adress,
     this.coupon,
+    this.couponId,
     this.paymentMethod,
     this.orderItems,
   });

@@ -15,6 +15,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
 
         public virtual DtoCustomer Customer { get; set; }
         public virtual DtoAdress Adress { get; set; }
+        public int? CouponId { get; set; }
         public virtual DtoCoupon Coupon { get; set; }
         public virtual DtoPaymentMethod PaymentMethod { get; set; }
         public virtual List<DtoOrderItem> OrderItems { get; set; }

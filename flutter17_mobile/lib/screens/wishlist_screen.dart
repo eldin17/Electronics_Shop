@@ -206,11 +206,14 @@ class ItemCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "${item.product!.brand!} ${item.product!.model!}",
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.black, fontSize: 18),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: Text(
+                  "${item.product!.brand!} ${item.product!.model!}",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
+                ),
               ),
               const SizedBox(height: 8),
               Row(

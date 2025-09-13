@@ -10,7 +10,7 @@ namespace Electronics_Shop_17.Model.Requests
     {
         public DateTime OrderTime { get; set; } = DateTime.UtcNow;
         public double TotalAmount { get; set; }
-        public string StateMachine { get; set; } = "Pending";
+        public string StateMachine { get; set; } = "Initial";
 
         public int CustomerId { get; set; }
         public int AdressId { get; set; }

@@ -15,6 +15,7 @@ namespace Electronics_Shop_17.Services.Database
         public string PostalCode { get; set; }
 
         public int PersonId { get; set; }
+        public int CustomerId { get; set; }
         public virtual List<Order> Orders { get; set; }
         public bool isDeleted { get; set; }
 

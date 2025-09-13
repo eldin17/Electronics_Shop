@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Electronics_Shop_17.Model.Requests
 {
-    public class AddPaymentInfo
+    public class AddByCartReq
     {
-        public string? PaymentId { get; set; }
-        public string? PaymentIntent { get; set; }
-        public int? OrderId { get; set; }
         public int CartId { get; set; }
+        public int? CouponId { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/providers/adress_provider.dart';
 import 'package:flutter17_mobile/providers/coupon_provider.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/providers/discount_provider.dart';
@@ -6,6 +7,8 @@ import 'package:flutter17_mobile/providers/image_upload_provider.dart';
 import 'package:flutter17_mobile/providers/login_provider.dart';
 import 'package:flutter17_mobile/providers/news_provider.dart';
 import 'package:flutter17_mobile/providers/notification_provider.dart';
+import 'package:flutter17_mobile/providers/order_item_provider.dart';
+import 'package:flutter17_mobile/providers/order_provider.dart';
 import 'package:flutter17_mobile/providers/payment_methods_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/providers/reviews_provider.dart';
@@ -39,6 +42,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CouponProvider()),
         ChangeNotifierProvider(create: (_) => UserAccountProvider()),
         ChangeNotifierProvider(create: (_) => PaymentMethodProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => AdressProvider()),
+        ChangeNotifierProvider(create: (_) => OrderItemProvider()),
 
       ],
       child: const MyApp(),

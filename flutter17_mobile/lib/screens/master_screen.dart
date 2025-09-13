@@ -38,7 +38,6 @@ class _MasterScreenState extends State<MasterScreen> {
 
   void _onItemTapped(int index) {
     if (index == currentSelectedIndex && index == 1) {
-      print("EVOMEEEEE test");
     } else if (index == currentSelectedIndex) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
     } else {

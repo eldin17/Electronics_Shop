@@ -11,14 +11,15 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IOrderService : IBaseServiceSoftDelete<DtoOrder,SearchOrder,AddOrder,UpdateOrder>
     {
-        Task<DtoOrderSuggestion> Confirm(int id, string? paymentId = null, string? paymentIntent = null);
+        Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null);
         Task<DtoOrder> BackToDraft(int id);
         Task<DtoOrder> AddItem(int id, int productColorId, int quantity);
         Task<DtoOrder> RemoveItem(int id, int itemId);
-        Task<DtoOrder> Activate(int id);
-        Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request);
+        Task<DtoOrderSuggestion> CheckAndActivate(CheckAndActivateReq req);
         Task<DtoOrder> ApplyCoupon(int id, int couponId);
         Task<List<string>> AllowedActionsInState(int id);
+        Task<DtoOrder> AddByCart(AddByCartReq request);
+        Task<DtoOrder> DeleteOrderAndCoupon(int id);
 
     }
 }

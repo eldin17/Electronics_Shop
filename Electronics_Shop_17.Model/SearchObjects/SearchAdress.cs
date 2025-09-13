@@ -13,6 +13,7 @@ namespace Electronics_Shop_17.Model.SearchObjects
         public string? City { get; set; }
         public string? Country { get; set; }
         public string? PostalCode { get; set; }
+        public int? CustomerId { get; set; }
 
         public int? PersonId { get; set; }
         public bool? isDeleted { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -7,6 +8,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Services.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services
@@ -20,6 +23,12 @@ namespace Electronics_Shop_17.Services
             _context = context;
             _mapper = mapper;
         }
+
+        public async Task<double> GetFinalPrice(int productId)
+        {
+            var product = await PriceCheck(productId);
+            return product.FinalPrice;
+        } 
         public async Task<DtoProduct> PriceCheck(DtoProduct product)
         {            
             product.FinalPrice= product.Price;

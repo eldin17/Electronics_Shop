@@ -139,7 +139,7 @@ class _PaymentMethodCardState extends State<PaymentMethodCard> {
                             .add(Duration(days: 3000))
                             .toUtc()
                             .toIso8601String(),
-                        'isDefault': false,
+                        'isDefault': widget.paymentMethod.isDefault,
                         "customerId": LoginResponse.currentCustomer!.id,
                         'isDeleted': false
                       });

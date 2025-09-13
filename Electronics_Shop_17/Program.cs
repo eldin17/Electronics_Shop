@@ -63,6 +63,7 @@ builder.Services.AddTransient<ArchivedProductState>();
 
 
 builder.Services.AddTransient<BaseOrderState>();
+builder.Services.AddTransient<InitialOrderState>();
 builder.Services.AddTransient<DraftOrderState>();
 builder.Services.AddTransient<PendingOrderState>();
 builder.Services.AddTransient<CompletedOrderState>();

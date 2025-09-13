@@ -8,6 +8,7 @@ using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Services.Database;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Ocsp;
 
 namespace Electronics_Shop_17.Services.OrderStateMachine
 {
@@ -22,72 +23,29 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         public override async Task<List<string>> AllowedActionsInState()
         {
             var actions = await base.AllowedActionsInState();
-            actions.Add("CheckAndAdd");
             actions.Add("Confirm");
             actions.Add("Update");
             actions.Add("SoftDelete");
             actions.Add("BackToDraft");
             actions.Add("ApplyCoupon");
+            actions.Add("DeleteOrderAndCoupon");
             return actions;
         }
 
-        public override async Task<DtoOrderSuggestion> CheckAndAdd(AddOrder request)
+        
+
+        public override async Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null )
         {
-            var dbObj = _mapper.Map<Order>(request);
+            var dbObj = await _context.Orders
+            .Include(o => o.OrderItems)
+            .FirstOrDefaultAsync(o => o.Id == id);
 
-            var newOrderSuggestion = _mapper.Map<DtoOrder>(dbObj);
-            newOrderSuggestion.OrderItems.Clear();
-            newOrderSuggestion.TotalAmount = 0;
-            bool hasChanges = false;
-
-            foreach (var item in dbObj.OrderItems)
-            {
-                var stockCheckedItem = await _checks.StockCheck(item);
-                var priceCheckedItem = await _checks.PriceCheck(item.ProductId);
-                if (item.Quantity != stockCheckedItem.Quantity || item.FinalPrice != priceCheckedItem.FinalPrice)
-                {
-                    var newItemSuggestion = _mapper.Map<DtoOrderItem>(item);
-                    newItemSuggestion.Quantity = stockCheckedItem.Quantity;
-                    newItemSuggestion.FinalPrice = priceCheckedItem.FinalPrice;
-
-                    newOrderSuggestion.OrderItems.Add(newItemSuggestion);
-                    newOrderSuggestion.TotalAmount += newItemSuggestion.FinalPrice;
-
-                    hasChanges = true;
-                }
-                else
-                {
-                    newOrderSuggestion.OrderItems.Add(_mapper.Map<DtoOrderItem>(item));
-                    newOrderSuggestion.TotalAmount += item.FinalPrice;
-                }
-            }
-            var obj = new DtoOrderSuggestion()
-            {
-                oldOrder = _mapper.Map<DtoOrder>(dbObj),
-                newOrder = hasChanges ? _mapper.Map<DtoOrder>(newOrderSuggestion) : new DtoOrder()
-            };
-
-            if (!hasChanges)
-            {
-                _context.Orders.Add(dbObj);
-
-                await _context.SaveChangesAsync();
-            }
-
-            return obj;
-        }
-
-        public override async Task<DtoOrderSuggestion> Confirm(int id, string? paymentId = null, string? paymentIntent = null)
-        {            
-            var dbObj = await _context.Orders.Include(x=>x.OrderItems).ThenInclude(x=>x.ProductColor)
-                .Include(x => x.OrderItems).ThenInclude(x => x.Product)
-                .SingleOrDefaultAsync(x=>x.Id==id);
             if (dbObj == null)
                 throw new KeyNotFoundException($"Order with id {id} not found");
 
             var newOrderSuggestion = _mapper.Map<DtoOrder>(dbObj);
             var orderItemsList = new List<DtoOrderItem>();
-            //newOrderSuggestion.OrderItems.Clear();//ovdje ce brisati i iz dbObj, prepraviti
+            
             newOrderSuggestion.TotalAmount = 0;
             bool hasChanges = false;
 
@@ -114,12 +72,13 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
             var obj = new DtoOrderSuggestion()
             {
                 oldOrder = _mapper.Map<DtoOrder>(dbObj),
-                newOrder = hasChanges ? _mapper.Map<DtoOrder>(newOrderSuggestion) : new DtoOrder()                
+                newOrder = hasChanges ? _mapper.Map<DtoOrder>(newOrderSuggestion) : null                
             };
            
             if (!hasChanges)
             {
-                RemoveStock(dbObj.OrderItems);
+                await RemoveStock(dbObj.OrderItems);
+                await ResetShoppingCart(cartId);
                 dbObj.StateMachine = "Completed";
                 if(paymentId!=null && paymentIntent != null)
                 {
@@ -127,12 +86,27 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
                     dbObj.PaymentIntent = paymentIntent;                        
                 }
 
+                
+
                 await _context.SaveChangesAsync();
             }
             else
-                obj.newOrder.OrderItems= orderItemsList;
+            {
+                obj.newOrder.OrderItems= orderItemsList;                
+            }
 
-                return obj;
+            return obj;
+        }
+
+        public async Task ResetShoppingCart(int cartId)
+        {
+            var dbObj = await _context.Set<ShoppingCart>().FirstOrDefaultAsync(x => x.Id == cartId);
+            if (dbObj == null)
+                throw new Exception("No Shopping Cart Found");
+
+            dbObj.CartItems = new List<CartItem>();
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task RemoveStock(List<OrderItem> obj)
@@ -149,6 +123,28 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
                 productColor.Stock -= item.Quantity;
             }
             await _context.SaveChangesAsync();
+        }
+
+        public async override Task<DtoOrder> DeleteOrderAndCoupon(int id)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var returnObj = _mapper.Map<DtoOrder>(dbObj);
+
+            if (dbObj == null)
+                throw new Exception("No Order found");
+
+            if (dbObj.CouponId != null)
+            {
+                var couponCustomer = await _context.CustomerCoupons.Where(x=>x.CouponId==dbObj.CouponId && x.CustomerId==dbObj.CustomerId).FirstOrDefaultAsync();
+
+                _context.Remove(couponCustomer);
+            }
+
+            _context.Remove(dbObj);
+
+            await _context.SaveChangesAsync();
+
+            return returnObj;
         }
 
         public override async Task<DtoOrder> SoftDelete(int id)

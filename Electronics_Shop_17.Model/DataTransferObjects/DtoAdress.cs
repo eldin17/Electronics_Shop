@@ -14,6 +14,7 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public string Country { get; set; }
         public string PostalCode { get; set; }
         public bool isDeleted { get; set; }
+        public int CustomerId { get; set; }
 
     }
 }
