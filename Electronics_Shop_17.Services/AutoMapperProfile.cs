@@ -342,11 +342,7 @@ namespace Electronics_Shop_17.Services
             CreateMap<PaymentMethod, AddPaymentMethod>().ReverseMap();
             CreateMap<PaymentMethod, UpdatePaymentMethod>().ReverseMap()
             .ForMember(dest => dest.Type, opt => opt.Condition(src => src.Type != null))
-            .ForMember(dest => dest.Provider, opt => opt.Condition(src => src.Provider != null))
-            .ForMember(dest => dest.Key, opt => opt.Condition(src => src.Key != null))
-            .ForMember(dest => dest.ExpiryDate, opt => opt.Condition(src => src.ExpiryDate != null))
-            .ForMember(dest => dest.IsDefault, opt => opt.Condition(src => src.IsDefault != null))
-            .ForMember(dest => dest.isDeleted, opt => opt.Condition(src => src.isDeleted != null));
+            .ForMember(dest => dest.Provider, opt => opt.Condition(src => src.Provider != null));
 
             CreateMap<Coupon, DtoCoupon>().ReverseMap();
             CreateMap<Coupon, AddCoupon>().ReverseMap();
@@ -390,8 +386,7 @@ namespace Electronics_Shop_17.Services
             CreateMap<Customer, UpdateCustomer>().ReverseMap()
             .ForMember(dest => dest.LoyaltyPoints, opt => opt.Condition(src => src.LoyaltyPoints != null))
             .ForMember(dest => dest.Adresses, opt => opt.Condition(src => src.Adresses != null))
-            .ForMember(dest => dest.isDeleted, opt => opt.Condition(src => src.isDeleted != null))
-            .ForMember(dest => dest.PaymentMethods, opt => opt.Condition(src => src.PaymentMethods != null));
+            .ForMember(dest => dest.isDeleted, opt => opt.Condition(src => src.isDeleted != null));
 
             CreateMap<Seller, DtoSeller>().ReverseMap();
             CreateMap<Seller, AddSeller>().ReverseMap();

@@ -14,6 +14,7 @@ namespace Electronics_Shop_17.Model.Requests
         public string PostalCode { get; set; }
 
         public int PersonId { get; set; }
+        public int CustomerId { get; set; }
         public bool isDeleted { get; set; } = false;
     }
 }

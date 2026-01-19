@@ -30,7 +30,7 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
       var response = await http.post(uri, headers: headers, body: send);
 
       if (isValidResponse(response)) {
-        var data = jsonDecode(response.body);
+        var data = jsonDecode(response.body);        
         return fromJson(data);
       }
     } catch (e) {

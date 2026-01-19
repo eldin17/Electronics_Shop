@@ -22,6 +22,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       coupon: json['coupon'] == null
           ? null
           : Coupon.fromJson(json['coupon'] as Map<String, dynamic>),
+      stateMachine: json['stateMachine'] as String?,
       couponId: (json['couponId'] as num?)?.toInt(),
       paymentMethod: json['paymentMethod'] == null
           ? null
@@ -41,6 +42,7 @@ Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
       'adress': instance.adress,
       'coupon': instance.coupon,
       'couponId': instance.couponId,
+      'stateMachine': instance.stateMachine,
       'paymentMethod': instance.paymentMethod,
       'orderItems': instance.orderItems,
     };

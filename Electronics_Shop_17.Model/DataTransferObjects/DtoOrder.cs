@@ -12,8 +12,9 @@ namespace Electronics_Shop_17.Model.DataTransferObjects
         public DateTime OrderTime { get; set; }
         public double TotalAmount { get; set; }
         public double? FinalTotalAmount { get; set; }
+        public string StateMachine { get; set; }
 
-        public virtual DtoCustomer Customer { get; set; }
+        //public virtual DtoCustomer Customer { get; set; }
         public virtual DtoAdress Adress { get; set; }
         public int? CouponId { get; set; }
         public virtual DtoCoupon Coupon { get; set; }

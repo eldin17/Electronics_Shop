@@ -21,8 +21,10 @@ import 'package:provider/provider.dart';
 
 import '../models/order.dart';
 import '../providers/adress_provider.dart';
+import '../widgets/add_address.dart';
 import '../widgets/adress_card_select.dart';
 import '../widgets/payment_method_card_select.dart';
+import '../widgets/section.dart';
 import 'order_review_screen.dart';
 
 class PaymentMethodsSelectScreen extends StatefulWidget {
@@ -56,9 +58,7 @@ class _PaymentMethodsSelectScreenState
   }
 
   Future initForm() async {
-    var paymentMethods = await _paymentMethodProvider.getAll(filter: {
-      'customerId': LoginResponse.currentCustomer!.id,
-    });
+    var paymentMethods = await _paymentMethodProvider.getAll();
 
     var adress = await _adressProvider.getAll(filter: {
       'customerId': LoginResponse.currentCustomer!.id,
@@ -99,6 +99,33 @@ class _PaymentMethodsSelectScreenState
     print(selectedAdress?.city ?? "No address selected");
   }
 
+  Future<void> _openAddAddressModal() async {
+  final result = await showModalBottomSheet<Adress>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: AddAddressModal(),
+      );
+    },
+  );
+
+  if (result != null) {
+    setState(() {
+      listAdress.add(result);
+      selectedAdress = result; // auto-select new address
+    });
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,38 +141,41 @@ class _PaymentMethodsSelectScreenState
           ? LoadingScreen()
           : Column(
               children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListView.builder(
-                      itemCount: listPaymentMethods.length,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: PaymentMethodCardForSelection(
-                            paymentMethod: listPaymentMethods[index],
-                            isSelected:
-                                selectedMethod == listPaymentMethods[index],
-                            onSelected: () {
-                              onMethodSelect(index);
-                            }),
+                Section(
+                  title: "Payment method",
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: listPaymentMethods.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      child: PaymentMethodCardForSelection(
+                        paymentMethod: listPaymentMethods[index],
+                        isSelected: selectedMethod == listPaymentMethods[index],
+                        onSelected: () => onMethodSelect(index),
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListView.builder(
-                      itemCount: listAdress.length,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: AdressCardForSelection(
-                          adress: listAdress[index],
-                          isSelected: selectedAdress == listAdress[index],
-                          onSelected: () {
-                            onAdressSelect(index);
-                          },
-                        ),
+                Section(
+                  title: "Delivery address",
+                  action: TextButton.icon(
+                    onPressed: _openAddAddressModal,
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add new"),
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: listAdress.length,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      child: AdressCardForSelection(
+                        adress: listAdress[index],
+                        isSelected: selectedAdress == listAdress[index],
+                        onSelected: () => onAdressSelect(index),
                       ),
                     ),
                   ),
@@ -188,10 +218,10 @@ class _PaymentMethodsSelectScreenState
                                 MaterialStateProperty.resolveWith<Color>(
                               (states) {
                                 if (states.contains(MaterialState.disabled)) {
-                                  return const Color(0xFFFF7643).withOpacity(
-                                      0.5); // lighter orange when disabled
+                                  return const Color(0xFFFF7643)
+                                      .withOpacity(0.5);
                                 }
-                                return const Color(0xFFFF7643); // normal orange
+                                return const Color(0xFFFF7643);
                               },
                             ),
                             foregroundColor:

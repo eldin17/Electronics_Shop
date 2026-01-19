@@ -52,9 +52,9 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
             }
 
 
-            var (adressId,paymentMethodId) = GetIds(request).Result;
+            var adressId = GetIds(request).Result;
             addOrderObj.AdressId= adressId;
-            addOrderObj.PaymentMethodId= paymentMethodId;
+            addOrderObj.PaymentMethodId= 54;
             
             var obj = _mapper.Map<Order>(addOrderObj);
 
@@ -69,33 +69,13 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         }
 
 
-        public async Task<(int,int)> GetIds(DtoShoppingCart request)
+        public async Task<int> GetIds(DtoShoppingCart request)
         {            
             var adressDb = await _context.Set<Adress>().FirstOrDefaultAsync(x => x.CustomerId == request.CustomerId);
             if (adressDb == null)
                 throw new Exception("Adress not found");
 
-
-            var paymentMethodDb = await _context.Set<PaymentMethod>().FirstOrDefaultAsync(x => x.CustomerId == request.CustomerId && x.IsDefault);
-            
-            if (paymentMethodDb == null)
-            {
-                var newPaymentMethod = new AddPaymentMethod()
-                {
-                    Type = "Cash on Delivery",
-                    Provider = "Internal",
-                    Key = "cash_cod",
-                    ExpiryDate = DateTime.UtcNow.AddDays(3000),
-                    IsDefault = true,
-                    CustomerId = request.CustomerId,
-                    isDeleted = false
-                };
-
-                var dto = await _paymentMethodService.Add(newPaymentMethod);
-                paymentMethodDb.Id = dto.Id;
-            }
-
-            return (adressDb.Id,paymentMethodDb.Id);
+            return adressDb.Id;
         }
     }
 }

@@ -8,6 +8,7 @@ import 'package:flutter17_mobile/models/user_account.dart';
 import 'package:flutter17_mobile/providers/image_upload_provider.dart';
 import 'package:flutter17_mobile/providers/user_account_provider.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
+import 'package:flutter17_mobile/screens/my_orders_screen.dart';
 import 'package:flutter17_mobile/screens/no_payment_methods.dart';
 import 'package:flutter17_mobile/screens/payment_methods_screen.dart';
 import 'package:flutter17_mobile/screens/splash_screen.dart';
@@ -127,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   ProfileMenu(
-                    text: "My Payment Methods",
+                    text: "My Orders",
                     icon: paymentIcon,
                     press: () {
                       Navigator.of(context).push(
@@ -142,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  PaymentMethodsScreen(),
+                                  MyOrders(),
                         ),
                       );
                     },

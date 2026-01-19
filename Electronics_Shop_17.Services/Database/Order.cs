@@ -25,7 +25,7 @@ namespace Electronics_Shop_17.Services.Database
         public virtual PaymentMethod PaymentMethod { get; set; }
         public virtual List<OrderItem> OrderItems { get; set; }
         public bool isDeleted { get; set; }
-        public string PaymentId { get; set; }
-        public string PaymentIntent { get; set; }
+        public string? PaymentId { get; set; }
+        public string? PaymentIntent { get; set; }
     }
 }

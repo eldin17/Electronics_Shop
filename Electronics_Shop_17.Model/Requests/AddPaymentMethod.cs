@@ -8,12 +8,9 @@ namespace Electronics_Shop_17.Model.Requests
 {
     public class AddPaymentMethod
     {
+        public string Code { get; set; }
         public string Type { get; set; }
         public string Provider { get; set; }
-        public string? Key { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public bool IsDefault { get; set; }
-        public int CustomerId { get; set; }
-        public bool isDeleted { get; set; } = false;
+        
     }
 }

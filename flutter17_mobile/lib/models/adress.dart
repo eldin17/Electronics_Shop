@@ -10,6 +10,9 @@ class Adress {
   String? country;
   String? postalCode;
   bool? isDeleted;
+  int? customerId;
+  int? personId;
+
 
   Adress({
     this.id,
@@ -18,6 +21,8 @@ class Adress {
     this.country,
     this.postalCode,
     this.isDeleted,
+    this.customerId,
+    this.personId,
   });
 
   factory Adress.fromJson(Map<String, dynamic> json) => _$AdressFromJson(json);

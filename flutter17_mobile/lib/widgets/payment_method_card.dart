@@ -97,35 +97,35 @@ class _PaymentMethodCardState extends State<PaymentMethodCard> {
           paymentMethodIsSelected
               ? Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.orange),
-                      onPressed: () async {
-                        var delObj = PayMethDel(
-                            customerId: LoginResponse.currentCustomer!.id,
-                            type: widget.paymentMethod.type);
-                        var obj =
-                            await _paymentMethodProvider.findAndDelete(delObj);
-                        if (obj.isDeleted!) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              duration: Duration(milliseconds: 1500),
-                              content: Text("❌ Payment Method removed"),
-                              backgroundColor:
-                                  Color.fromARGB(255, 158, 158, 158),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              margin: EdgeInsets.only(
-                                  left: 20, right: 20, bottom: 20),
-                            ),
-                          );
-                          setState(() {
-                            paymentMethodIsSelected = false;
-                          });
-                        }
-                      },
-                    ),
+                    // IconButton(
+                    //   icon: const Icon(Icons.close, color: Colors.orange),
+                    //   onPressed: () async {
+                    //     var delObj = PayMethDel(
+                    //         customerId: LoginResponse.currentCustomer!.id,
+                    //         type: widget.paymentMethod.type);
+                    //     // var obj =
+                    //     //     await _paymentMethodProvider.findAndDelete(delObj);
+                    //     if (obj.isDeleted!) {
+                    //       ScaffoldMessenger.of(context).showSnackBar(
+                    //         SnackBar(
+                    //           duration: Duration(milliseconds: 1500),
+                    //           content: Text("❌ Payment Method removed"),
+                    //           backgroundColor:
+                    //               Color.fromARGB(255, 158, 158, 158),
+                    //           behavior: SnackBarBehavior.floating,
+                    //           shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(50),
+                    //           ),
+                    //           margin: EdgeInsets.only(
+                    //               left: 20, right: 20, bottom: 20),
+                    //         ),
+                    //       );
+                    //       setState(() {
+                    //         paymentMethodIsSelected = false;
+                    //       });
+                    //     }
+                    //   },
+                    // ),
                   ],
                 )
               : ElevatedButton(

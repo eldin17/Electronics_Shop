@@ -9,6 +9,7 @@ using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -53,6 +54,18 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.isDeleted == search.isDeleted);
             }
             return base.AddFilter(data, search);
+        }
+
+        public override async Task<DtoAdress> Add(AddAdress addRequest)
+        {
+            var customer = await _context.Customers.Include(x=>x.Adresses).FirstOrDefaultAsync(x => x.Id == addRequest.CustomerId);
+
+            var dbAdress = _mapper.Map<Adress>(addRequest);
+            customer.Adresses.Add(dbAdress);
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<DtoAdress>(dbAdress);
         }
     }
 }

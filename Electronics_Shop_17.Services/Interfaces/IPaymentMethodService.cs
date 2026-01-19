@@ -10,8 +10,7 @@ using Electronics_Shop_17.Model.SearchObjects;
 
 namespace Electronics_Shop_17.Services.Interfaces
 {
-    public interface IPaymentMethodService : IBaseServiceSoftDelete<DtoPaymentMethod,SearchPaymentMethod,AddPaymentMethod,UpdatePaymentMethod>
+    public interface IPaymentMethodService : IBaseServiceCRUD<DtoPaymentMethod,SearchPaymentMethod,AddPaymentMethod,UpdatePaymentMethod>
     {
-        public Task<DtoPaymentMethod> FindAndDelete(PayMethDel obj);
     }
 }

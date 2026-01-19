@@ -13,6 +13,8 @@ Adress _$AdressFromJson(Map<String, dynamic> json) => Adress(
       country: json['country'] as String?,
       postalCode: json['postalCode'] as String?,
       isDeleted: json['isDeleted'] as bool?,
+      customerId: (json['customerId'] as num?)?.toInt(),
+      personId: (json['personId'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$AdressToJson(Adress instance) => <String, dynamic>{
@@ -22,4 +24,6 @@ Map<String, dynamic> _$AdressToJson(Adress instance) => <String, dynamic>{
       'country': instance.country,
       'postalCode': instance.postalCode,
       'isDeleted': instance.isDeleted,
+      'customerId': instance.customerId,
+      'personId': instance.personId,
     };

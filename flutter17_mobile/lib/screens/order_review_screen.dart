@@ -81,6 +81,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
         ? Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
+              leading: SizedBox(),
               backgroundColor: Colors.white,
               title: Column(
                 children: [
@@ -121,6 +122,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                         });
 
                         removeItem(deletedItem.id!);
+
+                        
+
+
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(

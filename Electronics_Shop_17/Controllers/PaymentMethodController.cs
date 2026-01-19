@@ -10,16 +10,12 @@ namespace Electronics_Shop_17.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentMethodController : BaseSoftDeleteController<DtoPaymentMethod, SearchPaymentMethod, AddPaymentMethod, UpdatePaymentMethod>
+    public class PaymentMethodController : BaseCRUDController<DtoPaymentMethod, SearchPaymentMethod, AddPaymentMethod, UpdatePaymentMethod>
     {
         public PaymentMethodController(IPaymentMethodService service) : base(service)
         {
         }
 
-        [HttpDelete("findAndDelete")]
-        public async Task<DtoPaymentMethod> FindAndDelete(PayMethDel obj)
-        {
-            return await (_service as IPaymentMethodService).FindAndDelete(obj);
-        }
+        
     }
 }

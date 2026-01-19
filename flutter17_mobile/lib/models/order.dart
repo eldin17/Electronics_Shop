@@ -17,6 +17,7 @@ class Order {
   Adress? adress;
   Coupon? coupon;
   int? couponId;
+  String? stateMachine;
   PaymentMethod? paymentMethod;
   List<OrderItem>? orderItems;
 
@@ -28,6 +29,7 @@ class Order {
     this.customer,
     this.adress,
     this.coupon,
+    this.stateMachine,
     this.couponId,
     this.paymentMethod,
     this.orderItems,
