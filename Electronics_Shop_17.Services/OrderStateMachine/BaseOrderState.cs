@@ -7,6 +7,7 @@ using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Services.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Electronics_Shop_17.Services.OrderStateMachine
@@ -61,8 +62,16 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         {
             throw new Exception("Action Not Allowed :(");
         }
-        public virtual async Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null)
+        public virtual async Task<DtoOrderSuggestion> Confirm(int id, int cartId)
         {            
+            throw new Exception("Action Not Allowed :(");
+        }
+        public virtual async Task<DtoOrderSuggestion> ConfirmStripe(int id, int cartId)
+        {
+            throw new Exception("Action Not Allowed :(");
+        }
+        public virtual async Task HandleStripeWebhook(HttpRequest request)
+        {
             throw new Exception("Action Not Allowed :(");
         }
         public virtual async Task<DtoOrder> Delete(int id)

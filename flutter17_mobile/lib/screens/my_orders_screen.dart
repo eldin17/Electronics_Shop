@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/screens/payment_methods_select.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/order.dart';
@@ -34,6 +36,8 @@ class _MyOrdersState extends State<MyOrders> {
         _ordersList = (ordersObj.data as List)
             .map((item) => item is Order ? item : Order.fromJson(item))
             .toList();
+
+        _ordersList.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
       } else {
         _ordersList = [];
       }
@@ -63,26 +67,45 @@ class _MyOrdersState extends State<MyOrders> {
             children: [
               Text(
                 'Order #${order.id}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text('Total Amount: ${order.totalAmount}€'),
-              Text('Final Total: ${order.finalTotalAmount ?? order.totalAmount}€'),
-              Text('Order Time: ${order.orderTime}'),
+              Text(
+                  'Final Total: ${order.finalTotalAmount ?? order.totalAmount}€'),
+              Text(
+                  'Order Time: ${DateFormat('dd-MMM-yy HH:mm').format(order.orderTime!)}'),
               const SizedBox(height: 10),
               const Divider(),
-              const Text('Items', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Items',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               ...order.orderItems!.map((item) => ListTile(
-                    title: Text('${item.product!.brand!} ${item.product!.model!}'),
+                    title:
+                        Text('${item.product!.brand!} ${item.product!.model!}'),
                     trailing: Text('${item.finalPrice}€'),
                   )),
               const SizedBox(height: 10),
-              if (order.stateMachine == 'Pending') // your state machine property
+              if (order.stateMachine == 'Pending')
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await _orderProvider.backToDraft(order.id!);
                     Navigator.pop(context);
                     // Navigate to your Stripe screen
-                    Navigator.pushNamed(context, '/stripe', arguments: order);
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        transitionDuration: Duration(milliseconds: 150),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            PaymentMethodsSelectScreen(draftOrder: order),
+                      ),
+                    );
                   },
                   child: const Text('Pay Now'),
                 ),
@@ -133,13 +156,17 @@ class _MyOrdersState extends State<MyOrders> {
             child: GestureDetector(
               onTap: () => _showOrderModal(_ordersList[index]),
               child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: Colors.white,
+                shadowColor: Color.fromARGB(62, 105, 240, 175),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 3,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      const Icon(Icons.shopping_bag, size: 40, color: Colors.orange),
+                      const Icon(Icons.shopping_bag,
+                          size: 40, color: Colors.orangeAccent),
                       const SizedBox(width: 20),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +174,9 @@ class _MyOrdersState extends State<MyOrders> {
                           Text(
                             "Order #${_ordersList[index].id}",
                             style: const TextStyle(
-                                color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -163,7 +192,8 @@ class _MyOrdersState extends State<MyOrders> {
                       const Spacer(),
                       _ordersList[index].stateMachine == 'Pending'
                           ? const Icon(Icons.warning, color: Colors.amberAccent)
-                          : const Icon(Icons.check_circle, color: Colors.greenAccent),
+                          : const Icon(Icons.check_circle,
+                              color: Colors.greenAccent),
                     ],
                   ),
                 ),

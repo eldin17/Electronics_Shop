@@ -8,6 +8,7 @@ part of 'order_suggestion.dart';
 
 OrderSuggestion _$OrderSuggestionFromJson(Map<String, dynamic> json) =>
     OrderSuggestion(
+      sessionId: json['sessionId'] as String?,
       oldOrder: json['oldOrder'] == null
           ? null
           : Order.fromJson(json['oldOrder'] as Map<String, dynamic>),
@@ -18,6 +19,7 @@ OrderSuggestion _$OrderSuggestionFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$OrderSuggestionToJson(OrderSuggestion instance) =>
     <String, dynamic>{
+      'sessionId': instance.sessionId,
       'oldOrder': instance.oldOrder,
       'newOrder': instance.newOrder,
     };

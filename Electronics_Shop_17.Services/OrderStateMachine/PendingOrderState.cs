@@ -2,22 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Services.Database;
+using Electronics_Shop_17.Services.InterfaceImplementations;
+using Electronics_Shop_17.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Org.BouncyCastle.Ocsp;
+using Stripe;
+using Stripe.Checkout;
+using System.Text.Json;
 
 namespace Electronics_Shop_17.Services.OrderStateMachine
 {
     public class PendingOrderState : BaseOrderState
     {
         Checks _checks;
-        public PendingOrderState(DataContext context, IMapper mapper, IServiceProvider serviceProvider, Checks checks) : base(context, mapper, serviceProvider)
+        IOrderValidationService _orderValidationService;
+        private readonly string _stripeWebhookSecret;
+        
+        public PendingOrderState(DataContext context, IMapper mapper, IServiceProvider serviceProvider, Checks checks, IOrderValidationService orderValidationService, IConfiguration config) : base(context, mapper, serviceProvider)
         {
+            
             _checks = checks;
+            _orderValidationService = orderValidationService;
+            _stripeWebhookSecret = config["Stripe:WebhookSecret"];
+            StripeConfiguration.ApiKey = config["Stripe:SecretKey"];
         }
 
         public override async Task<List<string>> AllowedActionsInState()
@@ -32,79 +47,237 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
             return actions;
         }
 
-        
-
-        public override async Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null )
+        public override async Task HandleStripeWebhook(HttpRequest request)
         {
-            var dbObj = await _context.Orders
-            .Include(o => o.OrderItems)
-            .FirstOrDefaultAsync(o => o.Id == id);
+            Console.WriteLine("Webhook triggered in PendingOrderState");
+            string json = await new StreamReader(request.Body).ReadToEndAsync();
+            Console.WriteLine("Stripe JSON: " + json);
+            Event stripeEvent;
 
-            if (dbObj == null)
-                throw new KeyNotFoundException($"Order with id {id} not found");
-
-            var newOrderSuggestion = _mapper.Map<DtoOrder>(dbObj);
-            var orderItemsList = new List<DtoOrderItem>();
-            
-            newOrderSuggestion.TotalAmount = 0;
-            bool hasChanges = false;
-
-            foreach (var item in dbObj.OrderItems) {
-                var stockCheckedItem = await _checks.StockCheck(item);
-                var priceCheckedItem = await _checks.PriceCheck(item.ProductId);
-                if(item.Quantity!=stockCheckedItem.Quantity || item.FinalPrice != priceCheckedItem.FinalPrice)
-                {
-                    var newItemSuggestion = _mapper.Map<DtoOrderItem>(item);
-                    newItemSuggestion.Quantity = stockCheckedItem.Quantity;
-                    newItemSuggestion.FinalPrice = priceCheckedItem.FinalPrice;
-
-                    orderItemsList.Add(newItemSuggestion);
-                    newOrderSuggestion.TotalAmount += newItemSuggestion.FinalPrice;
-
-                    hasChanges = true;
-                }
-                else
-                {
-                    orderItemsList.Add(_mapper.Map<DtoOrderItem>(item));
-                    newOrderSuggestion.TotalAmount += item.FinalPrice;
-                }
+            try
+            {
+                stripeEvent = EventUtility.ConstructEvent(
+                    json,
+                    request.Headers["Stripe-Signature"],
+                    _stripeWebhookSecret,
+                    throwOnApiVersionMismatch: false
+                );
+                Console.WriteLine("Stripe event type: " + stripeEvent.Type);
             }
-            var obj = new DtoOrderSuggestion()
+            catch (Exception ex)
             {
-                oldOrder = _mapper.Map<DtoOrder>(dbObj),
-                newOrder = hasChanges ? _mapper.Map<DtoOrder>(newOrderSuggestion) : null                
-            };
-           
-            if (!hasChanges)
-            {
-                await RemoveStock(dbObj.OrderItems);
-                await ResetShoppingCart(cartId);
-                dbObj.StateMachine = "Completed";
-                if(paymentId!=null && paymentIntent != null)
-                {
-                    dbObj.PaymentId = paymentId;
-                    dbObj.PaymentIntent = paymentIntent;                        
-                }
-
-                
-
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                obj.newOrder.OrderItems= orderItemsList;                
+                Console.WriteLine("Webhook signature invalid: " + ex.Message);
+                return;
             }
 
-            return obj;
+            // Only care about checkout.session.* events
+            if (!stripeEvent.Type.StartsWith("checkout.session."))
+            {
+                Console.WriteLine("Not a checkout.session event");
+                return;
+            }
+
+            var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
+
+            if (session?.Metadata == null ||
+                !session.Metadata.ContainsKey("order_id") ||
+                !session.Metadata.ContainsKey("cart_id"))
+            {
+                Console.WriteLine("Metadata missing");
+                return;
+            }
+
+            int orderId = int.Parse(session.Metadata["order_id"]);
+            int cartId = int.Parse(session.Metadata["cart_id"]);
+
+            Console.WriteLine($"OrderId: {orderId}, CartId: {cartId}");
+
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                Console.WriteLine("Order not found");
+                return;
+            }
+
+            Console.WriteLine("Order found: " + order.Id);
+
+            // Parse IDs from JSON (your original logic)
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            string? chargeId = null;
+            string? paymentIntentId = null;
+
+            if (root.TryGetProperty("data", out var data) &&
+                data.TryGetProperty("object", out var obj))
+            {
+                if (obj.TryGetProperty("id", out var idProp))
+                    chargeId = idProp.GetString();
+
+                if (obj.TryGetProperty("payment_intent", out var piProp))
+                    paymentIntentId = piProp.GetString();
+            }
+
+            // SUCCESS
+            if (stripeEvent.Type == "checkout.session.completed")
+            {
+                order.PaymentId = chargeId;
+                order.PaymentIntent = paymentIntentId;
+
+                await FinalizeOrderAsync(order, cartId);
+                Console.WriteLine("FinalizeOrderAsync complete. Order state: " + order.StateMachine);
+                return;
+            }
+
+            // ANYTHING ELSE = failed / canceled → Draft
+            Console.WriteLine($"Checkout not successful ({stripeEvent.Type}). Returning order to Draft.");
+
+            order.StateMachine = "Draft";
+
+            await _context.SaveChangesAsync();
+
+            Console.WriteLine($"Order {order.Id} returned to Draft");
         }
+
+
+
+        public override async Task<DtoOrderSuggestion> ConfirmStripe(int id, int cartId)
+        {
+            var (order, suggestion) = await ValidateAndPrepareOrder(id);
+            if (suggestion != null)
+                return suggestion;
+
+            var service = new SessionService();
+
+            if (!string.IsNullOrEmpty(order.PaymentId))
+            {
+                try
+                {
+                    var existingSession = await service.GetAsync(order.PaymentId);
+                    if (existingSession.Status != "expired")
+                    {
+                        return new DtoOrderSuggestion
+                        {
+                            sessionId = existingSession.Id,
+                            oldOrder = _mapper.Map<DtoOrder>(order)
+                        };
+                    }
+                }
+                catch { }
+            }
+
+            var session = await service.CreateAsync(new SessionCreateOptions
+            {
+                PaymentMethodTypes = new() { "card" },
+                Mode = "payment",
+                LineItems = new()
+        {
+            new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    Currency = "eur",
+                    UnitAmount = (long)(order.FinalTotalAmount * 100),
+                    ProductData = new()
+                    {
+                        Name = $"Order #{order.Id} - {order.OrderItems.Count} items"
+                    }
+                },
+                Quantity = 1
+            }
+        },
+                SuccessUrl = "https://checkout.stripe.dev/success",
+                CancelUrl = "https://checkout.stripe.dev/cancel",
+                Metadata = new()
+        {
+            { "order_id", order.Id.ToString() },
+            { "cart_id", cartId.ToString() }
+        }
+            });
+
+            order.PaymentId = session.Id;
+            await _context.SaveChangesAsync();
+
+            return new DtoOrderSuggestion
+            {
+                sessionId = session.Id,
+                oldOrder = _mapper.Map<DtoOrder>(order)
+            };
+        }
+
+
+        public override async Task<DtoOrderSuggestion> Confirm(int id, int cartId)
+        {
+            var (order, suggestion) = await ValidateAndPrepareOrder(id);
+            if (suggestion != null)
+                return suggestion;
+
+            await FinalizeOrderAsync(order,cartId);
+
+            return new DtoOrderSuggestion
+            {
+                oldOrder = _mapper.Map<DtoOrder>(order)
+            };
+        }
+
+
+
+        private async Task<(Order order, DtoOrderSuggestion? suggestion)>ValidateAndPrepareOrder(int orderId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                throw new KeyNotFoundException();
+
+            var validation = await _orderValidationService.ValidateAsync(order);
+
+            if (validation.HasChanges)
+            {
+                return (order, new DtoOrderSuggestion
+                {
+                    oldOrder = _mapper.Map<DtoOrder>(order),
+                    newOrder = _mapper.Map<DtoOrder>(new Order
+                    {
+                        OrderItems = validation.CorrectedItems,
+                        TotalAmount = validation.TotalAmount,
+                        FinalTotalAmount = validation.FinalTotalAmount
+                    })
+                });
+            }
+
+            order.TotalAmount = validation.TotalAmount;
+            order.FinalTotalAmount = validation.FinalTotalAmount;
+
+            await _context.SaveChangesAsync();
+
+            return (order, null);
+        }
+
+        private async Task FinalizeOrderAsync(Order order, int cartId)
+        {
+            if (order.StateMachine == "Completed")
+                return; 
+
+            await RemoveStock(order.OrderItems);
+            await ResetShoppingCart(cartId);
+
+            order.StateMachine = "Completed";
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task ResetShoppingCart(int cartId)
         {
-            var dbObj = await _context.Set<ShoppingCart>().FirstOrDefaultAsync(x => x.Id == cartId);
+            var dbObj = await _context.ShoppingCarts.Include(c => c.CartItems).FirstOrDefaultAsync(x => x.Id == cartId);
             if (dbObj == null)
                 throw new Exception("No Shopping Cart Found");
 
-            dbObj.CartItems = new List<CartItem>();
+            dbObj.CartItems.Clear();
 
             await _context.SaveChangesAsync();
         }
@@ -163,6 +336,8 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
             var dbObj = await _context.Orders.FindAsync(id);
 
             dbObj.StateMachine = "Draft";
+            //dbObj.PaymentId = "";
+            //dbObj.PaymentIntent = "";
 
             await _context.SaveChangesAsync();
             return _mapper.Map<DtoOrder>(dbObj);

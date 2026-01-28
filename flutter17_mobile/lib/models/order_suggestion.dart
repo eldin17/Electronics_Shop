@@ -5,11 +5,13 @@ part 'order_suggestion.g.dart';
 
 @JsonSerializable()
 class OrderSuggestion {
+  String? sessionId;
   Order? oldOrder;
   Order? newOrder;
  
 
   OrderSuggestion({
+    this.sessionId,
     this.oldOrder,
     this.newOrder,   
   });

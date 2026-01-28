@@ -31,3 +31,5 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 📨 RabbitMQ – Message Brokering, Mail Sending
 
 🐳 Docker – Containerization
+
+💳 Stripe – Secure payments with webhook-driven order processing

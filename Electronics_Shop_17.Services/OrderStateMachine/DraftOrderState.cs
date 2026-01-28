@@ -17,11 +17,15 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         IOrderItemService _orderItemService;
         IOrderService _orderService;
         Checks _checks;
-        public DraftOrderState(DataContext context, IMapper mapper, IServiceProvider serviceProvider, IOrderItemService orderItemService, Checks checks, IOrderService orderService) : base(context, mapper, serviceProvider)
+        IOrderValidationService _orderValidationService;
+
+        public DraftOrderState(DataContext context, IMapper mapper, IServiceProvider serviceProvider, IOrderItemService orderItemService, Checks checks, IOrderService orderService, IOrderValidationService orderValidationService) : base(context, mapper, serviceProvider)
         {
             _orderItemService = orderItemService;
             _orderService = orderService;
             _checks = checks;
+            _orderValidationService = orderValidationService;
+
         }
 
         public override async Task<List<string>> AllowedActionsInState()
@@ -37,72 +41,51 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
 
         public override async Task<DtoOrderSuggestion> CheckAndActivate(CheckAndActivateReq req)
         {
-            var dbObj = await _context.Orders
-            .Include(o => o.OrderItems)
-            .FirstOrDefaultAsync(o => o.Id == req.OrderId);
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == req.OrderId);
 
-            if (dbObj == null)
-                throw new Exception($"Order {req.OrderId} not found");
+            if (order == null)
+                throw new KeyNotFoundException($"Order {req.OrderId} not found");
 
-            dbObj.AdressId = req.AdressId;
-            dbObj.PaymentMethodId = req.PaymentMethodId;
+            order.AdressId = req.AdressId;
+            order.PaymentMethodId = req.PaymentMethodId;
 
-            var newOrderSuggestion = _mapper.Map<DtoOrder>(dbObj);
-            newOrderSuggestion.OrderItems.Clear();
-            newOrderSuggestion.TotalAmount = 0;
-            bool hasChanges = false;
+            var validation = await _orderValidationService.ValidateAsync(order);
 
-            foreach (var item in dbObj.OrderItems)
+            if (validation.HasChanges)
             {
-                var stockCheckedItem = await _checks.StockCheck(item);
-                var priceCheckedItem = await _checks.PriceCheck(item.ProductId);
-                if (item.Quantity != stockCheckedItem.Quantity || item.FinalPrice != priceCheckedItem.FinalPrice)
+                return new DtoOrderSuggestion
                 {
-                    var newItemSuggestion = _mapper.Map<DtoOrderItem>(item);
-                    newItemSuggestion.Quantity = stockCheckedItem.Quantity;
-                    newItemSuggestion.FinalPrice = priceCheckedItem.FinalPrice;
-
-                    newOrderSuggestion.OrderItems.Add(newItemSuggestion);
-                    newOrderSuggestion.TotalAmount += newItemSuggestion.FinalPrice;
-
-                    hasChanges = true;
-                }
-                else
-                {
-                    newOrderSuggestion.OrderItems.Add(_mapper.Map<DtoOrderItem>(item));
-                    newOrderSuggestion.TotalAmount += item.FinalPrice;
-                }
+                    oldOrder = _mapper.Map<DtoOrder>(order),
+                    newOrder = _mapper.Map<DtoOrder>(new Order
+                    {
+                        OrderItems = validation.CorrectedItems,
+                        TotalAmount = validation.TotalAmount,
+                        FinalTotalAmount = validation.TotalAmount
+                    })
+                };
             }
-            var obj = new DtoOrderSuggestion()
+
+            order.StateMachine = "Pending";
+            order.TotalAmount = validation.TotalAmount;
+
+            if (order.CouponId.HasValue)
             {
-                oldOrder = _mapper.Map<DtoOrder>(dbObj),
-                newOrder = hasChanges ? _mapper.Map<DtoOrder>(newOrderSuggestion) : null
-            };
-
-            if (!hasChanges)
-            {
-                dbObj.StateMachine = "Pending";
-                //_context.Orders.Add(dbObj);
-
-                if (dbObj.CouponId.HasValue)
-                {
-                    var dtoOrder = await _orderService.ApplyCoupon(dbObj.Id, dbObj.CouponId.Value);
-                    obj.oldOrder.FinalTotalAmount = dtoOrder.FinalTotalAmount;
-                }
-                else
-                {
-                    obj.oldOrder.FinalTotalAmount = obj.oldOrder.TotalAmount;  
-                }
-
-                await _context.SaveChangesAsync();
+                var dtoOrder = await _orderService.ApplyCoupon(order.Id, order.CouponId.Value);
+                order.FinalTotalAmount = dtoOrder.FinalTotalAmount;
             }
             else
             {
-                obj.newOrder.FinalTotalAmount = obj.newOrder.TotalAmount;
+                order.FinalTotalAmount = order.TotalAmount;
             }
 
+            await _context.SaveChangesAsync();
 
-            return obj;
+            return new DtoOrderSuggestion
+            {
+                oldOrder = _mapper.Map<DtoOrder>(order)
+            };
         }
 
         public override async Task<DtoOrder> AddItem(int id, int productColorId, int quantity)

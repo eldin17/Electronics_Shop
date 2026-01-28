@@ -108,23 +108,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: "  My Personal Info",
                     icon: accountIcon,
                     press: () {
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 150),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-                          },
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  PersonalInfoScreen(
-                            userAcc: userAcc,
-                          ),
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (_) => PersonalInfoScreen(userAcc: userAcc),
                         ),
                       );
+                      // Navigator.of(context).push(
+                      //   PageRouteBuilder(
+                      //     transitionDuration: Duration(milliseconds: 150),
+                      //     transitionsBuilder:
+                      //         (context, animation, secondaryAnimation, child) {
+                      //       return FadeTransition(
+                      //         opacity: animation,
+                      //         child: child,
+                      //       );
+                      //     },
+                      //     pageBuilder:
+                      //         (context, animation, secondaryAnimation) =>
+                      //             PersonalInfoScreen(
+                      //       userAcc: userAcc,
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                   ProfileMenu(
@@ -134,18 +139,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.of(context).push(
                         PageRouteBuilder(
                           transitionDuration: Duration(milliseconds: 150),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-                          },
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  MyOrders(),
+                          pageBuilder: (_, __, ___) => MyOrders(),
+                          transitionsBuilder: (_, animation, __, child) =>
+                              FadeTransition(opacity: animation, child: child),
                         ),
                       );
+                      // Navigator.of(context).push(
+                      //   PageRouteBuilder(
+                      //     transitionDuration: Duration(milliseconds: 150),
+                      //     transitionsBuilder:
+                      //         (context, animation, secondaryAnimation, child) {
+                      //       return FadeTransition(
+                      //         opacity: animation,
+                      //         child: child,
+                      //       );
+                      //     },
+                      //     pageBuilder:
+                      //         (context, animation, secondaryAnimation) =>
+                      //             MyOrders(),
+                      //   ),
+                      // );
                     },
                   ),
                   ProfileMenu(

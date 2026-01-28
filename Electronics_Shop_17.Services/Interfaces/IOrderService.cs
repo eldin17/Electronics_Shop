@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
+using Microsoft.AspNetCore.Http;
 
 namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IOrderService : IBaseServiceSoftDelete<DtoOrder,SearchOrder,AddOrder,UpdateOrder>
     {
-        Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null);
+        Task<DtoOrderSuggestion> Confirm(int id, int cartId);
+        Task<DtoOrderSuggestion> ConfirmStripe(int id, int cartId);
+        Task HandleStripeWebhook(HttpRequest request); 
         Task<DtoOrder> BackToDraft(int id);
         Task<DtoOrder> AddItem(int id, int productColorId, int quantity);
         Task<DtoOrder> RemoveItem(int id, int itemId);

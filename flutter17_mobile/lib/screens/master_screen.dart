@@ -76,8 +76,16 @@ class _MasterScreenState extends State<MasterScreen> {
           ),
         );
         break;
+      // case 3:
+      //   page = ProfileScreen();
+      //   break;
       case 3:
-        page = ProfileScreen();
+        page = Navigator(
+          key: _navigatorKeys[3],
+          onGenerateRoute: (_) => MaterialPageRoute(
+            builder: (_) => ProfileScreen(),
+          ),
+        );
         break;
       default:
         page = HomeScreen();
@@ -100,23 +108,39 @@ class _MasterScreenState extends State<MasterScreen> {
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: SvgPicture.string(homeIcon, colorFilter: const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
-            activeIcon: SvgPicture.string(homeIcon, colorFilter: const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
+            icon: SvgPicture.string(homeIcon,
+                colorFilter:
+                    const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
+            activeIcon: SvgPicture.string(homeIcon,
+                colorFilter:
+                    const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.string(heartIcon, colorFilter: const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
-            activeIcon: SvgPicture.string(heartIcon, colorFilter: const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
+            icon: SvgPicture.string(heartIcon,
+                colorFilter:
+                    const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
+            activeIcon: SvgPicture.string(heartIcon,
+                colorFilter:
+                    const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
             label: "Fav",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.string(chatIcon, colorFilter: const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
-            activeIcon: SvgPicture.string(chatIcon, colorFilter: const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
+            icon: SvgPicture.string(chatIcon,
+                colorFilter:
+                    const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
+            activeIcon: SvgPicture.string(chatIcon,
+                colorFilter:
+                    const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
             label: "Chat",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.string(userIcon, colorFilter: const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
-            activeIcon: SvgPicture.string(userIcon, colorFilter: const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
+            icon: SvgPicture.string(userIcon,
+                colorFilter:
+                    const ColorFilter.mode(inActiveIconColor, BlendMode.srcIn)),
+            activeIcon: SvgPicture.string(userIcon,
+                colorFilter:
+                    const ColorFilter.mode(Color(0xFFFF7643), BlendMode.srcIn)),
             label: "Profile",
           ),
         ],

@@ -2,6 +2,7 @@
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +16,22 @@ namespace Electronics_Shop_17.Controllers
         {
         }
 
+        [HttpPost("HandleStripeWebhook")]
+        [AllowAnonymous]
+        public async Task<IActionResult> HandleStripeWebhook()
+        {
+            await (_service as IOrderService).HandleStripeWebhook(Request);
+            return Ok();
+        }
         [HttpPatch("Confirm/{id}")]
-        public virtual async Task<DtoOrderSuggestion> Confirm(int id, [FromBody] AddPaymentInfo? payment = null)
+        public virtual async Task<DtoOrderSuggestion> Confirm(int id, int cartId)
         {            
-            return await (_service as IOrderService).Confirm(id, payment.CartId, payment?.PaymentId, payment?.PaymentIntent);
+            return await (_service as IOrderService).Confirm(id, cartId);
+        }
+        [HttpPatch("ConfirmStripe/{id}")]
+        public virtual async Task<DtoOrderSuggestion> ConfirmStripe(int id, int cartId)
+        {
+            return await (_service as IOrderService).ConfirmStripe(id, cartId);
         }
         [HttpPatch("BackToDraft/{id}")]
         public virtual async Task<DtoOrder> BackToDraft(int id)

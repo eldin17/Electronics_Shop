@@ -6,13 +6,15 @@ import 'dart:convert';
 import '../models/order.dart';
 import '../models/order_suggestion.dart';
 
+
+
 class OrderProvider extends BaseCRUDProvider<Order> {
   OrderProvider() : super("api/Order");
 
   @override
   Order fromJson(data) {
     return Order.fromJson(data);
-  }
+  } 
 
   Future<Order> addFromCart(dynamic obj) async {
     var url = "${baseUrl}api/Order/AddByCart";
@@ -35,6 +37,8 @@ class OrderProvider extends BaseCRUDProvider<Order> {
     }
     throw Exception();
   }
+
+
 
   Future<OrderSuggestion> checkAndActivate(dynamic obj) async {
     var url = "${baseUrl}api/Order/CheckAndActivate";
@@ -65,26 +69,24 @@ class OrderProvider extends BaseCRUDProvider<Order> {
     int cartId, {
     int? paymentId,
     String? paymentIntent,
-
   }) async {
     var url = "${baseUrl}api/Order/Confirm/$orderId";
-    var uri = Uri.parse(url);
+    var uri = Uri.parse(
+      "${baseUrl}api/Order/Confirm/$orderId",
+    ).replace(
+      queryParameters: {
+        "cartId": cartId.toString(),
+      },
+    );
 
     var headers = getHeaders(withAuth: true);
 
-    Map<String, dynamic>? body = {
-      if (paymentId != null) "paymentId": paymentId,
-      if (paymentIntent != null) "paymentIntent": paymentIntent,
-      if (cartId != null) "cartId": cartId,
-    };
-
-    print("CONFIRM ORDER $uri body=$body");
+    print("CONFIRM ORDER $uri");
 
     try {
       var response = await http.patch(
         uri,
         headers: headers,
-        body: body != null ? jsonEncode(body) : "{}",
       );
 
       if (isValidResponse(response)) {
@@ -95,6 +97,39 @@ class OrderProvider extends BaseCRUDProvider<Order> {
       throw Exception("Confirm failed: ${e.toString()}");
     }
     throw Exception("Unexpected error during confirm");
+  }
+
+  Future<OrderSuggestion> confirmStripeOrder(
+    int orderId,
+    int cartId,
+  ) async {
+    final uri = Uri.parse(
+      "${baseUrl}api/Order/ConfirmStripe/$orderId",
+    ).replace(
+      queryParameters: {
+        "cartId": cartId.toString(),
+      },
+    );
+
+    final headers = getHeaders(withAuth: true);
+
+    print("CONFIRM STRIPE ORDER $uri");
+
+    try {
+      final response = await http.patch(
+        uri,
+        headers: headers,
+      );
+
+      if (isValidResponse(response)) {
+        final data = jsonDecode(response.body);
+        return OrderSuggestion.fromJson(data);
+      }
+    } catch (e) {
+      throw Exception("ConfirmStripe failed: ${e.toString()}");
+    }
+
+    throw Exception("Unexpected error during ConfirmStripe");
   }
 
   Future<Order> deleteOrderAndCoupon(int id) async {
@@ -123,4 +158,25 @@ class OrderProvider extends BaseCRUDProvider<Order> {
     }
     throw Exception();
   }
+
+  Future<Order> backToDraft(int id) async {
+  final url = "${baseUrl}api/Order/BackToDraft/$id";
+  final uri = Uri.parse(url);
+
+  final headers = getHeaders(withAuth: true);
+
+  try {
+    final response = await http.patch(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      final data = jsonDecode(response.body);
+      return Order.fromJson(data);
+    }
+  } catch (e) {
+    throw Exception("BackToDraft failed: ${e.toString()}");
+  }
+
+  throw Exception("BackToDraft request failed");
+}
+
 }

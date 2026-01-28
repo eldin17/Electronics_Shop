@@ -13,18 +13,23 @@ import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
 import 'package:flutter17_mobile/providers/shopping_cart_provider.dart';
 import 'package:flutter17_mobile/screens/no_cart.dart';
 import 'package:flutter17_mobile/screens/product_details_screen.dart';
+import 'package:flutter17_mobile/screens/profile_screen.dart';
+import 'package:flutter17_mobile/screens/shopping_cart_screen.dart';
 import 'package:flutter17_mobile/widgets/add_coupon.dart';
 import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter17_mobile/widgets/payment_method_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:stripe_checkout/stripe_checkout.dart';
 
 import '../models/order.dart';
 import '../providers/adress_provider.dart';
 import '../widgets/add_address.dart';
 import '../widgets/adress_card_select.dart';
+import '../widgets/fail.dart';
 import '../widgets/payment_method_card_select.dart';
 import '../widgets/section.dart';
+import '../widgets/success.dart';
 import 'order_review_screen.dart';
 
 class PaymentMethodsSelectScreen extends StatefulWidget {
@@ -53,7 +58,7 @@ class _PaymentMethodsSelectScreenState
     _paymentMethodProvider = context.read<PaymentMethodProvider>();
     _orderProvider = context.read<OrderProvider>();
     _adressProvider = context.read<AdressProvider>();
-
+  
     initForm();
   }
 
@@ -100,31 +105,30 @@ class _PaymentMethodsSelectScreenState
   }
 
   Future<void> _openAddAddressModal() async {
-  final result = await showModalBottomSheet<Adress>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: AddAddressModal(),
-      );
-    },
-  );
+    final result = await showModalBottomSheet<Adress>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: AddAddressModal(),
+        );
+      },
+    );
 
-  if (result != null) {
-    setState(() {
-      listAdress.add(result);
-      selectedAdress = result; // auto-select new address
-    });
+    if (result != null) {
+      setState(() {
+        listAdress.add(result);
+        selectedAdress = result;
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -263,10 +267,15 @@ class _PaymentMethodsSelectScreenState
                                           obj.newOrder == null
                                               ? OrderReviewScreen(
                                                   currentOrder: obj.oldOrder!,
-                                                  orderSuggestion: false)
+                                                  orderSuggestion: false,
+                                                  paymentMethodId:
+                                                      selectedMethod!.id!,
+                                                )
                                               : OrderReviewScreen(
                                                   currentOrder: obj.newOrder!,
                                                   orderSuggestion: true,
+                                                  paymentMethodId:
+                                                      selectedMethod!.id!,
                                                 ),
                                     ),
                                   );

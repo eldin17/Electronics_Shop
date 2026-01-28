@@ -11,7 +11,9 @@ using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
 using Electronics_Shop_17.Services.OrderStateMachine;
 using Electronics_Shop_17.Services.ProductStateMachine;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -74,7 +76,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             }
             return base.AddFilter(data, search);
         }
-
+        
         public async Task<List<string>> AllowedActionsInState(int id)
         {
             var obj = await _context.Orders.FindAsync(id);
@@ -89,11 +91,17 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return await state.Update(id, updateRequest);
         }
 
-        public async Task<DtoOrderSuggestion> Confirm(int id, int cartId, string? paymentId = null, string? paymentIntent = null)
+        public async Task<DtoOrderSuggestion> Confirm(int id, int cartId)
         {
             var dbObj = await _context.Orders.FindAsync(id);
             var state = _baseOrderState.GetState(dbObj.StateMachine);
-            return await state.Confirm(id, cartId, paymentId, paymentIntent);
+            return await state.Confirm(id, cartId);
+        }
+        public async Task<DtoOrderSuggestion> ConfirmStripe(int id, int cartId)
+        {
+            var dbObj = await _context.Orders.FindAsync(id);
+            var state = _baseOrderState.GetState(dbObj.StateMachine);
+            return await state.ConfirmStripe(id, cartId);
         }
 
         public async Task<DtoOrder> BackToDraft(int id)
@@ -143,6 +151,12 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var dbObj = await _context.Orders.FindAsync(id);
             var state = _baseOrderState.GetState(dbObj.StateMachine);
             return await state.DeleteOrderAndCoupon(id);
+        }
+
+        public async Task HandleStripeWebhook(HttpRequest request)
+        {            
+            var state = _baseOrderState.GetState("Pending");
+            await state.HandleStripeWebhook(request);
         }
 
         // nesto ovako

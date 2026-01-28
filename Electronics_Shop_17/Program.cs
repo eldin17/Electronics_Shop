@@ -53,6 +53,9 @@ builder.Services.AddTransient<IPersonService, PersonService>();
 builder.Services.AddTransient<ICustomerCouponService, CustomerCouponService>();
 builder.Services.AddTransient<IAccessoryCategoryService, AccessoryCategoryService>();
 
+builder.Services.AddTransient<IOrderValidationService, OrderValidationService>();
+
+
 
 builder.Services.AddTransient<BaseProductState>();
 builder.Services.AddTransient<InitialProductState>();

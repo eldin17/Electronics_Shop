@@ -6,6 +6,7 @@ import 'package:flutter17_mobile/models/cart_item.dart';
 import 'package:flutter17_mobile/models/order.dart';
 import 'package:flutter17_mobile/models/shopping_cart.dart';
 import 'package:flutter17_mobile/providers/order_provider.dart';
+import 'package:flutter17_mobile/providers/payment_methods_provider.dart';
 import 'package:flutter17_mobile/screens/no_cart.dart';
 import 'package:flutter17_mobile/screens/payment_methods_select.dart';
 import 'package:flutter17_mobile/screens/product_details_screen.dart';
@@ -17,14 +18,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../models/order_item.dart';
+import '../models/payment_method.dart';
 import '../providers/order_item_provider.dart';
 import '../widgets/success.dart';
+
+import 'package:stripe_checkout/stripe_checkout.dart';
 
 class OrderReviewScreen extends StatefulWidget {
   Order currentOrder;
   bool orderSuggestion;
+  int paymentMethodId;
   OrderReviewScreen(
-      {super.key, required this.currentOrder, required this.orderSuggestion});
+      {super.key,
+      required this.currentOrder,
+      required this.orderSuggestion,
+      required this.paymentMethodId});
 
   @override
   State<OrderReviewScreen> createState() => _OrderReviewScreenState();
@@ -32,16 +40,20 @@ class OrderReviewScreen extends StatefulWidget {
 
 class _OrderReviewScreenState extends State<OrderReviewScreen> {
   late OrderProvider _orderProvider;
+  late PaymentMethodProvider _paymentMethodProvider;
   late OrderItemProvider _orderItemProvider;
+  late PaymentMethod _paymentMethod;
 
   bool isLoading = true;
   double totalPrice = 0;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _orderProvider = context.read<OrderProvider>();
     _orderItemProvider = context.read<OrderItemProvider>();
+    _paymentMethodProvider = context.read<PaymentMethodProvider>();
 
     if (LoginResponse.currentCustomer!.shoppingCart != null) {
       initForm();
@@ -51,7 +63,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
   }
 
   Future initForm() async {
+    var paymentMethod =
+        await _paymentMethodProvider.getById(widget.paymentMethodId);
     setState(() {
+      _paymentMethod = paymentMethod;
       totalPrice = widget.currentOrder.finalTotalAmount!;
       isLoading = false;
     });
@@ -122,10 +137,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                         });
 
                         removeItem(deletedItem.id!);
-
-                        
-
-
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -156,9 +167,9 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
               ),
             ),
             bottomNavigationBar: CheckoutCard(
-              total: totalPrice ?? 0,
-              orderObj: widget.currentOrder,
-            ),
+                total: totalPrice ?? 0,
+                orderObj: widget.currentOrder,
+                paymentMethod: _paymentMethod.provider!),
           )
         : !isLoading
             ? NoCartScreen()
@@ -336,7 +347,13 @@ class _OrderCardState extends State<OrderCard> {
 class CheckoutCard extends StatefulWidget {
   Order orderObj;
   double total;
-  CheckoutCard({Key? key, required this.total, required this.orderObj})
+  String paymentMethod;
+
+  CheckoutCard(
+      {Key? key,
+      required this.total,
+      required this.orderObj,
+      required this.paymentMethod})
       : super(key: key);
 
   @override
@@ -345,8 +362,15 @@ class CheckoutCard extends StatefulWidget {
 
 class _CheckoutCardState extends State<CheckoutCard> {
   late OrderProvider _orderProvider;
+
+  String stripePublishableKey = "";
+
   @override
   void initState() {
+    stripePublishableKey = const String.fromEnvironment(
+      "stripePublishableKey",
+    );
+
     super.initState();
     _orderProvider = context.read<OrderProvider>();
   }
@@ -450,57 +474,94 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: (widget.orderObj.orderItems?.length == 0)
-                        ? null // disables the button if no items
+                        ? null
                         : () async {
                             print("CONFIRM Method CALL");
 
-                            var obj = await _orderProvider.confirmOrder(
-                                widget.orderObj.id!,
-                                LoginResponse
-                                    .currentCustomer!.shoppingCart!.id!);
+                            if (widget.paymentMethod != "Stripe") {
+                              var obj = await _orderProvider.confirmOrder(
+                                  widget.orderObj.id!,
+                                  LoginResponse
+                                      .currentCustomer!.shoppingCart!.id!);
 
-                            if (obj.newOrder == null) {
-                              showSuccessPopup(
-                                  context, "Your order is on its way!");
-                              setState(() {});
-                              Future.delayed(const Duration(milliseconds: 600),
-                                  () {
-                                Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    transitionDuration:
-                                        const Duration(milliseconds: 150),
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return FadeTransition(
-                                          opacity: animation, child: child);
-                                    },
-                                    pageBuilder: (context, animation,
-                                            secondaryAnimation) =>
-                                        ShoppingCartScreen(),
+                              if (obj.newOrder == null) {
+                                showSuccessPopup(
+                                    context, "Your order is on its way!");
+                                setState(() {});
+                                Future.delayed(
+                                    const Duration(milliseconds: 600), () {
+                                  Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      transitionDuration:
+                                          const Duration(milliseconds: 150),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        return FadeTransition(
+                                            opacity: animation, child: child);
+                                      },
+                                      pageBuilder: (context, animation,
+                                              secondaryAnimation) =>
+                                          ShoppingCartScreen(),
+                                    ),
+                                  );
+                                });
+                              } else {
+                                setState(() {
+                                  widget.orderObj = obj.newOrder!;
+                                });
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    duration: Duration(milliseconds: 2000),
+                                    content: Text(
+                                      "⚠️ Cart updated! Some items changed in price or availability while you were checking out. We've refreshed your order — please review the updated suggestion before confirming again.",
+                                    ),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 158, 158, 158),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    margin: EdgeInsets.only(
+                                        left: 20, right: 20, bottom: 155),
                                   ),
                                 );
-                              });
+                              }
                             } else {
-                              setState(() {
-                                widget.orderObj = obj.newOrder!;
-                              });
+                              print(
+                                  "STRIPE CONFIRM CALL --- STRIPE CONFIRM CALL --- STRIPE CONFIRM CALL");
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  duration: Duration(milliseconds: 2000),
-                                  content: Text(
-                                    "⚠️ Cart updated! Some items changed in price or availability while you were checking out. We've refreshed your order — please review the updated suggestion before confirming again.",
-                                  ),
-                                  backgroundColor:
-                                      Color.fromARGB(255, 158, 158, 158),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  margin: EdgeInsets.only(
-                                      left: 20, right: 20, bottom: 155),
-                                ),
+                              final result =
+                                  await _orderProvider.confirmStripeOrder(
+                                widget.orderObj.id!,
+                                LoginResponse
+                                    .currentCustomer!.shoppingCart!.id!,
                               );
+
+                              final sessionId = result.sessionId;
+                              if (sessionId == null) {
+                                throw Exception("Stripe sessionId is null");
+                              }
+
+                              var resultStripe = await redirectToCheckout(
+                                context: context,
+                                sessionId: sessionId,
+                                publishableKey: stripePublishableKey,
+                                successUrl:
+                                    "https://checkout.stripe.dev/success",
+                                canceledUrl:
+                                    "https://checkout.stripe.dev/cancel",
+                              );
+
+                              if (mounted) {
+                                final text = resultStripe.when(
+                                  redirected: () => 'Redirected Successfuly',
+                                  success: () => onSuccess(),
+                                  canceled: () => onCancel(),
+                                  error: (e) => onError(e),
+                                );
+                                return text;
+                              }
                             }
                           },
                     style: ElevatedButton.styleFrom(
@@ -521,5 +582,47 @@ class _CheckoutCardState extends State<CheckoutCard> {
         ),
       ),
     );
+  }
+
+  onSuccess() {
+    showSuccessPopup(context, "Your order is on its way!");
+    setState(() {});
+    Future.delayed(const Duration(milliseconds: 600), () {
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 150),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              ShoppingCartScreen(),
+        ),
+      );
+    });
+  }
+
+  onCancel() async {
+    print("BTN - CANCEL order");
+
+    var obj = await _orderProvider.deleteOrderAndCoupon(widget.orderObj.id!);
+
+    showFailPopup(context, "Order Canceled!");
+
+    Future.delayed(const Duration(milliseconds: 600), () {
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 150),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              ShoppingCartScreen(),
+        ),
+      );
+    });
+  }
+
+  onError(Object e) {
+    onCancel();
   }
 }
