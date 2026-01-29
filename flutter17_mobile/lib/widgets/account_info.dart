@@ -74,7 +74,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
           _headline(context),
           _description(context),
           const SizedBox(height: 48),
-          _formBuilder1(context),
+          //_formBuilder1(context),
           _formBuilder2(context),
         ]),
       ),
@@ -277,7 +277,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       obscureText: _obscureTextOld,
       decoration: InputDecoration(
           //hintText: "Enter your password",
-          labelText: "Old Password",
+          labelText: "Current Password",
           floatingLabelBehavior: FloatingLabelBehavior.always,
           hintStyle: const TextStyle(color: Color.fromARGB(209, 117, 117, 117)),
           contentPadding: const EdgeInsets.symmetric(
@@ -419,7 +419,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
 
 Text _description(BuildContext context) {
   return Text(
-    "Keep your account up to date.\nEdit your email, username, or password below.",
+    "You can change your password here.\nContact support to update other details..",
     textAlign: TextAlign.center,
     style: TextStyle(
       color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.64),
@@ -429,7 +429,7 @@ Text _description(BuildContext context) {
 
 Text _headline(BuildContext context) {
   return Text(
-    "Update Account Info",
+    "Account Security",
     style: Theme.of(context)
         .textTheme
         .headlineSmall!

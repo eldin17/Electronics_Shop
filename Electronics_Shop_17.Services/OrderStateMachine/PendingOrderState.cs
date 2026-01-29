@@ -70,7 +70,7 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
                 return;
             }
 
-            // Only care about checkout.session.* events
+            
             if (!stripeEvent.Type.StartsWith("checkout.session."))
             {
                 Console.WriteLine("Not a checkout.session event");
@@ -104,7 +104,7 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
 
             Console.WriteLine("Order found: " + order.Id);
 
-            // Parse IDs from JSON (your original logic)
+            
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
@@ -121,7 +121,7 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
                     paymentIntentId = piProp.GetString();
             }
 
-            // SUCCESS
+            
             if (stripeEvent.Type == "checkout.session.completed")
             {
                 order.PaymentId = chargeId;
@@ -132,7 +132,7 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
                 return;
             }
 
-            // ANYTHING ELSE = failed / canceled → Draft
+            
             Console.WriteLine($"Checkout not successful ({stripeEvent.Type}). Returning order to Draft.");
 
             order.StateMachine = "Draft";
@@ -173,29 +173,29 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
             {
                 PaymentMethodTypes = new() { "card" },
                 Mode = "payment",
-                LineItems = new()
-        {
-            new SessionLineItemOptions
-            {
-                PriceData = new SessionLineItemPriceDataOptions
-                {
-                    Currency = "eur",
-                    UnitAmount = (long)(order.FinalTotalAmount * 100),
-                    ProductData = new()
+
+                LineItems = order.OrderItems.Select(item => new SessionLineItemOptions
                     {
-                        Name = $"Order #{order.Id} - {order.OrderItems.Count} items"
+                        Quantity = item.Quantity,
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = "eur",
+                            UnitAmount = (long)(item.FinalPrice * 100),
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"{item.Product.Brand} {item.Product.Model}"
+                            }
+                        }
                     }
-                },
-                Quantity = 1
-            }
-        },
+                ).ToList(),
+
                 SuccessUrl = "https://checkout.stripe.dev/success",
                 CancelUrl = "https://checkout.stripe.dev/cancel",
                 Metadata = new()
-        {
-            { "order_id", order.Id.ToString() },
-            { "cart_id", cartId.ToString() }
-        }
+                {
+                    { "order_id", order.Id.ToString() },
+                    { "cart_id", cartId.ToString() }
+                }
             });
 
             order.PaymentId = session.Id;
@@ -228,7 +228,7 @@ namespace Electronics_Shop_17.Services.OrderStateMachine
         private async Task<(Order order, DtoOrderSuggestion? suggestion)>ValidateAndPrepareOrder(int orderId)
         {
             var order = await _context.Orders
-                .Include(o => o.OrderItems)
+                .Include(o => o.OrderItems).ThenInclude(x=>x.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
