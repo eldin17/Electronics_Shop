@@ -1,5 +1,6 @@
 using System.Text;
 using Electronics_Shop_17.Services;
+using Electronics_Shop_17.Services.AI_Recommendations;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.InterfaceImplementations;
 using Electronics_Shop_17.Services.Interfaces;
@@ -54,6 +55,9 @@ builder.Services.AddTransient<ICustomerCouponService, CustomerCouponService>();
 builder.Services.AddTransient<IAccessoryCategoryService, AccessoryCategoryService>();
 
 builder.Services.AddTransient<IOrderValidationService, OrderValidationService>();
+
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+
 
 
 
