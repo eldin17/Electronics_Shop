@@ -2,6 +2,10 @@
 ## 🚧 Work In Progress 🚧 ## 
 ### 🚀 Demo Project 🚀 ###
 A multi-platform demo project for an electronics shop.
+Implementing features such as product management, JWT user authentication, 
+order processing, discounts, coupons, AI product recommendation system (ML.NET), 
+reviews, online payments, webhook-driven order processing, interactive UI, 
+Docker containers, automated email notifications.
 ### 📸 App Screenshots ###
 Rest of the screenshots can be found in the <a href="https://github.com/eldin17/Electronics_Shop/tree/main/app_screenshots">app_screenshots</a> folder. (All currently working parts of the project)
 <div style="display: flex;">
