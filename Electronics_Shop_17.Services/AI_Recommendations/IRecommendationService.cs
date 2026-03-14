@@ -9,7 +9,7 @@ namespace Electronics_Shop_17.Services.AI_Recommendations
 {
     public interface IRecommendationService
     {
-        List<DtoProduct> GetRecommendations(int productId, int take = 3);
+        Task<List<DtoProduct>> GetRecommendations(int customerId, int productId, int take = 3);
         void TrainModel();
     }
 }

@@ -14,5 +14,11 @@ namespace Electronics_Shop_17.Controllers
         public WishlistItemController(IWishlistItemService service) : base(service)
         {
         }
+
+        [HttpDelete("DeleteByProductId")]
+        public virtual async Task<DtoWishlistItem> DeleteByProductId([FromQuery] int productId, [FromQuery] int wishlistId)
+        {
+            return await (_service as IWishlistItemService).DeleteByProductId(productId, wishlistId);
+        }
     }
 }

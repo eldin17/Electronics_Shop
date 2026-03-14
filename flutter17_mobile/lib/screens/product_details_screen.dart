@@ -5,6 +5,7 @@ import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/product_color.dart';
 import 'package:flutter17_mobile/models/product_image.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
+import 'package:flutter17_mobile/providers/recommendations_provider.dart';
 import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
 import 'package:flutter17_mobile/providers/wishlist_item_provider.dart';
 import 'package:flutter17_mobile/screens/no_cart.dart';
@@ -13,6 +14,7 @@ import 'package:flutter17_mobile/screens/reviews_screen.dart';
 import 'package:flutter17_mobile/widgets/color_dots.dart';
 import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter17_mobile/widgets/product_images.dart';
+import 'package:flutter17_mobile/widgets/recommendations.dart';
 import 'package:flutter17_mobile/widgets/success.dart';
 import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 import 'package:flutter17_mobile/widgets/top_rounded_corner.dart';
@@ -40,6 +42,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late WishlistItemProvider _wishlistItemProvider;
   late ShoppingCartItemProvider _shoppingCartItemProvider;
   late ProductProvider _productProvider;
+  late RecommendationsProvider _recommendationsProvider;
+  List<Product> recList = [];
+
   var wishlistItemId = 0;
   var quantityInfo = 1;
   bool isLoading = true;
@@ -50,6 +55,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     _wishlistItemProvider = context.read<WishlistItemProvider>();
     _shoppingCartItemProvider = context.read<ShoppingCartItemProvider>();
     _productProvider = context.read<ProductProvider>();
+    _recommendationsProvider = context.read<RecommendationsProvider>();
 
     if (LoginResponse.currentCustomer?.wishlist != null) {
       var obj = LoginResponse.currentCustomer!.wishlist!.wishlistItems?.where(
@@ -80,15 +86,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   Future initForm() async {
     late Product obj;
+    List<Product> recReturn = [];
+
     if (widget.productId != null) {
       obj = await _productProvider.getByIdWithChecks(
           LoginResponse.currentCustomer!.id!, widget.productId!);
-    } else
+      print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      recReturn =
+          await _recommendationsProvider.getRecommendations(LoginResponse.userId!,widget.productId!);
+    } else{
       obj = Product();
+      print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB ${LoginResponse.userId!} ${widget.selectedProduct.id}");
+       recReturn =
+          await _recommendationsProvider.getRecommendations(LoginResponse.userId!,widget.selectedProduct.id!);
+    }
 
     setState(() {
-      if (obj.id!=null) widget.selectedProduct = obj;
-
+      if (obj.id != null) widget.selectedProduct = obj;
+      recList = recReturn;
       isLoading = false;
     });
   }
@@ -225,6 +240,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 });
                               },
                             ),
+                            SizedBox(height: 20,),
+                            TopRoundedContainer(
+                              color: Colors.white,
+                              child: Column(
+                                children: [
+                                  recList.isNotEmpty?RecommendProducts(products: recList):SizedBox()
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -339,50 +363,47 @@ class _ProductDescriptionState extends State<ProductDescription> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 5, 0),
-              child: widget.product.finalPrice == widget.product.price
-                  ? Text(
-                      "${widget.product.finalPrice}€",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color.fromARGB(255, 255, 118, 67),
-                      ),
-                    )
-                  : Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${widget.product.price}€",
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough,
-                                  decorationColor:
-                                      Color.fromARGB(141, 158, 158, 158),
-                                  decorationThickness: 3),
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Text(
-                              "${widget.product.finalPrice}€",
-                              style: const TextStyle(
+            // Move Expanded here so it is a direct child of the Row
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 5, 0),
+                child: widget.product.finalPrice == widget.product.price
+                    ? Text(
+                        "${widget.product.finalPrice}€",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color.fromARGB(255, 255, 118, 67),
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${widget.product.price}€",
+                            style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
-                                color: Color.fromARGB(255, 255, 118, 67),
-                              ),
-                            )
-                          ],
-                        ),
+                                color: Colors.grey,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor:
+                                    Color.fromARGB(141, 158, 158, 158),
+                                decorationThickness: 3),
+                          ),
+                          const SizedBox(width: 15),
+                          Text(
+                            "${widget.product.finalPrice}€",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Color.fromARGB(255, 255, 118, 67),
+                            ),
+                          )
+                        ],
                       ),
-                    ),
+              ),
             ),
+            // The Heart Icon stays aligned to the right
             Align(
               alignment: Alignment.centerRight,
               child: InkWell(
@@ -391,26 +412,24 @@ class _ProductDescriptionState extends State<ProductDescription> {
                   if (LoginResponse.currentCustomer?.wishlist == null) {
                     Navigator.of(context).push(
                       PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 150),
+                        transitionDuration: const Duration(milliseconds: 150),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
+                              opacity: animation, child: child);
                         },
                         pageBuilder: (context, animation, secondaryAnimation) =>
-                            NoWishlistScreen(
-                          productObj: widget.product,
-                        ),
+                            NoWishlistScreen(productObj: widget.product),
                       ),
                     );
                   } else {
                     if (widget.product.isFavourite!) {
-                      await widget.wishlistItemProvider.delete(widget.deleteId);
-
+                      print(widget.product.id!);
+                      print(LoginResponse.currentCustomer!.wishlist!.id!);
+                      //await widget.wishlistItemProvider.delete(widget.deleteId);
+                      var deletedWishlistItem = await widget.wishlistItemProvider.deleteByProductId(widget.product.id!, LoginResponse.currentCustomer!.wishlist!.id!);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                             duration: Duration(milliseconds: 500),
                             content: Text('Removed from Wishlist ❌')),
                       );
@@ -425,15 +444,12 @@ class _ProductDescriptionState extends State<ProductDescription> {
                         LoginResponse.currentCustomer!.wishlist?.wishlistItems
                             ?.add(itemObj);
                       });
-
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                             duration: Duration(milliseconds: 500),
                             content: Text('Added to Wishlist ❤️')),
                       );
                     }
-
-                    ;
                     setState(() {
                       widget.product.isFavourite = !widget.product.isFavourite!;
                     });

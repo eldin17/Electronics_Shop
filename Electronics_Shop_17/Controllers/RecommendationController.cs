@@ -1,4 +1,6 @@
-﻿using Electronics_Shop_17.Model.DataTransferObjects;
+﻿using System.Reflection.Metadata;
+using System;
+using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Services.AI_Recommendations;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -17,12 +19,15 @@ namespace Electronics_Shop_17.Controllers
         {
             _service = service;
         }
-
-        [HttpGet("{productId}")]
-        public ActionResult<List<DtoProduct>> GetRecommendations(int productId, [FromQuery] int take = 3)
+        
+        [HttpGet] 
+        public async Task<ActionResult<List<DtoProduct>>> GetRecommendations(
+            [FromQuery] int customerId,
+            [FromQuery] int productId,
+            [FromQuery] int take = 3)
         {
-            var results = _service.GetRecommendations(productId, take);
-            return Ok(results); 
+            var results = await _service.GetRecommendations(customerId, productId, take);
+            return results; 
         }
 
         [HttpPost("Train")]        

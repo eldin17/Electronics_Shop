@@ -11,5 +11,6 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IWishlistItemService : IBaseServiceCRUD<DtoWishlistItem,SearchWishlistItem,AddWishlistItem,UpdateWishlistItem>
     {
+        Task<DtoWishlistItem> DeleteByProductId(int productId, int wishlistId);
     }
 }

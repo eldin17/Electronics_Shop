@@ -72,6 +72,7 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
 
     var uri = Uri.parse(url);
     print("DEL DEL DEL");
+    print(url);
 
     try {
       var response = await http.delete(

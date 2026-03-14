@@ -207,6 +207,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         );
 
+                        final navigator = Navigator.of(context, rootNavigator: true);
+
                         Future.delayed(Duration(milliseconds: 3000), () async {
                           await logOutMethod(context);
                         });
@@ -242,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     LoginResponse.isSeller = null;
     LoginResponse.currentCustomer = null;
 
-    Navigator.of(context).pushAndRemoveUntil(
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (context) => SplashScreen(),
       ),

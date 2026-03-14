@@ -20,6 +20,7 @@ class MasterScreen extends StatefulWidget {
 
 class _MasterScreenState extends State<MasterScreen> {
   int currentSelectedIndex = 0;
+  List<int> _tabVersions = [0, 0, 0, 0];
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -36,10 +37,26 @@ class _MasterScreenState extends State<MasterScreen> {
     currentSelectedIndex = widget.index;
   }
 
+  // void _onItemTapped(int index) {
+  //   if (index == currentSelectedIndex && index == 1) {
+  //   } else if (index == currentSelectedIndex) {
+  //     _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+  //   } else {
+  //     setState(() {
+  //       currentSelectedIndex = index;
+  //     });
+  //   }
+  // }
+
   void _onItemTapped(int index) {
-    if (index == currentSelectedIndex && index == 1) {
-    } else if (index == currentSelectedIndex) {
+    if (index == currentSelectedIndex) {
+      
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+      
+      setState(() {
+        _tabVersions[index]++;
+        _pages.remove(index); 
+      });
     } else {
       setState(() {
         currentSelectedIndex = index;
@@ -56,7 +73,9 @@ class _MasterScreenState extends State<MasterScreen> {
         page = Navigator(
           key: _navigatorKeys[0],
           onGenerateRoute: (_) => MaterialPageRoute(
-            builder: (_) => HomeScreen(),
+            builder: (_) => HomeScreen(
+              key: ValueKey('home_${_tabVersions[0]}'),
+            ),
           ),
         );
         break;
@@ -64,7 +83,9 @@ class _MasterScreenState extends State<MasterScreen> {
         page = Navigator(
           key: _navigatorKeys[1],
           onGenerateRoute: (_) => MaterialPageRoute(
-            builder: (_) => WishlistScreen(),
+            builder: (_) => WishlistScreen(
+              key: ValueKey('wishlist_${_tabVersions[1]}'),
+            ),
           ),
         );
         break;
@@ -72,7 +93,9 @@ class _MasterScreenState extends State<MasterScreen> {
         page = Navigator(
           key: _navigatorKeys[2],
           onGenerateRoute: (_) => MaterialPageRoute(
-            builder: (_) => ShoppingCartScreen(),
+            builder: (_) => ShoppingCartScreen(
+              key: ValueKey('cart_${_tabVersions[2]}'),
+            ),
           ),
         );
         break;
@@ -83,7 +106,9 @@ class _MasterScreenState extends State<MasterScreen> {
         page = Navigator(
           key: _navigatorKeys[3],
           onGenerateRoute: (_) => MaterialPageRoute(
-            builder: (_) => ProfileScreen(),
+            builder: (_) => ProfileScreen(
+              key: ValueKey('profile_${_tabVersions[3]}'),
+            ),
           ),
         );
         break;

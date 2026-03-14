@@ -49,7 +49,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
     setState(() {
       currentUserWishlist = wishlistObj;
-
+      LoginResponse.currentCustomer!.wishlist!=currentUserWishlist;
       isLoading = false;
     });
 

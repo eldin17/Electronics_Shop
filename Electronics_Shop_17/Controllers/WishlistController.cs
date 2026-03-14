@@ -13,6 +13,9 @@ namespace Electronics_Shop_17.Controllers
     {
         public WishlistController(IWishlistService service) : base(service)
         {
+         
         }
+
+        
     }
 }

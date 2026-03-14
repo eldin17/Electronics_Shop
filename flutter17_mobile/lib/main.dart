@@ -11,6 +11,7 @@ import 'package:flutter17_mobile/providers/order_item_provider.dart';
 import 'package:flutter17_mobile/providers/order_provider.dart';
 import 'package:flutter17_mobile/providers/payment_methods_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
+import 'package:flutter17_mobile/providers/recommendations_provider.dart';
 import 'package:flutter17_mobile/providers/reviews_provider.dart';
 import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
 import 'package:flutter17_mobile/providers/shopping_cart_provider.dart';
@@ -45,6 +46,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => AdressProvider()),
         ChangeNotifierProvider(create: (_) => OrderItemProvider()),
+        ChangeNotifierProvider(create: (_) => RecommendationsProvider()),
 
       ],
       child: const MyApp(),

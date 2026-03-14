@@ -12,7 +12,9 @@ namespace Electronics_Shop_17.Services.AI_Recommendations
     using AutoMapper;
     using Electronics_Shop_17.Model.DataTransferObjects;
     using Electronics_Shop_17.Services.Database;
-    using Microsoft.ML.Trainers;
+    using Microsoft.ML.Trainers;    
+    using Product = Database.Product;
+    using Castle.Core.Resource;
 
     public class RecommendationService : IRecommendationService
     {
@@ -22,77 +24,120 @@ namespace Electronics_Shop_17.Services.AI_Recommendations
         private static MLContext _mlContext = new MLContext();
         private static readonly object _lock = new object();
         private readonly string _modelPath = Path.Combine(Environment.CurrentDirectory, "Data", "recommendation_model.zip");
-
-        public RecommendationService(DataContext context, IMapper mapper)
+        Checks _checks;
+        public RecommendationService(DataContext context, IMapper mapper, Checks checks)
         {
             _context = context;
             _mapper = mapper;
+            _checks = checks;
         }
 
-        public List<DtoProduct> GetRecommendations(int productId, int take = 3)
+        public async Task<List<DtoProduct>> GetRecommendations(int customerId, int productId, int take = 3)
         {
-            var recommendations = new List<Product>();
+            var recommendations = new List<DtoProduct>();
 
             
             LazyLoadModel();
 
             if (_model != null)
             {
-                recommendations = GetAiResults(productId, take);
+                recommendations = await GetAiResults(customerId, productId, take);                
             }
 
             
             if (recommendations.Count < take)
             {
+                Console.WriteLine("FALLBACK FALLBACK FALLBACK");
+
                 var existingIds = recommendations.Select(r => r.Id).ToList();
                 existingIds.Add(productId);
 
                 var product = _context.Products.Find(productId);
                 if (product != null)
                 {
-                    
-                    var fallbacks = _context.Products
-                        .Where(p => p.ProductCategoryId == product.ProductCategoryId
-                                 && !existingIds.Contains(p.Id)
-                                 && p.StateMachine != "Deleted")
-                        .Select(p => new {
-                            Product = p,                            
-                            AverageRating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 0,
-                            ReviewCount = p.Reviews.Count()
-                        })                        
-                        .OrderByDescending(x => x.AverageRating)
-                        .ThenByDescending(x => x.ReviewCount)
-                        .Take(take - recommendations.Count)
-                        .ToList();
 
-                    recommendations.AddRange(fallbacks.Select(x => x.Product));
+                    var excludeIds = recommendations.Select(r => r.Id).ToList();
+                    excludeIds.Add(productId);
+
+                    var fallbacks = await _context.Products
+                        .Where(p => p.ProductCategoryId == product.ProductCategoryId
+                                 && !excludeIds.Contains(p.Id) 
+                                 && p.StateMachine != "Deleted")     
+                        .OrderBy(x => Guid.NewGuid())
+                        .Take(take - recommendations.Count)
+                        .ToListAsync();
+
+                    var dtoFallbacks = _mapper.Map<List<DtoProduct>>(fallbacks);
+
+                    var wishlistSet = (await _context.Customers
+                        .Where(x => x.Id == customerId)
+                        .SelectMany(x => x.Wishlist.WishlistItems)
+                        .Select(x => x.ProductId)
+                        .ToListAsync()).ToHashSet();
+
+                    foreach (var item in dtoFallbacks)
+                    {
+                        var priceCheckedObj = await _checks.PriceCheck(item);
+                        item.FinalPrice = priceCheckedObj.FinalPrice;
+                        item.reviewScoreAvg = await _checks.ReviewCheck(item);
+                        item.isFavourite = wishlistSet.Contains(item.Id);
+                    }
+
+                    recommendations.AddRange(dtoFallbacks);
                 }
             }
 
-            return _mapper.Map<List<DtoProduct>>(recommendations);
+            return recommendations;
         }
 
-        private List<Product> GetAiResults(int productId, int take)
+        private async Task<List<DtoProduct>> GetAiResults(int customerId, int productId, int take)
         {
+            Console.WriteLine("AI AI AI");
+
             var predictionEngine = _mlContext.Model.CreatePredictionEngine<ProductEntry, ProductPrediction>(_model);
 
-            var allProducts = _context.Products
+            var allProducts = await _context.Products
                 .Where(p => p.Id != productId && p.StateMachine != "Deleted")
-                .ToList();
+                .ToListAsync();
 
-            var scores = new List<(Product Product, float Score)>();
+            var wishlistSet = (await _context.Customers
+                .Where(x => x.Id == customerId)
+                .SelectMany(x => x.Wishlist.WishlistItems)
+                .Select(x => x.ProductId)
+                .ToListAsync()).ToHashSet();
+
+            var scores = new List<(DtoProduct Product, float Score)>();
 
             foreach (var p in allProducts)
             {
+                if ((int)p.Id == (int)productId)
+                {
+                    Console.WriteLine($"SKIPPING SELF: {p.Id} matches {productId}");
+                    continue;
+                }
+
                 var prediction = predictionEngine.Predict(new ProductEntry
                 {
                     ProductID = (uint)productId,
                     CoPurchaseProductID = (uint)p.Id
                 });
-                
-                if (prediction.Score > 0.1)
+
+
+                if (prediction.Score > 0.4)
                 {
-                    scores.Add((p, prediction.Score));
+                    Console.WriteLine($"AI MATCH: {p.Model} (ID: {p.Id}) Score: {prediction.Score}");
+                    
+                
+                    var dtoP = _mapper.Map<DtoProduct>(p);
+                    
+                    var priceCheckedObj = await _checks.PriceCheck(dtoP);
+                    dtoP.FinalPrice = priceCheckedObj.FinalPrice;
+
+                    dtoP.reviewScoreAvg = await _checks.ReviewCheck(dtoP);
+
+                    dtoP.isFavourite = wishlistSet.Any() && wishlistSet.Contains(dtoP.Id);
+
+                    scores.Add((dtoP, prediction.Score));
                 }
             }
 
@@ -114,15 +159,16 @@ namespace Electronics_Shop_17.Services.AI_Recommendations
                     _model = _mlContext.Model.Load(_modelPath, out _);
                 }
             }
+            Console.WriteLine("LAZY LAZY LAZY");
         }
 
         public void TrainModel()
         {
             lock (_lock)
-            {
+            {                
                 var orders = _context.Orders
                     .Include(o => o.OrderItems)
-                    .Where(o => o.OrderItems.Count > 1)
+                    .Where(o => o.OrderItems.Count > 1 && o.StateMachine=="Completed" && !o.isDeleted)
                     .ToList();
 
                 var data = new List<ProductEntry>();
@@ -149,9 +195,9 @@ namespace Electronics_Shop_17.Services.AI_Recommendations
                     MatrixRowIndexColumnName = nameof(ProductEntry.CoPurchaseProductID),
                     LabelColumnName = "Label",
                     LossFunction = MatrixFactorizationTrainer.LossFunctionType.SquareLossOneClass,
-                    Alpha = 0.01,
-                    Lambda = 0.025,
-                    NumberOfIterations = 50
+                    Alpha = 0.05,
+                    Lambda = 0.01,
+                    NumberOfIterations = 100,                    
                 };
 
                 var est = _mlContext.Recommendation().Trainers.MatrixFactorization(options);

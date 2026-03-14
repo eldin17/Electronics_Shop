@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using AutoMapper;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Requests;
@@ -41,6 +42,19 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.WishlistId == search.WishlistId);
             }
             return base.AddFilter(data, search);
+        }
+
+        public async Task<DtoWishlistItem> DeleteByProductId(int productId, int wishlistId)
+        {
+            var dbObj = await _context.Set<WishlistItem>().FirstOrDefaultAsync(x => x.WishlistId == wishlistId && x.ProductId == productId);
+
+            if (dbObj == null)
+                throw new KeyNotFoundException($"No record found with ProductId: {productId}; WishlistId: {wishlistId}");
+
+            _context.Set<WishlistItem>().Remove(dbObj);
+
+            await _context.SaveChangesAsync();
+            return _mapper.Map<DtoWishlistItem>(dbObj);
         }
     }
 }
