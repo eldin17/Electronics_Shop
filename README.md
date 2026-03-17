@@ -4,7 +4,7 @@
 A multi-platform demo project for an electronics shop.
 Implementing features such as product management, JWT user authentication, 
 order processing, discounts, coupons, AI product recommendation system (ML.NET), 
-reviews, online payments, webhook-driven order processing, interactive UI, 
+reviews, online payments, webhook-driven order processing, SignalR notifications, interactive UI, 
 Docker containers, automated email notifications.
 ### 📸 App Screenshots ###
 Rest of the screenshots can be found in the <a href="https://github.com/eldin17/Electronics_Shop/tree/main/app_screenshots">app_screenshots</a> folder. (All currently working parts of the project)
@@ -37,3 +37,5 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 🐳 Docker – Containerization
 
 💳 Stripe – Secure payments with webhook-driven order processing
+
+📡 SignalR – Real-time web functionality for instant notifications and UI updates.
