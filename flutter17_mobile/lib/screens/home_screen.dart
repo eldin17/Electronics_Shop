@@ -24,6 +24,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter17_mobile/models/notification.dart' as Model_n;
 
+import '../providers/signalR_service.dart';
 import '../widgets/news_section.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -59,6 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    final signalR = SignalRService();
+    if (LoginResponse.token != null) {
+      signalR.startConnection(LoginResponse.token!);
+    }
+
     _productProvider = context.read<ProductProvider>();
     _newsProvider = context.read<NewsProvider>();
     _discountProvider = context.read<DiscountProvider>();
@@ -114,7 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             setState(() {
                               isNotificationVisible = !isNotificationVisible;
                             });
-                            print(isNotificationVisible);
+                            print(
+                                "Notification Pop Up Open - ${isNotificationVisible}");
                           },
                           searchController: searchController,
                         ),
@@ -248,8 +256,14 @@ class _HomeHeaderState extends State<HomeHeader> {
             isClicked: widget.isClicked,
             svgSrc: bellIcon,
             numOfitem: notificationsList.length,
-            press: () {
+            press: () async {
+              var notificationObj = await _notificationProvider
+                  .getAllForUser(LoginResponse.userId!);
               setState(() {
+                // if(needToFetchNewNotifications==true)
+                //notificationsList = List<Model_n.Notification>.from(notificationObj.data);
+
+                print(notificationsList.length);
                 notificationsList.length = 0;
                 widget.showInfo();
               });

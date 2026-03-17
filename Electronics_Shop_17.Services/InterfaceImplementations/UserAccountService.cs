@@ -175,6 +175,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             List<Claim> claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role.RoleName)
             };

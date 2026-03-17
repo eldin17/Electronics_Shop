@@ -10,6 +10,8 @@ using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Electronics_Shop_17.Services.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -19,47 +21,71 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
     public class NotificationService : BaseServiceCRUD<DtoNotification, Notification, SearchNotification, AddNotification, UpdateNotification>, INotificationService
     {
         IUserNotificationService _IUserNotificationService;
-        public NotificationService(DataContext context, IMapper mapper, IUserNotificationService IUserNotificationService) : base(context, mapper)
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public NotificationService(IHubContext<NotificationHub> hubContext, DataContext context, IMapper mapper, IUserNotificationService IUserNotificationService) : base(context, mapper)
         {
             _IUserNotificationService = IUserNotificationService;
+            _hubContext = hubContext;
         }
 
         public async Task<DtoNotification> AddForUser(AddNotificationForUser addRequest)
         {
-            if (addRequest!=null && addRequest.userAccIds!=null)
+            if (addRequest != null && addRequest.userAccIds != null)
             {
                 var addObj = _mapper.Map<AddNotification>(addRequest);
                 var obj = await Add(addObj);
-                if (obj!=null && obj.IsGeneral)
-                {
-                    var users = await _context.UserAccounts.Where(x => x.Role.RoleName == "Customer" && !x.isDeactivated).Select(x=>x.Id).ToListAsync();
-                    foreach (var item in users)
+
+                if (obj != null)
+                {                    
+                    var notificationPayload = new
                     {
-                        var newObj = new AddUserNotification()
+                        Id = obj.Id,       
+                        Title = obj.Title,
+                        Content = obj.Message,
+                        IsGeneral = obj.IsGeneral,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    if (obj.IsGeneral)
+                    {
+                        var users = await _context.UserAccounts
+                            .Where(x => x.Role.RoleName == "Customer" && !x.isDeactivated)
+                            .Select(x => x.Id).ToListAsync();
+
+                        foreach (var item in users)
                         {
-                            UserAccountId = item,
-                            NotificationId = obj.Id,
-                            IsRead = false
-                        };
-                        await _IUserNotificationService.Add(newObj);
+                            var newObj = new AddUserNotification()
+                            {
+                                UserAccountId = item,
+                                NotificationId = obj.Id,
+                                IsRead = false
+                            };
+                            await _IUserNotificationService.Add(newObj);
+                        }
+
+                        await _hubContext.Clients.All.SendAsync("ReceiveNotification", notificationPayload);
+                    }
+                    else
+                    {
+                        foreach (var item in addRequest.userAccIds)
+                        {
+                            var newObj = new AddUserNotification()
+                            {
+                                UserAccountId = item,
+                                NotificationId = obj.Id,
+                                IsRead = false
+                            };
+                            await _IUserNotificationService.Add(newObj);
+                            
+                            await _hubContext.Clients.User(item.ToString()).SendAsync("ReceiveNotification", notificationPayload);
+                        }
                     }
                 }
-                else
-                {
-                    foreach (var item in addRequest.userAccIds)
-                    {
-                        var newObj = new AddUserNotification()
-                        {
-                            UserAccountId = item,
-                            NotificationId = obj.Id,
-                            IsRead = false
-                        };
-                        await _IUserNotificationService.Add(newObj);
-                    }
-                }
+
                 await _context.SaveChangesAsync();
                 return obj;
             }
+
             var addObjDefault = _mapper.Map<AddNotification>(addRequest);
             return await Add(addObjDefault);
         }
