@@ -24,7 +24,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter17_mobile/models/notification.dart' as Model_n;
 
-import '../providers/signalR_service.dart';
 import '../widgets/news_section.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -44,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late ProductProvider _productProvider;
   late NewsProvider _newsProvider;
   late DiscountProvider _discountProvider;
+  late NotificationProvider _notificationProvider;
 
   bool isLoading = true;
   TextEditingController searchController = new TextEditingController();
@@ -52,23 +52,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
-    final signalR = SignalRService();
-    if (LoginResponse.token != null) {
-      signalR.startConnection(LoginResponse.token!);
-    }
 
     _productProvider = context.read<ProductProvider>();
     _newsProvider = context.read<NewsProvider>();
     _discountProvider = context.read<DiscountProvider>();
+    _notificationProvider = context.read<NotificationProvider>();
+
+    if (LoginResponse.token != null) {
+      _notificationProvider.initSignalR();
+    }
 
     initForm();
   }
@@ -243,6 +241,7 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final prov = context.watch<NotificationProvider>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -255,13 +254,17 @@ class _HomeHeaderState extends State<HomeHeader> {
             onClickColor: true,
             isClicked: widget.isClicked,
             svgSrc: bellIcon,
-            numOfitem: notificationsList.length,
+            numOfitem: prov.hasNewNotification 
+              ? notificationsList.length + 1 
+              : notificationsList.length,
             press: () async {
+              prov.clearNotificationFlag();
               var notificationObj = await _notificationProvider
                   .getAllForUser(LoginResponse.userId!);
               setState(() {
-                // if(needToFetchNewNotifications==true)
-                //notificationsList = List<Model_n.Notification>.from(notificationObj.data);
+                if (_notificationProvider.hasNewNotification)
+                  notificationsList =
+                      List<Model_n.Notification>.from(notificationObj.data);
 
                 print(notificationsList.length);
                 notificationsList.length = 0;

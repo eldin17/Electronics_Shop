@@ -139,7 +139,8 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             if (dbObj.isDeactivated)
             {
-                Reactivate(dbObj.Id);
+                dbObj.isDeactivated = false;
+                await _context.SaveChangesAsync();
             }
 
             if (dbObj.Customer != null)            
@@ -221,8 +222,8 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             if (obj == null)
                 throw new KeyNotFoundException($"User with ID {id} not found.");
 
-            if (obj.isDeactivated)
-                return _mapper.Map<DtoUserAccount>(obj);
+            //if (obj.isDeactivated)
+            //    return _mapper.Map<DtoUserAccount>(obj);
 
             obj.isDeactivated = false;
 

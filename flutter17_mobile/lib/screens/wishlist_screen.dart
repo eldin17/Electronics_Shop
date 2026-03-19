@@ -192,7 +192,7 @@ class ItemCard extends StatelessWidget {
                       color:
                           Color.fromARGB(255, 156, 156, 156).withOpacity(0.4),
                       blurRadius: 10,
-                      offset: const Offset(0, 4), // Soft drop shadow
+                      offset: const Offset(0, 4), 
                     ),
                   ],
                 ),

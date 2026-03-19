@@ -1,18 +1,113 @@
-import 'package:flutter17_mobile/models/notification.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/models/notification.dart' as Model;
 import 'package:flutter17_mobile/providers/base_crud_provider.dart';
 import 'package:flutter17_mobile/models/search_result.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class NotificationProvider extends BaseCRUDProvider<Notification> {
+import 'package:signalr_netcore/signalr_client.dart';
+
+import '../helpers/login_response.dart';
+import '../main.dart';
+
+class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
+  HubConnection? _hubConnection;
+  bool _hasNewNotification = false;
   NotificationProvider() : super("api/Notification");
 
   @override
-  Notification fromJson(data) {
-    return Notification.fromJson(data);
+  Model.Notification fromJson(data) {
+    return Model.Notification.fromJson(data);
   }
 
-  Future<SearchResult<Notification>> getAllForUser(int userAccountId,
+  bool get hasNewNotification => _hasNewNotification;
+
+  void initSignalR() {
+    if (_hubConnection?.state == HubConnectionState.Connected) return;
+
+    _hubConnection = HubConnectionBuilder()
+        .withUrl(
+          "${baseUrl}notificationHub",
+          options: HttpConnectionOptions(
+            accessTokenFactory: () async => LoginResponse.token ?? "",
+          ),
+        )
+        .withAutomaticReconnect()
+        .build();
+
+    _hubConnection!.on("ReceiveNotification", (arguments) {
+      final data = arguments![0] as Map<String, dynamic>;
+
+      _hasNewNotification = true;
+      notifyListeners();
+
+      _showTopPopup(data['title'] ?? "New Notification", data['content'] ?? "");
+
+      print("--- SIGNALR NOTIFICATION RECEIVED ---");
+      print("Payload: $data");
+      print("---------------------------------------");
+    });
+
+    _hubConnection!.start()?.then((_) {
+      print("SignalR: Connected to Hub successfully.");
+    }).catchError((error) {
+      print("SignalR Error: $error");
+    });
+  }
+
+  void _showTopPopup(String title, String content) {
+    print("SignalR: POPUP");
+
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 2500),
+          elevation: 12, 
+          
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '🎉 $title',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                content,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis, 
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 12,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: const Color.fromARGB(
+              255, 80, 80, 80), 
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),          
+          margin: EdgeInsets.only(
+              bottom: 30,
+              left: 30,
+              right: 30),
+        ),
+      );
+    }
+  }
+
+  void clearNotificationFlag() {
+    _hasNewNotification = false;
+    notifyListeners();
+  }
+
+  Future<SearchResult<Model.Notification>> getAllForUser(int userAccountId,
       {dynamic filter}) async {
     var url = "${baseUrl}api/Notification/GetAllForUser/${userAccountId}";
 
@@ -33,7 +128,7 @@ class NotificationProvider extends BaseCRUDProvider<Notification> {
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
 
-        var result = SearchResult<Notification>();
+        var result = SearchResult<Model.Notification>();
         result.totalItems = data['totalItems'];
 
         for (var item in data['data']) {
@@ -48,7 +143,7 @@ class NotificationProvider extends BaseCRUDProvider<Notification> {
     throw Exception();
   }
 
-  Future<Notification> AddForUser(dynamic obj) async {
+  Future<Model.Notification> AddForUser(dynamic obj) async {
     var url = "${baseUrl}api/Notification/AddForUser";
     var uri = Uri.parse(url);
 
@@ -71,11 +166,11 @@ class NotificationProvider extends BaseCRUDProvider<Notification> {
   }
 
   Future<String> MarkAsRead(int userAccId, int notificationId) async {
-    var url = "${baseUrl}api/Notification/MarkAsRead/${userAccId}/${notificationId}";
+    var url =
+        "${baseUrl}api/Notification/MarkAsRead/${userAccId}/${notificationId}";
     var uri = Uri.parse(url);
 
     var headers = getHeaders(withAuth: true);
-
 
     try {
       var response = await http.post(uri, headers: headers);
