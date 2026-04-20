@@ -1,0 +1,8 @@
+.btn.transition-transform:focus,
+.btn.transition-transform:active,
+.btn.transition-transform:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+}

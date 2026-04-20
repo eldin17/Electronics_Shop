@@ -7,4 +7,5 @@ export const routes: Routes = [
   { path: '', component: Splash },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
+  { path: '**', component: Splash },
 ];

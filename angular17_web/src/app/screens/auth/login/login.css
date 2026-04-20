@@ -1,0 +1,48 @@
+.divider:after,
+.divider:before {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eee;
+}
+.h-custom {
+  height: calc(100% - 73px);
+}
+@media (max-width: 450px) {
+  .h-custom {
+    height: 100%;
+  }
+}
+
+
+.form-check-input:checked {
+  background-color: #ff8800 !important;
+  border-color: #ff8800 !important;
+}
+
+
+.form-check-input:focus {
+  border-color: #ff8800;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(255, 136, 0, 0.25);
+}
+
+
+.form-check-input:checked:focus {
+  background-color: #ff8800;
+}
+
+
+#loginFormUsername::placeholder {
+  color: gray !important;
+  opacity: 1 !important;
+}
+#loginFormPassword::placeholder {
+  color: gray !important;
+  opacity: 1 !important;
+}
+
+.form-control::placeholder {
+  color: #ccc !important;
+  font-weight: 300;
+}
