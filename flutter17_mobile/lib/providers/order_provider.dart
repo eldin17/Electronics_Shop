@@ -6,27 +6,27 @@ import 'dart:convert';
 import '../models/order.dart';
 import '../models/order_suggestion.dart';
 
-
-
 class OrderProvider extends BaseCRUDProvider<Order> {
   OrderProvider() : super("api/Order");
 
   @override
   Order fromJson(data) {
     return Order.fromJson(data);
-  } 
+  }
 
   Future<Order> addFromCart(dynamic obj) async {
     var url = "${baseUrl}api/Order/AddByCart";
     var uri = Uri.parse(url);
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var send = jsonEncode(obj);
 
     print("ADD ADD ADD $uri $send");
     try {
-      var response = await http.post(uri, headers: headers, body: send);
+      var response = await sendWithRefresh(
+          (headers) => http.post(uri, headers: headers, body: send));
+      //var response = await http.post(uri, headers: headers, body: send);
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -38,19 +38,19 @@ class OrderProvider extends BaseCRUDProvider<Order> {
     throw Exception();
   }
 
-
-
   Future<OrderSuggestion> checkAndActivate(dynamic obj) async {
     var url = "${baseUrl}api/Order/CheckAndActivate";
     var uri = Uri.parse(url);
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var send = jsonEncode(obj);
 
     print("ADD ADD ADD $uri $send");
     try {
-      var response = await http.post(uri, headers: headers, body: send);
+      var response = await sendWithRefresh(
+          (headers) => http.post(uri, headers: headers, body: send));
+      //var response = await http.post(uri, headers: headers, body: send);
 
       if (isValidResponse(response)) {
         print("Response length: ${response.body.length}");
@@ -79,15 +79,17 @@ class OrderProvider extends BaseCRUDProvider<Order> {
       },
     );
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     print("CONFIRM ORDER $uri");
 
     try {
-      var response = await http.patch(
-        uri,
-        headers: headers,
-      );
+      var response =
+          await sendWithRefresh((headers) => http.patch(uri, headers: headers));
+      // var response = await http.patch(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -111,15 +113,17 @@ class OrderProvider extends BaseCRUDProvider<Order> {
       },
     );
 
-    final headers = getHeaders(withAuth: true);
+    final headers = await getHeaders(withAuth: true);
 
     print("CONFIRM STRIPE ORDER $uri");
 
     try {
-      final response = await http.patch(
-        uri,
-        headers: headers,
-      );
+      var response =
+          await sendWithRefresh((headers) => http.patch(uri, headers: headers));
+      // final response = await http.patch(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         final data = jsonDecode(response.body);
@@ -135,16 +139,18 @@ class OrderProvider extends BaseCRUDProvider<Order> {
   Future<Order> deleteOrderAndCoupon(int id) async {
     var url = "${baseUrl}api/Order/DeleteOrderAndCoupon/$id";
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
     print("DEL DEL DEL $uri");
 
     try {
-      var response = await http.delete(
-        uri,
-        headers: headers,
-      );
+      var response = await sendWithRefresh(
+          (headers) => http.delete(uri, headers: headers));
+      // var response = await http.delete(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -160,23 +166,24 @@ class OrderProvider extends BaseCRUDProvider<Order> {
   }
 
   Future<Order> backToDraft(int id) async {
-  final url = "${baseUrl}api/Order/BackToDraft/$id";
-  final uri = Uri.parse(url);
+    final url = "${baseUrl}api/Order/BackToDraft/$id";
+    final uri = Uri.parse(url);
 
-  final headers = getHeaders(withAuth: true);
+    final headers = await getHeaders(withAuth: true);
 
-  try {
-    final response = await http.patch(uri, headers: headers);
+    try {
+      var response =
+          await sendWithRefresh((headers) => http.patch(uri, headers: headers));
+      //final response = await http.patch(uri, headers: headers);
 
-    if (isValidResponse(response)) {
-      final data = jsonDecode(response.body);
-      return Order.fromJson(data);
+      if (isValidResponse(response)) {
+        final data = jsonDecode(response.body);
+        return Order.fromJson(data);
+      }
+    } catch (e) {
+      throw Exception("BackToDraft failed: ${e.toString()}");
     }
-  } catch (e) {
-    throw Exception("BackToDraft failed: ${e.toString()}");
+
+    throw Exception("BackToDraft request failed");
   }
-
-  throw Exception("BackToDraft request failed");
-}
-
 }

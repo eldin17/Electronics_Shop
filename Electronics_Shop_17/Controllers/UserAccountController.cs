@@ -12,14 +12,14 @@ namespace Electronics_Shop_17.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserAccountController : BaseCRUDController<DtoUserAccount, SearchUserAccount,AddUserAcc,UpdateUserAcc>
+    public class UserAccountController : BaseCRUDController<DtoUserAccount, SearchUserAccount, AddUserAcc, UpdateUserAcc>
     {
         public UserAccountController(IUserAccountService service) : base(service)
         {
         }
 
-        [HttpPost("register"),AllowAnonymous]
-        public async Task<DtoUserAccount> Register(AddUserAccount obj) 
+        [HttpPost("register"), AllowAnonymous]
+        public async Task<DtoUserAccount> Register(AddUserAccount obj)
         {
             return await (_service as IUserAccountService).Register(obj);
         }
@@ -53,7 +53,7 @@ namespace Electronics_Shop_17.Controllers
             try
             {
                 var result = await (_service as IUserAccountService).Deactivate(id);
-                return Ok(result); 
+                return Ok(result);
             }
             catch (KeyNotFoundException)
             {
@@ -100,6 +100,27 @@ namespace Electronics_Shop_17.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+        [HttpPost("logout/{userId}")]
+        public async Task<IActionResult> Logout(int userId)
+        {
+            await (_service as IUserAccountService).Logout(userId);
+            return Ok(new { message = "User logged out successfully." });
+        }
 
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest input)
+        {
+            try
+            {
+                var (accessToken, refreshToken) = await (_service as IUserAccountService).Refresh(input);
+                return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+
+        }
     }
 }

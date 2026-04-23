@@ -456,7 +456,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                     await box.put('isSeller', false);
                   }
                   print("******FROM REGISTER CUSTOMER******");
-                  print(LoginResponse.token);
+                  print(LoginResponse.accessToken);
                   print(LoginResponse.userId);
                   print(LoginResponse.roleName);
                   print("customer - ${LoginResponse.isCustomer}");
@@ -464,7 +464,7 @@ class _RegisterCustomerScreenState extends State<RegisterCustomerScreen> {
                   print("current - ${LoginResponse.currentCustomer?.id}");
 
                   print("******FROM AUTH_BOX******");
-                  print(box.get('token'));
+                  print(box.get('accessToken'));
                   print(box.get('userId'));
                   print(box.get('roleId'));
                   print("customer - ${box.get('isCustomer')}");

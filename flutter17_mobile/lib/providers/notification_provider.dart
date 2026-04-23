@@ -22,14 +22,14 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
 
   bool get hasNewNotification => _hasNewNotification;
 
-  void initSignalR() {
+  void initSignalR() async {
     if (_hubConnection?.state == HubConnectionState.Connected) return;
-
+    final accessToken = await storage.read(key: "accessToken");
     _hubConnection = HubConnectionBuilder()
         .withUrl(
           "${baseUrl}notificationHub",
           options: HttpConnectionOptions(
-            accessTokenFactory: () async => LoginResponse.token ?? "",
+            accessTokenFactory: () async => accessToken ?? "",
           ),
         )
         .withAutomaticReconnect()
@@ -63,8 +63,7 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           duration: const Duration(milliseconds: 2500),
-          elevation: 12, 
-          
+          elevation: 12,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -78,7 +77,7 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
                 content,
                 textAlign: TextAlign.center,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis, 
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.normal,
                   fontSize: 12,
@@ -87,16 +86,12 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
               ),
             ],
           ),
-          backgroundColor: const Color.fromARGB(
-              255, 80, 80, 80), 
+          backgroundColor: const Color.fromARGB(255, 80, 80, 80),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
-          ),          
-          margin: EdgeInsets.only(
-              bottom: 30,
-              left: 30,
-              right: 30),
+          ),
+          margin: EdgeInsets.only(bottom: 30, left: 30, right: 30),
         ),
       );
     }
@@ -115,15 +110,17 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
       var queryString = getQueryString(filter);
       url = "$url?$queryString";
     }
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 
     try {
-      var response = await http.get(
-        uri,
-        headers: headers,
-      );
+      var response =
+          await sendWithRefresh((headers) => http.get(uri, headers: headers));
+      // var response = await http.get(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -147,13 +144,15 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
     var url = "${baseUrl}api/Notification/AddForUser";
     var uri = Uri.parse(url);
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var send = jsonEncode(obj);
 
     print("ADD ADD ADD $uri $send");
     try {
-      var response = await http.post(uri, headers: headers, body: send);
+      var response = await sendWithRefresh(
+          (headers) => http.post(uri, headers: headers, body: send));
+      //var response = await http.post(uri, headers: headers, body: send);
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -170,10 +169,12 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
         "${baseUrl}api/Notification/MarkAsRead/${userAccId}/${notificationId}";
     var uri = Uri.parse(url);
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     try {
-      var response = await http.post(uri, headers: headers);
+      var response =
+          await sendWithRefresh((headers) => http.post(uri, headers: headers));
+      //var response = await http.post(uri, headers: headers);
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);

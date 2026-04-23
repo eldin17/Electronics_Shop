@@ -78,20 +78,20 @@ class SplashScreen extends StatelessWidget {
     return TextButton.icon(
       onPressed: () async {
         var box = Hive.box('authBox');
-        var token = box.get('token');
+        var accessToken = box.get('accessToken');
         var isCustomer = box.get('isCustomer');
         var isSeller = box.get('isSeller');
         var userId = box.get('userId');
         var roleName = box.get('roleName');
-        print(token);
+        print(accessToken);
 
-        if (token != null && !isTokenExpired(token)) {
+        if (accessToken != null && !isTokenExpired(accessToken)) {
           if (isCustomer) {
             var customer = await _customerProvider
                 .getAll(filter: {'userAccountId': userId});
             if (customer.data.isNotEmpty){
               LoginResponse.currentCustomer = customer.data[0];
-              LoginResponse.token = token;
+              //LoginResponse.accessToken = accessToken;
               LoginResponse.roleName = roleName;
               LoginResponse.isCustomer = isCustomer;
               LoginResponse.isSeller = isSeller;

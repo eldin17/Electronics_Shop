@@ -7,7 +7,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 
-abstract class BaseCRUDProvider<T> extends BaseProvider {
+abstract class BaseCRUDProvider<T> extends BaseProvider<T> {
   String? baseUrl;
   String endpoint = "";
 
@@ -21,16 +21,18 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
     var url = "$baseUrl$endpoint";
     var uri = Uri.parse(url);
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var send = jsonEncode(obj);
 
     print("ADD ADD ADD $uri $send");
     try {
-      var response = await http.post(uri, headers: headers, body: send);
+      var response = await sendWithRefresh(
+          (headers) => http.post(uri, headers: headers, body: send));
+      //var response = await http.post(uri, headers: headers, body: send);
 
       if (isValidResponse(response)) {
-        var data = jsonDecode(response.body);        
+        var data = jsonDecode(response.body);
         return fromJson(data);
       }
     } catch (e) {
@@ -42,17 +44,20 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
   Future<T> update(int id, dynamic obj) async {
     var url = "$baseUrl$endpoint/$id";
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
     var objEncoded = jsonEncode(obj);
     var body = objEncoded;
     try {
-      var response = await http.put(
-        uri,
-        headers: headers,
-        body: body,
-      );
+      var response = await sendWithRefresh(
+          (headers) => http.put(uri, headers: headers, body: body));
+
+      // var response = await http.put(
+      //   uri,
+      //   headers: headers,
+      //   body: body,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -68,17 +73,19 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
   Future<T> delete(int id) async {
     var url = "$baseUrl$endpoint/$id";
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
     print("DEL DEL DEL");
     print(url);
 
     try {
-      var response = await http.delete(
-        uri,
-        headers: headers,
-      );
+      var response = await sendWithRefresh(
+          (headers) => http.delete(uri, headers: headers));
+      // var response = await http.delete(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -93,14 +100,15 @@ abstract class BaseCRUDProvider<T> extends BaseProvider {
     throw Exception();
   }
 
-  Map<String, String> getHeaders({bool withAuth = true}) {
+  Future<Map<String, String>> getHeaders({bool withAuth = true}) async {
     final headers = {
       "Content-Type": "application/json",
       "Accept": "application/json",
     };
 
+    final accessToken = await storage.read(key: "accessToken");
     if (withAuth) {
-      headers["Authorization"] = "Bearer ${LoginResponse.token}";
+      headers["Authorization"] = "Bearer ${accessToken}";
     }
 
     return headers;

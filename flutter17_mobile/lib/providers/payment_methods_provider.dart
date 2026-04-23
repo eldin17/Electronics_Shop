@@ -12,6 +12,4 @@ class PaymentMethodProvider extends BaseCRUDProvider<PaymentMethod> {
   PaymentMethod fromJson(data) {
     return PaymentMethod.fromJson(data);
   }
-
-  
 }

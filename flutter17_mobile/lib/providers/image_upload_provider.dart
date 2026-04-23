@@ -4,15 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
- 
+
 import 'dart:io';
 import 'package:dio/dio.dart' as dio;
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ImageUploadProvider with ChangeNotifier {
   static String? _baseUrl;
   final String _endpoint = "api/Image";
+  final storage = FlutterSecureStorage();
 
   ImageUploadProvider() {
     _baseUrl = const String.fromEnvironment("baseUrl",
@@ -22,11 +24,12 @@ class ImageUploadProvider with ChangeNotifier {
   Future<void> addSingleImage(int id, File image) async {
     try {
       var url = "$_baseUrl$_endpoint/AddSingleImage/$id";
+      final accessToken = await storage.read(key: "accessToken");
 
       final dioOptions = dio.BaseOptions(
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer ${LoginResponse.token}',
+          'Authorization': 'Bearer ${accessToken}',
         },
       );
       final dioClient = dio.Dio(dioOptions);
@@ -62,14 +65,15 @@ class ImageUploadProvider with ChangeNotifier {
       print('Failed to upload image: $error');
     }
   }
-  Map<String, String> _getHeaders({bool withAuth = true}) {
+
+  Future<Map<String, String>> _getHeaders({bool withAuth = true}) async {
     final headers = {
       "Content-Type": "application/json",
       "Accept": "application/json",
     };
-
+    final accessToken = await storage.read(key: "accessToken");
     if (withAuth) {
-      headers["Authorization"] = "Bearer ${LoginResponse.token}";
+      headers["Authorization"] = "Bearer ${accessToken}";
     }
 
     return headers;

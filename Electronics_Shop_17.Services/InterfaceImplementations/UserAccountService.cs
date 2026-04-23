@@ -151,16 +151,26 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 if (dbObj.Seller.isDeleted)
                     throw new UnauthorizedAccessException();
 
-            string token = CreateToken(dbObj);
+            string accessToken = CreateAccessToken(dbObj);
+            string refreshToken = CreateRefreshToken();
+
+            CreateRefreshTokenHash(refreshToken, out byte[] rtHash, out byte[] rtSalt);
+
+            dbObj.RefreshTokenHash = rtHash;
+            dbObj.RefreshTokenSalt = rtSalt;
+            dbObj.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            await _context.SaveChangesAsync();
 
             return new DtoLogin
             {
-                Token = token,
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
                 UserId = dbObj.Id,
                 RoleName = dbObj.Role.RoleName,
                 isCustomer = dbObj.Customer != null,
-                isSeller = dbObj.Seller != null,                
-            }; 
+                isSeller = dbObj.Seller != null
+            };
         }
 
         private bool VerifyPasswordHash(string pw, byte[] pwHash, byte[] pwSalt)
@@ -232,6 +242,86 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return _mapper.Map<DtoUserAccount>(obj);
         }
 
-        
+
+        private string CreateAccessToken(UserAccount user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role.RoleName)
+            };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+
+                expires: DateTime.UtcNow.AddMinutes(15), 
+
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private string CreateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+
+        private void CreateRefreshTokenHash(string refreshToken, out byte[] tokenHash, out byte[] tokenSalt)
+        {
+            using var hmac = new HMACSHA512();
+            tokenSalt = hmac.Key;
+            tokenHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+        }
+
+        private bool VerifyRefreshToken(string refreshToken, byte[] storedHash, byte[] storedSalt)
+        {
+            using var hmac = new HMACSHA512(storedSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+            return computedHash.SequenceEqual(storedHash);
+        }
+        public async Task Logout(int userId)
+        {
+            var user = await _context.UserAccounts.FindAsync(userId);
+            if (user != null)
+            {
+                user.RefreshTokenHash = null;
+                user.RefreshTokenSalt = null;
+                user.RefreshTokenExpiry = null;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<(string AccessToken, string RefreshToken)> Refresh(RefreshRequest input)
+        {
+            var user = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Id == input.UserId);
+
+            if (user == null ||
+                user.RefreshTokenExpiry <= DateTime.UtcNow ||
+                !VerifyRefreshToken(input.RefreshToken, user.RefreshTokenHash, user.RefreshTokenSalt))
+            {
+                throw new UnauthorizedAccessException();
+            }
+            string newAccessToken = CreateAccessToken(user);
+            string newRefreshToken = CreateRefreshToken();
+
+            CreateRefreshTokenHash(newRefreshToken, out byte[] rtHash, out byte[] rtSalt);
+
+            user.RefreshTokenHash = rtHash;
+            user.RefreshTokenSalt = rtSalt;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            await _context.SaveChangesAsync();
+            
+
+            return (newAccessToken, newRefreshToken);
+        }
     }
 }

@@ -4,26 +4,27 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DiscountProvider extends BaseCRUDProvider<Discount> {
-
-  DiscountProvider() : super("api/Discount") ;
+  DiscountProvider() : super("api/Discount");
 
   @override
-  Discount fromJson(data){
+  Discount fromJson(data) {
     return Discount.fromJson(data);
   }
 
   Future<Discount> getOneRandom() async {
     var url = "$baseUrl$endpoint/GetOneRandom";
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 
     try {
-      var response = await http.get(
-        uri,
-        headers: headers,
-      );
+      var response =
+          await sendWithRefresh((headers) => http.get(uri, headers: headers));
+      // var response = await http.get(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -37,5 +38,5 @@ class DiscountProvider extends BaseCRUDProvider<Discount> {
       throw Exception("Action failed: ${e.toString()}");
     }
     throw Exception();
-  }  
+  }
 }

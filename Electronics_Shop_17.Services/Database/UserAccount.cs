@@ -26,5 +26,10 @@ namespace Electronics_Shop_17.Services.Database
         public virtual Image? Image { get; set; }
 
         public bool isDeactivated { get; set; }
+
+        public byte[]? RefreshTokenHash { get; set; }
+        public byte[]? RefreshTokenSalt { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
+
     }
 }

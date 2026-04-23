@@ -20,15 +20,19 @@ class CouponProvider extends BaseCRUDProvider<Coupon> {
       url = "$url?$queryString";
     }
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 
     try {
-      var response = await http.get(
+      var response = await sendWithRefresh(
+          (headers) => http.get(
         uri,
-        headers: headers,
-      );
+        headers: headers));
+      // var response = await http.get(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);

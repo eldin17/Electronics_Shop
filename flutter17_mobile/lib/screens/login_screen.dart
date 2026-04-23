@@ -9,6 +9,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../helpers/login_response.dart';
 import '../helpers/test.dart';
@@ -28,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late LoginProvider _loginProvider;
   bool _rememberMe = false;
   bool _obscureText = true;
+  final storage = FlutterSecureStorage();
 
   @override
   void didChangeDependencies() {
@@ -45,7 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
       'username': "",
       'password': "",
     };
-    LoginResponse.token = null;
+    LoginResponse.accessToken = null;
+    LoginResponse.refreshToken = null;
     LoginResponse.userId = null;
     LoginResponse.roleName = null;
     LoginResponse.isCustomer = null;
@@ -263,7 +266,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   await _loginProvider.login(LoginModel.fromJson(formData));
                   if (_rememberMe) {
                     var box = Hive.box('authBox');
-                    await box.put('token', LoginResponse.token);
+                    final accessToken = await storage.read(key: "accessToken");
+                    await box.put('accessToken', accessToken);
                     await box.put('userId', LoginResponse.userId);
                     await box.put('roleName', LoginResponse.roleName);
                     await box.put('isCustomer', LoginResponse.isCustomer);
@@ -271,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
 
                   print("******FROM LOGIN******");
-                  print(LoginResponse.token);
+                  print(LoginResponse.accessToken);
                   print(LoginResponse.userId);
                   print(LoginResponse.roleName);
                   print("customer - ${LoginResponse.isCustomer}");

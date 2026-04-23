@@ -12,18 +12,21 @@ class WishlistItemProvider extends BaseCRUDProvider<WishlistItem> {
   }
 
   Future<WishlistItem> deleteByProductId(int productId, int wishlistId) async {
-    var url = "${baseUrl}api/WishlistItem/DeleteByProductId?productId=$productId&wishlistId=$wishlistId";
+    var url =
+        "${baseUrl}api/WishlistItem/DeleteByProductId?productId=$productId&wishlistId=$wishlistId";
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
     var uri = Uri.parse(url);
 
     print(uri);
 
     try {
-      var response = await http.delete(
-        uri,
-        headers: headers,
-      );
+      var response = await sendWithRefresh(
+          (headers) => http.delete(uri, headers: headers));
+      // var response = await http.delete(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);

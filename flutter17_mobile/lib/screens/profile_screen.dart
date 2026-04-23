@@ -6,6 +6,7 @@ import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/user_account.dart';
 import 'package:flutter17_mobile/providers/image_upload_provider.dart';
+import 'package:flutter17_mobile/providers/login_provider.dart';
 import 'package:flutter17_mobile/providers/user_account_provider.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
 import 'package:flutter17_mobile/screens/my_orders_screen.dart';
@@ -20,6 +21,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,7 +33,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late UserAccountProvider _userAccountProvider;
   late ImageUploadProvider _imageProvider;
+  late LoginProvider _loginProvider;
 
+  final storage = FlutterSecureStorage();
   late UserAccount userAcc;
   bool isLoading = true;
   String profileImage = '';
@@ -42,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _userAccountProvider = context.read<UserAccountProvider>();
     _imageProvider = context.read<ImageUploadProvider>();
+    _loginProvider = context.read<LoginProvider>();
 
     initForm();
   }
@@ -207,10 +212,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         );
 
-                        final navigator = Navigator.of(context, rootNavigator: true);
+                        final navigator =
+                            Navigator.of(context, rootNavigator: true);
 
                         Future.delayed(Duration(milliseconds: 3000), () async {
-                          await logOutMethod(context);
+                          await logOutMethod(context, LoginResponse.userId!);
                         });
                       });
                     },
@@ -219,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: "   Log Out",
                     icon: logOutIcon,
                     press: () async {
-                      await logOutMethod(context);
+                      await logOutMethod(context, LoginResponse.userId!);
                     },
                   ),
                 ],
@@ -229,20 +235,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : LoadingScreen();
   }
 
-  Future<void> logOutMethod(BuildContext context) async {
+  Future<void> logOutMethod(BuildContext context, int userId) async {
+
+    print("LOGOUT ${userId}");
     var box = Hive.box('authBox');
-    await box.delete('token');
+    await box.delete('accessToken');
     await box.delete('userId');
     await box.delete('roleName');
     await box.delete('isCustomer');
     await box.delete('isSeller');
 
-    LoginResponse.token = null;
+    LoginResponse.accessToken = null;
+    LoginResponse.refreshToken = null;
     LoginResponse.userId = null;
     LoginResponse.roleName = null;
     LoginResponse.isCustomer = null;
     LoginResponse.isSeller = null;
     LoginResponse.currentCustomer = null;
+    
+    await _loginProvider.logout(userId);
 
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       MaterialPageRoute(

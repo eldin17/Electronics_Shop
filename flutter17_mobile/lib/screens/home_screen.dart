@@ -25,6 +25,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter17_mobile/models/notification.dart' as Model_n;
 
 import '../widgets/news_section.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,7 +50,8 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = new TextEditingController();
   bool isNotificationVisible = false;
   bool isNewsDetailsVisible = false;
-
+  final storage = FlutterSecureStorage();
+  bool tokenCheckForSignalR = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -58,17 +60,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
+    tokenHelper();
     _productProvider = context.read<ProductProvider>();
     _newsProvider = context.read<NewsProvider>();
     _discountProvider = context.read<DiscountProvider>();
     _notificationProvider = context.read<NotificationProvider>();
-
-    if (LoginResponse.token != null) {
+    if (tokenCheckForSignalR) {
       _notificationProvider.initSignalR();
     }
 
     initForm();
+  }
+
+  Future tokenHelper() async {
+    final accessToken = await storage.read(key: "accessToken");
+    tokenCheckForSignalR = accessToken != null;
   }
 
   Future initForm() async {
@@ -91,8 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .where((element) => element.finalPrice != element.price));
       isLoading = false;
     });
-    print("******FROM HOME SCREEN******");
-    print(LoginResponse.token);
+    print("******FROM HOME SCREEN******"); 
     print(LoginResponse.userId);
     print(LoginResponse.roleName);
     print("customer - ${LoginResponse.isCustomer}");
@@ -254,9 +259,9 @@ class _HomeHeaderState extends State<HomeHeader> {
             onClickColor: true,
             isClicked: widget.isClicked,
             svgSrc: bellIcon,
-            numOfitem: prov.hasNewNotification 
-              ? notificationsList.length + 1 
-              : notificationsList.length,
+            numOfitem: prov.hasNewNotification
+                ? notificationsList.length + 1
+                : notificationsList.length,
             press: () async {
               prov.clearNotificationFlag();
               var notificationObj = await _notificationProvider

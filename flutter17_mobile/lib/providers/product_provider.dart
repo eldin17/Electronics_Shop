@@ -23,17 +23,19 @@ class ProductProvider extends BaseCRUDProvider<Product> {
       var queryString = getQueryString(filter);
       url = "$url?$queryString";
     }
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 
     print(uri);
 
     try {
-      var response = await http.get(
-        uri,
-        headers: headers,
-      );
+      var response =
+          await sendWithRefresh((headers) => http.get(uri, headers: headers));
+      // var response = await http.get(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
@@ -56,21 +58,23 @@ class ProductProvider extends BaseCRUDProvider<Product> {
   Future<dynamic> getByIdWithChecks(int customerId, int id) async {
     var url = "${baseUrl}api/Product/GetByIdWithChecks/${customerId}/${id}";
 
-    var headers = getHeaders(withAuth: true);
+    var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 
     try {
-      var response = await http.get(
-        uri,
-        headers: headers,
-      );
+      var response =
+          await sendWithRefresh((headers) => http.get(uri, headers: headers));
+      // var response = await http.get(
+      //   uri,
+      //   headers: headers,
+      // );
 
       if (isValidResponse(response)) {
         var data = jsonDecode(response.body);
 
         var result = fromJson(data);
-        
+
         return result;
       }
     } catch (e) {
