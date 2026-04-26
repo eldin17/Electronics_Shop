@@ -21,6 +21,6 @@ namespace Electronics_Shop_17.Services.Interfaces
         Task<DtoUserAccount> Reactivate(int id);
         Task<DtoUserAccount> ResetPW(ResetPW obj);
         Task<(string AccessToken, string RefreshToken)> Refresh(RefreshRequest input);
-        Task Logout(int userId);
+        Task Logout(string accessToken, int userId);
     }
 }

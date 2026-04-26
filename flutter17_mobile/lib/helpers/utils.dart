@@ -4,6 +4,9 @@ import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/models/image.dart' as Model;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter17_mobile/helpers/login_response.dart';
 
 bool isTokenExpired(String? token) {
   if (token == null) return true; 
@@ -18,6 +21,29 @@ bool isTokenExpired(String? token) {
   } catch (e) {
     return true; 
   }
+}
+
+void logoutCleanUp()async{
+  final storage = FlutterSecureStorage();
+
+  await storage.delete(key: "accessToken");
+      await storage.delete(key: "refreshToken");
+      print("LOGOUT METHOD");
+      var box = Hive.box('authBox');
+      box.clear();
+      // await box.delete('accessToken');
+      // await box.delete('userId');
+      // await box.delete('roleName');
+      // await box.delete('isCustomer');
+      // await box.delete('isSeller');
+
+      LoginResponse.accessToken = null;
+      LoginResponse.refreshToken = null;
+      LoginResponse.userId = null;
+      LoginResponse.roleName = null;
+      LoginResponse.isCustomer = null;
+      LoginResponse.isSeller = null;
+      LoginResponse.currentCustomer = null;
 }
 
 String getTimeAgo(DateTime createdAt) {

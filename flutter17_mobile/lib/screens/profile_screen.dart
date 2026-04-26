@@ -216,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Navigator.of(context, rootNavigator: true);
 
                         Future.delayed(Duration(milliseconds: 3000), () async {
-                          await logOutMethod(context, LoginResponse.userId!);
+                          await logOutMethod(context);
                         });
                       });
                     },
@@ -225,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: "   Log Out",
                     icon: logOutIcon,
                     press: () async {
-                      await logOutMethod(context, LoginResponse.userId!);
+                      await logOutMethod(context);
                     },
                   ),
                 ],
@@ -235,25 +235,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : LoadingScreen();
   }
 
-  Future<void> logOutMethod(BuildContext context, int userId) async {
+  Future<void> logOutMethod(BuildContext context) async {
 
-    print("LOGOUT ${userId}");
-    var box = Hive.box('authBox');
-    await box.delete('accessToken');
-    await box.delete('userId');
-    await box.delete('roleName');
-    await box.delete('isCustomer');
-    await box.delete('isSeller');
-
-    LoginResponse.accessToken = null;
-    LoginResponse.refreshToken = null;
-    LoginResponse.userId = null;
-    LoginResponse.roleName = null;
-    LoginResponse.isCustomer = null;
-    LoginResponse.isSeller = null;
-    LoginResponse.currentCustomer = null;
     
-    await _loginProvider.logout(userId);
+    
+    await _loginProvider.logout();
 
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
       MaterialPageRoute(

@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/login_provider.dart';
+import '../screens/splash_screen.dart';
 
 class AccountInfoScreen extends StatefulWidget {
   UserAccount userAcc;
@@ -200,9 +201,19 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   duration: Duration(milliseconds: 1000),
-                  content: Text('✅ Password changed! Stay safe out there 🔐'),
+                  content: Text('✅ Password changed! Please log in again 🔐'),
                 ),
               );
+
+              logoutCleanUp();
+              Future.delayed(const Duration(milliseconds: 1500), () {
+                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => SplashScreen(),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
+              });
             }
           } on Exception catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(

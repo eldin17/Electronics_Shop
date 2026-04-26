@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/login_model.dart';
 import 'package:flutter17_mobile/models/user_account.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
@@ -46,7 +47,7 @@ class LoginProvider with ChangeNotifier {
 
         await storage.write(key: "accessToken", value: data['accessToken']);
         await storage.write(key: "refreshToken", value: data['refreshToken']);
-        await storage.write(key: "userId", value: data['userId']);
+        await storage.write(key: "userId", value: data['userId'].toString());
 
         LoginResponse.accessToken = await storage.read(key: "accessToken");
         LoginResponse.userId = data['userId'];
@@ -65,12 +66,13 @@ class LoginProvider with ChangeNotifier {
         return;
       }
     } catch (e) {
+      
       throw Exception("Login failed: ${e.toString()}");
     }
   }
 
-  Future<void> logout(int userId) async {
-    var url = "$_baseUrl$_endpoint/logout/$userId";
+  Future<void> logout() async {
+    var url = "$_baseUrl$_endpoint/logout";
     print(url);
     var headers = await _getHeaders(withAuth: true);
     var response = await sendWithRefresh(
@@ -78,23 +80,7 @@ class LoginProvider with ChangeNotifier {
     //var response = await http.post(Uri.parse(url));
     print(response.statusCode);
     if (response.statusCode == 200) {
-      await storage.delete(key: "accessToken");
-      await storage.delete(key: "refreshToken");
-      print("LOGOUT ${userId}");
-      var box = Hive.box('authBox');
-      await box.delete('accessToken');
-      await box.delete('userId');
-      await box.delete('roleName');
-      await box.delete('isCustomer');
-      await box.delete('isSeller');
-
-      LoginResponse.accessToken = null;
-      LoginResponse.refreshToken = null;
-      LoginResponse.userId = null;
-      LoginResponse.roleName = null;
-      LoginResponse.isCustomer = null;
-      LoginResponse.isSeller = null;
-      LoginResponse.currentCustomer = null;
+      logoutCleanUp();
     } else {
       throw Exception("Logout failed");
     }

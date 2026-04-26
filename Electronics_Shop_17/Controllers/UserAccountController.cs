@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Electronics_Shop_17.Model.DataTransferObjects;
 using Electronics_Shop_17.Model.Helpers;
 using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
+using Electronics_Shop_17.Services.InterfaceImplementations;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -100,11 +102,34 @@ namespace Electronics_Shop_17.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        [HttpPost("logout/{userId}")]
-        public async Task<IActionResult> Logout(int userId)
+        
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
         {
-            await (_service as IUserAccountService).Logout(userId);
-            return Ok(new { message = "User logged out successfully." });
+            try
+            {                
+                string authHeader = Request.Headers["Authorization"];
+                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                {
+                    return BadRequest("Authorization header is missing or invalid.");
+                }
+                string token = authHeader.Replace("Bearer ", "");
+
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                {
+                    return Unauthorized("User ID not found in token.");
+                }
+
+                await (_service as IUserAccountService).Logout(token, userId);
+
+                return Ok(new { message = "Logged out successfully" });
+            }
+            catch (Exception)
+            {                
+                return StatusCode(500, "An internal server error occurred during logout.");
+            }
         }
 
         [HttpPost("refresh")]

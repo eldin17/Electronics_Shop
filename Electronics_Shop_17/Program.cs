@@ -6,11 +6,13 @@ using Electronics_Shop_17.Services.InterfaceImplementations;
 using Electronics_Shop_17.Services.Interfaces;
 using Electronics_Shop_17.Services.OrderStateMachine;
 using Electronics_Shop_17.Services.ProductStateMachine;
+using Electronics_Shop_17.Services.Redis;
 using Electronics_Shop_17.Services.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,17 +81,17 @@ builder.Services.AddTransient<DeletedOrderState>();
 
 builder.Services.AddTransient<Checks>();
 
-
+var redisConnection = builder.Configuration.GetConnectionString("Redis");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
 
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.AllowAnyOrigin() 
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); 
+              .AllowAnyMethod();
     });
 });
 
@@ -152,6 +154,7 @@ builder.Services.AddAutoMapper(typeof(IAccessoryService));
 
 builder.Services.AddSignalR();
 
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -169,10 +172,12 @@ app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
+app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

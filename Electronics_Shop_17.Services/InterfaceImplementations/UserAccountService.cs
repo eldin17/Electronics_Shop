@@ -14,10 +14,12 @@ using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -26,12 +28,15 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         DataContext _context;
         IMapper _mapper;
         IConfiguration _configuration;
-
-        public UserAccountService(DataContext context, IMapper mapper, IConfiguration configuration) : base(context, mapper)
+        private readonly IConnectionMultiplexer _redis;
+        IHttpContextAccessor _httpContextAccessor;
+        public UserAccountService(DataContext context, IMapper mapper, IConfiguration configuration, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor) : base(context, mapper)
         {
             _context = context;
             _mapper = mapper;
             _configuration = configuration;
+            _redis = redis;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public override IQueryable<UserAccount> AddInclude(IQueryable<UserAccount> data)
@@ -119,6 +124,19 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             await _context.SaveChangesAsync();
 
+            var authHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var token = authHeader.Replace("Bearer ", "");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var jti = jwtToken.Id;
+
+                var db = _redis.GetDatabase();
+                await db.StringSetAsync($"blacklist:{jti}", "revoked", TimeSpan.FromHours(1));
+            }
+
             return _mapper.Map<DtoUserAccount>(dbObj);
         }
 
@@ -181,30 +199,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 return computedHash.SequenceEqual(pwHash);
             }
         }
-
-        private string CreateToken(UserAccount user)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.RoleName)
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
+      
 
         public async Task<DtoUserAccount> Deactivate(int id)
         {
@@ -247,10 +242,11 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.RoleName)
-            };
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),              
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),            
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),       
+                new Claim(ClaimTypes.Role, user.Role.RoleName)                           
+            };                                                                           
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
@@ -260,7 +256,8 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 claims: claims,
 
                 expires: DateTime.UtcNow.AddMinutes(15), 
-
+                issuer: _configuration["AppSettings:Issuer"],
+                audience: _configuration["AppSettings:Audience"],
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -286,9 +283,9 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             using var hmac = new HMACSHA512(storedSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
             return computedHash.SequenceEqual(storedHash);
-        }
-        public async Task Logout(int userId)
-        {
+        }        
+        public async Task Logout(string accessToken, int userId)
+        {            
             var user = await _context.UserAccounts.FindAsync(userId);
             if (user != null)
             {
@@ -297,8 +294,25 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 user.RefreshTokenExpiry = null;
                 await _context.SaveChangesAsync();
             }
-        }
+            
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
 
+            var jti = jsonToken?.Id; 
+            var expiry = jsonToken?.ValidTo;
+
+            if (jti != null && expiry.HasValue)
+            {
+                var db = _redis.GetDatabase();
+                var timeout = expiry.Value - DateTime.UtcNow;
+
+                if (timeout.TotalSeconds > 0)
+                {                    
+                    await db.StringSetAsync($"blacklist:{jti}", "true", timeout);
+                }
+            }
+        }
+        
         public async Task<(string AccessToken, string RefreshToken)> Refresh(RefreshRequest input)
         {
             var user = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Id == input.UserId);
