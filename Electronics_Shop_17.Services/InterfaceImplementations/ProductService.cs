@@ -258,6 +258,18 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             return await state.Restore(id);
         }
 
-        
+        public async Task<List<DtoProduct>> GetProductsByIdsAsync(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new List<DtoProduct>();
+            }
+
+            var dbObj = await _context.Products
+                .Where(p => ids.Contains(p.Id)).Where(p=>!p.isDeleted && p.StateMachine=="Active")
+                .ToListAsync();
+
+            return _mapper.Map<List<DtoProduct>>(dbObj);
+        }
     }
 }

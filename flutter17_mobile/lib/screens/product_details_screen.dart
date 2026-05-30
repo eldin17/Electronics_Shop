@@ -4,6 +4,7 @@ import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/models/product.dart';
 import 'package:flutter17_mobile/models/product_color.dart';
 import 'package:flutter17_mobile/models/product_image.dart';
+import 'package:flutter17_mobile/providers/ai_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/providers/recommendations_provider.dart';
 import 'package:flutter17_mobile/providers/shopping_cart_item_provider.dart';
@@ -20,6 +21,8 @@ import 'package:flutter17_mobile/widgets/product_details_see_more.dart';
 import 'package:flutter17_mobile/widgets/top_rounded_corner.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/ai_summary_bubble.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   int? productId;
@@ -43,6 +46,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late ShoppingCartItemProvider _shoppingCartItemProvider;
   late ProductProvider _productProvider;
   late RecommendationsProvider _recommendationsProvider;
+  late AiProvider _aiProvider;
   List<Product> recList = [];
 
   var wishlistItemId = 0;
@@ -56,6 +60,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     _shoppingCartItemProvider = context.read<ShoppingCartItemProvider>();
     _productProvider = context.read<ProductProvider>();
     _recommendationsProvider = context.read<RecommendationsProvider>();
+    _aiProvider = context.read<AiProvider>();
 
     if (LoginResponse.currentCustomer?.wishlist != null) {
       var obj = LoginResponse.currentCustomer!.wishlist!.wishlistItems?.where(
@@ -92,13 +97,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       obj = await _productProvider.getByIdWithChecks(
           LoginResponse.currentCustomer!.id!, widget.productId!);
       print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      recReturn =
-          await _recommendationsProvider.getRecommendations(LoginResponse.userId!,widget.productId!);
-    } else{
+      recReturn = await _recommendationsProvider.getRecommendations(
+          LoginResponse.userId!, widget.productId!);
+    } else {
       obj = Product();
-      print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB ${LoginResponse.userId!} ${widget.selectedProduct.id}");
-       recReturn =
-          await _recommendationsProvider.getRecommendations(LoginResponse.userId!,widget.selectedProduct.id!);
+      print(
+          "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB ${LoginResponse.userId!} ${widget.selectedProduct.id}");
+      recReturn = await _recommendationsProvider.getRecommendations(
+          LoginResponse.userId!, widget.selectedProduct.id!);
     }
 
     setState(() {
@@ -240,12 +246,48 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 });
                               },
                             ),
-                            SizedBox(height: 20,),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Center(
+                              child: AiSummaryBubble(
+                                onFetchSummary: () async {
+                                  if (widget.selectedProduct.id == null) {
+                                    return "Error: System could not resolve the Product ID.";
+                                  }
+
+                                  try {
+                                    var result = await _aiProvider
+                                        .getProductReviewSummary(
+                                      productId: widget.selectedProduct.id!,
+                                      forceRefresh: false,
+                                    );
+
+                                    if (result != null &&
+                                        (result['summary'] != null ||
+                                            result['Summary'] != null)) {
+                                      return (result['summary'] ??
+                                              result['Summary'])
+                                          .toString();
+                                    }
+
+                                    return "No summary data found in the response.";
+                                  } catch (e) {
+                                    return "Failed to load summary: ${e.toString()}";
+                                  }
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
                             TopRoundedContainer(
                               color: Colors.white,
                               child: Column(
                                 children: [
-                                  recList.isNotEmpty?RecommendProducts(products: recList):SizedBox()
+                                  recList.isNotEmpty
+                                      ? RecommendProducts(products: recList)
+                                      : SizedBox()
                                 ],
                               ),
                             ),
@@ -427,7 +469,10 @@ class _ProductDescriptionState extends State<ProductDescription> {
                       print(widget.product.id!);
                       print(LoginResponse.currentCustomer!.wishlist!.id!);
                       //await widget.wishlistItemProvider.delete(widget.deleteId);
-                      var deletedWishlistItem = await widget.wishlistItemProvider.deleteByProductId(widget.product.id!, LoginResponse.currentCustomer!.wishlist!.id!);
+                      var deletedWishlistItem =
+                          await widget.wishlistItemProvider.deleteByProductId(
+                              widget.product.id!,
+                              LoginResponse.currentCustomer!.wishlist!.id!);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             duration: Duration(milliseconds: 500),
@@ -507,7 +552,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }

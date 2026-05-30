@@ -11,13 +11,18 @@ using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
     public class ReviewService : BaseServiceCRUD<DtoReview, Review, SearchReview, AddReview, UpdateReview>, IReviewService
     {
-        public ReviewService(DataContext context, IMapper mapper) : base(context, mapper)
-        {
+        
+        private readonly IDatabase _redisDb;
+
+        public ReviewService(DataContext context, IMapper mapper,  IConnectionMultiplexer redis) : base(context, mapper)
+        {            
+            _redisDb = redis.GetDatabase();
         }
 
         public override List<DtoReview> ImageIncludeForReviews(List<DtoReview> list)
@@ -31,6 +36,16 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             }
             list.OrderByDescending(x => x.Id);
             return base.ImageIncludeForReviews(list);
+        }
+
+        public override async Task<DtoReview> Add(AddReview addRequest)
+        {
+            var createdReview = await base.Add(addRequest);
+            
+            string cacheKey = $"product:{addRequest.ProductId}:ai-summary";
+            await _redisDb.KeyDeleteAsync(cacheKey);
+            
+            return createdReview;
         }
 
         public override IQueryable<Review> AddInclude(IQueryable<Review> data)

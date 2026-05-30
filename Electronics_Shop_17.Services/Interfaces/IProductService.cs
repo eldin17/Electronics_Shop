@@ -20,5 +20,7 @@ namespace Electronics_Shop_17.Services.Interfaces
         Task<Pagination<DtoProduct>> GetAllWithChecks(int customerId, SearchProduct search = null);
         Task<DtoProduct> GetByIdWithChecks(int customerId, int id);
 
+        Task<List<DtoProduct>> GetProductsByIdsAsync(List<int> ids);
+
     }
 }

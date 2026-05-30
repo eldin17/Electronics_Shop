@@ -76,7 +76,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             var aggregatedReviews = string.Join("\n- ", reviews);
             var history = new ChatHistory();
 
-            history.AddSystemMessage("You are an assistant that summarizes product reviews for an e-commerce store. Be concise, objective, and highlight the main pros and cons based *only* on the provided text.");
+            history.AddSystemMessage("You are an assistant that summarizes product reviews for an e-commerce store. Be concise, objective, and highlight the main pros and cons based *only* on the provided text. Keep responses short.");
             history.AddUserMessage($"Please summarize the following customer reviews:\n- {aggregatedReviews}");
 
             try

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/providers/adress_provider.dart';
+import 'package:flutter17_mobile/providers/ai_provider.dart';
 import 'package:flutter17_mobile/providers/coupon_provider.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 import 'package:flutter17_mobile/providers/discount_provider.dart';
@@ -49,6 +50,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AdressProvider()),
         ChangeNotifierProvider(create: (_) => OrderItemProvider()),
         ChangeNotifierProvider(create: (_) => RecommendationsProvider()),
+        ChangeNotifierProvider(create: (_) => AiProvider()),
 
       ],
       child: const MyApp(),

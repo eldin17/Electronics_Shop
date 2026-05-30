@@ -7,7 +7,14 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/models/search_result.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'package:http/http.dart';
 bool isTokenExpired(String? token) {
   if (token == null) return true; 
   try {
@@ -127,4 +134,74 @@ List<Map<String, dynamic>> categoriesFromUtils = [
         return"Accessory";    
     }
     return "";
+  }
+
+  Future<Response> sendWithRefresh(
+      Future<Response> Function(Map<String, String> headers) requestFn) async {
+    var headers = await getHeaders(withAuth: true);
+    var response = await requestFn(headers);
+
+    if (response.statusCode == 401) {
+      await refreshToken();
+      headers = await getHeaders(withAuth: true);
+      response = await requestFn(headers);
+    }
+
+    return response;
+  }
+
+  Future<void> refreshToken() async {
+    final storage = FlutterSecureStorage();
+    String? baseUrl;
+    baseUrl = const String.fromEnvironment("baseUrl",
+        defaultValue: "http://10.0.2.2:5116/");
+    print("*********REFRESH TOKEN METHOD*********");
+    final refreshToken = await storage.read(key: "refreshToken");
+    final userId = await storage.read(key: "userId");
+    if (refreshToken == null || userId == null) {
+      throw Exception("No refresh token or user ID found");
+    }
+    var url = "${baseUrl}api/UserAccount/refresh";
+
+    var response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "refreshToken": refreshToken,
+        "userId": int.parse(userId),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Response: ${response.statusCode} ${response.body}");
+      var data = jsonDecode(response.body);
+      await storage.write(key: "accessToken", value: data['accessToken']);
+      await storage.write(key: "refreshToken", value: data['refreshToken']);
+    } else {
+      throw Exception("Refresh failed, please login again");
+    }
+  }
+
+    Future<Map<String, String>> getHeaders({bool withAuth = true}) async {
+      final storage = FlutterSecureStorage();
+    final headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+
+    final accessToken = await storage.read(key: "accessToken");
+    if (withAuth) {
+      headers["Authorization"] = "Bearer ${accessToken}";
+    }
+
+    return headers;
+  }
+
+  bool isValidResponse(Response response) {
+    if (response.statusCode < 299) {
+      return true;
+    } else {
+      var data = jsonDecode(response.body);
+      throw Exception(data['message'] ?? "An error occurred.");
+    }
   }
