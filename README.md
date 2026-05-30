@@ -32,7 +32,7 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 
 🧬 Entity Framework – ORM
 
-🤖 ML.NET – Custom product recommendation system utilizing matrix factorization and rating-based fallback logic
+🤖 ML.NET – Co-purchase recommendations using Matrix Factorization on order history, with a category-based fallback mechanism
 
 🔮 Ollama – Self-hosted Local LLM integration for automated product review summarization
 
