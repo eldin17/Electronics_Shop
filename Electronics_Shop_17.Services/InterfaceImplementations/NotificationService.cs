@@ -43,7 +43,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                         Title = obj.Title,
                         Content = obj.Message,
                         IsGeneral = obj.IsGeneral,
-                        CreatedAt = DateTime.Now
+                        CreatedAt = obj.DateCreated
                     };
 
                     if (obj.IsGeneral)

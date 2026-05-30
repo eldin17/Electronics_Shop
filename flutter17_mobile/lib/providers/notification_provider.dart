@@ -23,13 +23,35 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
   bool get hasNewNotification => _hasNewNotification;
 
   void initSignalR() async {
-    if (_hubConnection?.state == HubConnectionState.Connected) return;
     final accessToken = await storage.read(key: "accessToken");
+    if (accessToken == null) {
+      print("SignalR: No token found in storage, aborting.");
+      return;
+    }
+    if (_hubConnection?.state == HubConnectionState.Connected) {
+      print("SignalR: Already Connected, aborting");
+      return;
+    }
+
     _hubConnection = HubConnectionBuilder()
         .withUrl(
           "${baseUrl}notificationHub",
           options: HttpConnectionOptions(
-            accessTokenFactory: () async => accessToken ?? "",
+            accessTokenFactory: () async {
+              String? token = await storage.read(key: "accessToken");
+
+              if (token == null) return "";
+
+              try {
+                await refreshToken();
+                token = await storage.read(key: "accessToken");
+              } catch (e) {
+                print(
+                    "SignalR: Token refresh failed, attempting with old token.");
+              }
+
+              return token ?? "";
+            },
           ),
         )
         .withAutomaticReconnect()
@@ -44,15 +66,14 @@ class NotificationProvider extends BaseCRUDProvider<Model.Notification> {
       _showTopPopup(data['title'] ?? "New Notification", data['content'] ?? "");
 
       print("--- SIGNALR NOTIFICATION RECEIVED ---");
-      print("Payload: $data");
-      print("---------------------------------------");
     });
 
-    _hubConnection!.start()?.then((_) {
+    try {
+      await _hubConnection!.start();
       print("SignalR: Connected to Hub successfully.");
-    }).catchError((error) {
+    } catch (error) {
       print("SignalR Error: $error");
-    });
+    }
   }
 
   void _showTopPopup(String title, String content) {

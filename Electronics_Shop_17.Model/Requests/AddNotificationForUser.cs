@@ -10,7 +10,7 @@ namespace Electronics_Shop_17.Model.Requests
     {
         public string Title { get; set; }
         public string Message { get; set; }
-        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        public DateTime DateCreated { get; set; } = DateTime.Now;
         public bool IsGeneral { get; set; }
         public List<int> userAccIds { get; set; }
     }

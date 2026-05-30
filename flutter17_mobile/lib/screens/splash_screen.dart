@@ -114,6 +114,7 @@ class SplashScreen extends StatelessWidget {
             ),
           );
         } else {
+          logoutCleanUp();
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
               transitionDuration: Duration.zero,

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Electronics_Shop_17.Services.SignalR
 {
-    [Authorize]
+    //[Authorize]
     public class NotificationHub : Hub
     {
     }

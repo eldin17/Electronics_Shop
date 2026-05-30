@@ -74,7 +74,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             CreatePasswordHash(obj.Password, out byte[] pwHash, out byte[] pwSalt);
 
-            var novi = new UserAccount()
+            var newAcc = new UserAccount()
             {
                 Username = obj.Username,
                 Email = obj.Email,
@@ -86,10 +86,10 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 isDeactivated = false,
             };
 
-            _context.UserAccounts.Add(novi);
+            _context.UserAccounts.Add(newAcc);
             await _context.SaveChangesAsync();
 
-            var newDto = _mapper.Map<DtoUserAccount>(novi);
+            var newDto = _mapper.Map<DtoUserAccount>(newAcc);
 
             return newDto;
         }
@@ -217,6 +217,21 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             await _context.SaveChangesAsync();
 
+            var authHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var token = authHeader.Replace("Bearer ", "");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var jti = jwtToken.Id;
+
+                var db = _redis.GetDatabase();
+                await db.StringSetAsync($"blacklist:{jti}", "revoked", TimeSpan.FromHours(1));
+            }
+
+
+
             return  _mapper.Map<DtoUserAccount>(obj);
         }
 
@@ -283,9 +298,15 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             using var hmac = new HMACSHA512(storedSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
             return computedHash.SequenceEqual(storedHash);
-        }        
-        public async Task Logout(string accessToken, int userId)
-        {            
+        }
+        public async Task Logout()
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token.");
+            }
+
             var user = await _context.UserAccounts.FindAsync(userId);
             if (user != null)
             {
@@ -294,25 +315,29 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 user.RefreshTokenExpiry = null;
                 await _context.SaveChangesAsync();
             }
-            
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
 
-            var jti = jsonToken?.Id; 
-            var expiry = jsonToken?.ValidTo;
+            var authHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var token = authHeader.Replace("Bearer ", "");
 
-            if (jti != null && expiry.HasValue)
+            if (!string.IsNullOrEmpty(token))
             {
-                var db = _redis.GetDatabase();
-                var timeout = expiry.Value - DateTime.UtcNow;
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
 
-                if (timeout.TotalSeconds > 0)
-                {                    
+                var jti = jwtToken.Id;
+                var expiry = jwtToken.ValidTo;
+
+                if (!string.IsNullOrEmpty(jti) && expiry > DateTime.UtcNow)
+                {
+                    var db = _redis.GetDatabase();
+                    var timeout = expiry - DateTime.UtcNow;
+
                     await db.StringSetAsync($"blacklist:{jti}", "true", timeout);
                 }
             }
         }
-        
+
+
         public async Task<(string AccessToken, string RefreshToken)> Refresh(RefreshRequest input)
         {
             var user = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Id == input.UserId);

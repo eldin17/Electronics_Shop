@@ -108,22 +108,8 @@ namespace Electronics_Shop_17.Controllers
         public async Task<IActionResult> Logout()
         {
             try
-            {                
-                string authHeader = Request.Headers["Authorization"];
-                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
-                {
-                    return BadRequest("Authorization header is missing or invalid.");
-                }
-                string token = authHeader.Replace("Bearer ", "");
-
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-                {
-                    return Unauthorized("User ID not found in token.");
-                }
-
-                await (_service as IUserAccountService).Logout(token, userId);
-
+            { 
+                await (_service as IUserAccountService).Logout();
                 return Ok(new { message = "Logged out successfully" });
             }
             catch (Exception)

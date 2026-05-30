@@ -60,21 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    tokenHelper();
+
     _productProvider = context.read<ProductProvider>();
     _newsProvider = context.read<NewsProvider>();
     _discountProvider = context.read<DiscountProvider>();
     _notificationProvider = context.read<NotificationProvider>();
-    if (tokenCheckForSignalR) {
-      _notificationProvider.initSignalR();
-    }
+
+    _notificationProvider.initSignalR();
 
     initForm();
-  }
-
-  Future tokenHelper() async {
-    final accessToken = await storage.read(key: "accessToken");
-    tokenCheckForSignalR = accessToken != null;
   }
 
   Future initForm() async {
@@ -97,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .where((element) => element.finalPrice != element.price));
       isLoading = false;
     });
-    print("******FROM HOME SCREEN******"); 
+    print("******FROM HOME SCREEN******");
     print(LoginResponse.userId);
     print(LoginResponse.roleName);
     print("customer - ${LoginResponse.isCustomer}");
@@ -223,6 +217,7 @@ class _HomeHeaderState extends State<HomeHeader> {
   late NotificationProvider _notificationProvider;
   List<Model_n.Notification> notificationsList = [];
   bool isLoading = true;
+  final storage = FlutterSecureStorage();
 
   @override
   void initState() {
@@ -266,12 +261,13 @@ class _HomeHeaderState extends State<HomeHeader> {
               prov.clearNotificationFlag();
               var notificationObj = await _notificationProvider
                   .getAllForUser(LoginResponse.userId!);
-              setState(() {
+              setState(() async {
                 if (_notificationProvider.hasNewNotification)
                   notificationsList =
                       List<Model_n.Notification>.from(notificationObj.data);
 
                 print(notificationsList.length);
+
                 notificationsList.length = 0;
                 widget.showInfo();
               });

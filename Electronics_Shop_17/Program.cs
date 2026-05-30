@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.SemanticKernel;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -61,6 +62,9 @@ builder.Services.AddTransient<IOrderValidationService, OrderValidationService>()
 
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
+builder.Services.AddScoped<ISummaryAIService, SummaryAIService>();
+
+
 
 
 
@@ -84,6 +88,14 @@ builder.Services.AddTransient<Checks>();
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
 
+
+var ollamaEndpoint = builder.Configuration["Ollama:Endpoint"] ?? "http://localhost:11434";
+
+builder.Services.AddKernel()
+                .AddOllamaChatCompletion(
+                    modelId: "phi3",
+                    endpoint: new Uri(ollamaEndpoint)
+                );
 
 builder.Services.AddCors(options =>
 {
