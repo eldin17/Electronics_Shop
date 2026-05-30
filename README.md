@@ -21,7 +21,7 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 
 🌐 Web App – Built with Angular
 
-### Tech Stack ###
+### Tech Stack, Features & Integrations  ###
 🧠 C# / .NET – Backend API
 
 📱 Flutter – Mobile and Desktop App
@@ -31,6 +31,10 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 🗄️ SQL – Relational Database
 
 🧬 Entity Framework – ORM
+
+🤖 ML.NET – Custom product recommendation system utilizing matrix factorization and rating-based fallback logic
+
+🔮 Ollama – Self-hosted Local LLM integration for automated product review summarization
 
 📨 RabbitMQ – Message Brokering, Mail Sending
 
