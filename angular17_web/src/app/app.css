@@ -1,0 +1,11 @@
+/*::ng-deep .custom-error-snackbar .mdc-snackbar__surface {*/
+/*  background-color: #9f9f9f !important; */
+/*}*/
+
+/*::ng-deep .custom-error-snackbar .mdc-snackbar__label {*/
+/*  color: #fd5421 !important; */
+/*}*/
+
+::ng-deep .custom-error-snackbar .mat-mdc-snack-bar-action {
+  color: #ffffff !important; /* Dark text for the action for contrast */
+}
