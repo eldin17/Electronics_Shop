@@ -32,6 +32,8 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 
 🧬 Entity Framework – ORM
 
+🔒 JWT Authentication – Utilizing Access and Refresh Tokens for seamless session management
+
 🤖 ML.NET – Co-purchase recommendations using Matrix Factorization on order history, with a category-based fallback mechanism
 
 🔮 Ollama – Self-hosted Local LLM integration for automated product review summarization
