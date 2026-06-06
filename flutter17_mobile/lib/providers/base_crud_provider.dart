@@ -21,7 +21,7 @@ abstract class BaseCRUDProvider<T> extends BaseProvider<T> {
     var url = "$baseUrl$endpoint";
     var uri = Uri.parse(url);
 
-    var headers = await getHeaders(withAuth: true);
+    //var headers = await getHeaders(withAuth: true);
 
     var send = jsonEncode(obj);
 
@@ -44,7 +44,7 @@ abstract class BaseCRUDProvider<T> extends BaseProvider<T> {
   Future<T> update(int id, dynamic obj) async {
     var url = "$baseUrl$endpoint/$id";
 
-    var headers = await getHeaders(withAuth: true);
+    //var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
     var objEncoded = jsonEncode(obj);
@@ -73,7 +73,7 @@ abstract class BaseCRUDProvider<T> extends BaseProvider<T> {
   Future<T> delete(int id) async {
     var url = "$baseUrl$endpoint/$id";
 
-    var headers = await getHeaders(withAuth: true);
+    //var headers = await getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
     print("DEL DEL DEL");

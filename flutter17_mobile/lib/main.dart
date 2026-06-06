@@ -11,6 +11,7 @@ import 'package:flutter17_mobile/providers/notification_provider.dart';
 import 'package:flutter17_mobile/providers/order_item_provider.dart';
 import 'package:flutter17_mobile/providers/order_provider.dart';
 import 'package:flutter17_mobile/providers/payment_methods_provider.dart';
+import 'package:flutter17_mobile/providers/person_provider.dart';
 import 'package:flutter17_mobile/providers/product_provider.dart';
 import 'package:flutter17_mobile/providers/recommendations_provider.dart';
 import 'package:flutter17_mobile/providers/reviews_provider.dart';
@@ -24,6 +25,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   await Hive.initFlutter();
@@ -46,6 +48,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CouponProvider()),
         ChangeNotifierProvider(create: (_) => UserAccountProvider()),
         ChangeNotifierProvider(create: (_) => PaymentMethodProvider()),
+        ChangeNotifierProvider(create: (_) => PersonProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => AdressProvider()),
         ChangeNotifierProvider(create: (_) => OrderItemProvider()),

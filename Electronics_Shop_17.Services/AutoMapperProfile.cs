@@ -385,7 +385,7 @@ namespace Electronics_Shop_17.Services
             CreateMap<Customer, AddCustomer>().ReverseMap();
             CreateMap<Customer, UpdateCustomer>().ReverseMap()
             .ForMember(dest => dest.LoyaltyPoints, opt => opt.Condition(src => src.LoyaltyPoints != null))
-            .ForMember(dest => dest.Adresses, opt => opt.Condition(src => src.Adresses != null))
+            //.ForMember(dest => dest.Adresses, opt => opt.Condition(src => src.Adresses != null))
             .ForMember(dest => dest.isDeleted, opt => opt.Condition(src => src.isDeleted != null));
 
             CreateMap<Seller, DtoSeller>().ReverseMap();

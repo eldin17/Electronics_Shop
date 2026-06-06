@@ -49,8 +49,8 @@ namespace Electronics_Shop_17.Services.AI_Recommendations
             {
                 Console.WriteLine("FALLBACK FALLBACK FALLBACK");
 
-                var existingIds = recommendations.Select(r => r.Id).ToList();
-                existingIds.Add(productId);
+                //var existingIds = recommendations.Select(r => r.Id).ToList();
+                //existingIds.Add(productId);
 
                 var product = _context.Products.Find(productId);
                 if (product != null)

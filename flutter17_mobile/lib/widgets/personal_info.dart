@@ -1,20 +1,29 @@
 import 'dart:convert';
 
 import 'package:country_picker/country_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/icons.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/models/adress.dart';
+import 'package:flutter17_mobile/models/person.dart';
 import 'package:flutter17_mobile/models/user_account.dart';
+import 'package:flutter17_mobile/providers/adress_provider.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
+import 'package:flutter17_mobile/providers/person_provider.dart';
 import 'package:flutter17_mobile/screens/home_screen.dart';
 import 'package:flutter17_mobile/screens/login_screen.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
 import 'package:flutter17_mobile/screens/welcome.dart';
+import 'package:flutter17_mobile/widgets/loading.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
+
+import '../providers/base_provider.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   UserAccount userAcc;
@@ -28,13 +37,17 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
   final _formKeyRegisterCustomer = GlobalKey<FormBuilderState>();
   Map<String, dynamic> _initialValueRegisterCustomer = {};
   late CustomerProvider _customerProvider;
+  late PersonProvider _personProvider;
+  late AdressProvider _adressProvider;
   TextEditingController dateController = TextEditingController();
 
+  late Person _person;
+  late Adress _adress;
+  bool isLoading = true;
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    _customerProvider = context.read<CustomerProvider>();
   }
 
   @override
@@ -42,33 +55,45 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
     // TODO: implement initState
     super.initState();
 
+    _customerProvider = context.read<CustomerProvider>();
+    _personProvider = context.read<PersonProvider>();
+    _adressProvider = context.read<AdressProvider>();
+
     _initialValueRegisterCustomer = {
-      'adresses': [
-        {
-          'street': "",
-          'city': "",
-          'country': "",
-          'postalCode': "",
-          'personId': 0,
-        }
-      ],
-      'paymentMethods': [
-        {
-          'type': "Cash",
-          'provider': "-",
-          'key': "-",
-          'expiryDate': "",
-          'isDefault': true,
-          'customerId': 0,
-        }
-      ],
-      'personId': LoginResponse.currentCustomer!.person!.id,
+      'adress': {'street': "", 'city': "", 'country': "", 'postalCode': ""},
+      // 'paymentMethods': [
+      //   {
+      //     'type': "Cash",
+      //     'provider': "-",
+      //     'key': "-",
+      //     'expiryDate': "",
+      //     'isDefault': true,
+      //     'customerId': 0,
+      //   }
+      // ],
+
       'person': {
         'firstName': "",
         'lastName': "",
         'dateOfBirth': null,
       }
     };
+
+    initForm();
+  }
+
+  Future initForm() async {
+    var person = await _personProvider
+        .getById(LoginResponse.currentCustomer!.person!.id!);
+
+    var adressList = await _adressProvider.getAll(
+        filter: {'personId': LoginResponse.currentCustomer!.person!.id!});
+
+    setState(() {
+      _person = person;
+      _adress = adressList.data[0];
+      isLoading = false;
+    });
   }
 
   @override
@@ -78,17 +103,19 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
         backgroundColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SingleChildScrollView(
-              child: smallScreen(context),
-            ),
-          ),
-        ),
-      ),
+      body: !isLoading
+          ? SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SingleChildScrollView(
+                    child: smallScreen(context),
+                  ),
+                ),
+              ),
+            )
+          : LoadingScreen(),
     );
   }
 
@@ -136,7 +163,8 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
-              initialValue: LoginResponse.currentCustomer?.person?.firstName,
+              //initialValue: LoginResponse.currentCustomer?.person?.firstName,
+              initialValue: _person.firstName,
               name: 'person.firstName',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -167,7 +195,7 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
-              initialValue: LoginResponse.currentCustomer?.person?.lastName,
+              initialValue: _person.lastName,
               name: 'person.lastName',
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -198,7 +226,7 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderDateTimePicker(
-              initialValue: LoginResponse.currentCustomer?.person?.dateOfBirth,
+              initialValue: _person.dateOfBirth,
               name: 'person.dateOfBirth',
               controller: dateController,
               inputType: InputType.date,
@@ -233,8 +261,8 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderField(
-              initialValue: LoginResponse.currentCustomer?.adresses?[0].country,
-              name: 'adresses[0].country',
+              initialValue: _adress.country,
+              name: 'adress.country',
               validator: (value) {
                 if (value == null) {
                   return 'Contry is required';
@@ -281,8 +309,8 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
-              initialValue: LoginResponse.currentCustomer?.adresses?[0].city,
-              name: 'adresses[0].city',
+              initialValue: _adress.city,
+              name: 'adress.city',
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'City is required';
@@ -312,8 +340,8 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
-              initialValue: LoginResponse.currentCustomer?.adresses?[0].street,
-              name: 'adresses[0].street',
+              initialValue: _adress.street,
+              name: 'adress.street',
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Street is required';
@@ -343,9 +371,8 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: FormBuilderTextField(
-              initialValue:
-                  LoginResponse.currentCustomer?.adresses?[0].postalCode,
-              name: 'adresses[0].postalCode',
+              initialValue: _adress.postalCode,
+              name: 'adress.postalCode',
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Postal Code is required';
@@ -377,56 +404,131 @@ class _RegisterCustomerScreenState extends State<PersonalInfoScreen> {
             onPressed: () async {
               var check =
                   _formKeyRegisterCustomer.currentState?.saveAndValidate();
+              if (check != true) return;
 
-              Map<String, dynamic> formData = Map<String, dynamic>.from(
-                  _formKeyRegisterCustomer.currentState!.value);
+              Map<String, dynamic> formData =
+                  _formKeyRegisterCustomer.currentState!.value;
 
-              Map<String, dynamic> requestData =
-                  Map<String, dynamic>.from(_initialValueRegisterCustomer);
+              String? cleanFormDateYMD;
+              String? formattedFormDateIso;
 
-              adressRequestFormat(requestData, formData);
-              paymentRequestFormat(requestData);
-              personRequestFormat(requestData, formData);
-
-              print("${jsonEncode(requestData)}");
-              if (check == true) {
+              if (dateController.text.isNotEmpty) {
                 try {
-                  var obj = await _customerProvider.update(
-                      LoginResponse.currentCustomer!.id!, requestData);
+                  var localDate = DateTime.parse(dateController.text);
+                  cleanFormDateYMD = DateFormat('yyyy-MM-dd').format(localDate);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: Duration(milliseconds: 1500),
-                      content: Text(
-                          '✅ Nicely done, ${obj.person?.firstName}! Everything’s up to date.'),
-                    ),
-                  );
-
-                  setState(() {
-                    LoginResponse.currentCustomer = obj;
-                  });
-
-                  Navigator.pop(context);
-                } on Exception catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: Duration(milliseconds: 1500),
-                      content: Text(
-                          '😕 Hmm, couldn’t save your info. Mind trying again?'),
-                    ),
-                  ); // showDialog(
-                  //     context: context,
-                  //     builder: (BuildContext context) => AlertDialog(
-                  //           title: Text("Error"),
-                  //           content: Text(e.toString()),
-                  //           actions: [
-                  //             TextButton(
-                  //               onPressed: () => Navigator.pop(context),
-                  //               child: Text("Ok"),
-                  //             )
-                  //           ],
-                  //         ));
+                  var safeUtcDate = DateTime.utc(
+                      localDate.year, localDate.month, localDate.day);
+                  formattedFormDateIso = safeUtcDate.toIso8601String();
+                } catch (e) {
+                  print("Date parsing failed: $e");
                 }
+              }
+
+              String formStreet = formData['adress.street'] ?? "";
+              String formCity = formData['adress.city'] ?? "";
+              String formCountry = formData['adress.country'] ?? "";
+              // Handles fallback to catch either 'adress.postalCode' or 'adresspostalCode'
+              String formPostalCode = (formData['adress.postalCode'] ??
+                      formData['adresspostalCode'] ??
+                      "")
+                  .toString();
+
+              Map<String, dynamic> requestData = {
+                'adress': {
+                  'street': formStreet,
+                  'city': formCity,
+                  'country': formCountry,
+                  'postalCode': formPostalCode,
+                },
+                'person': {
+                  'firstName': formData['person.firstName'] ?? "",
+                  'lastName': formData['person.lastName'] ?? "",
+                  'dateOfBirth': formattedFormDateIso,
+                }
+              };
+
+              String? initialDateYMD;
+              if (_person.dateOfBirth != null) {
+                initialDateYMD =
+                    _person.dateOfBirth.toString().substring(0, 10);
+              }
+
+              bool personChanged = requestData['person']['firstName'] !=
+                      (_person.firstName ?? "") ||
+                  requestData['person']['lastName'] !=
+                      (_person.lastName ?? "") ||
+                  cleanFormDateYMD != initialDateYMD;
+
+              bool addressChanged = requestData['adress']['street'] !=
+                      (_adress.street ?? "") ||
+                  requestData['adress']['city'] != (_adress.city ?? "") ||
+                  requestData['adress']['country'] != (_adress.country ?? "") ||
+                  requestData['adress']['postalCode'] !=
+                      (_adress.postalCode ?? "");
+
+              print(
+                  "Structural updates flagged -> Person: $personChanged, Address: $addressChanged");
+
+              print(requestData['person']);
+              print(requestData['adress']);
+
+              if (!personChanged && !addressChanged) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('ℹ️ No changes were made.')),
+                );
+                Navigator.pop(context);
+                return;
+              }
+
+              try {
+                String displayName = formData['person.firstName']?.toString() ??
+                    (_person.firstName ?? "User");
+
+                if (personChanged) {
+                  print("Firing update request for person properties...");
+                  var objPerson = await _personProvider.update(
+                      _person.id!, requestData['person']);
+                  displayName = objPerson?.firstName ?? displayName;
+                }
+
+                if (addressChanged) {
+                  print("Firing update request for address properties...");
+                  await _adressProvider.update(
+                      _adress.id!, requestData['adress']);
+                }
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: const Duration(milliseconds: 1500),
+                    content: Text(
+                        '✅ Nicely done, $displayName! Everything’s up to date.'),
+                  ),
+                );
+
+                Navigator.pop(context);
+              } catch (e) {
+                if (e is AuthSessionExpiredException || e.toString().contains("AuthSessionExpiredException")) {
+                  print("🛑 Auth session expired exception caught on UI layer. Suppressing error messages.");
+                  return;
+                }
+                if (!mounted) return;
+
+                if (LoginResponse.currentCustomer == null) {
+                  print(
+                      "User session was cleaned up. Suppressing 'hmm' snackbar.");
+                  return;
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    duration: Duration(milliseconds: 1500),
+                    content: Text(
+                        '😕 Hmm, couldn’t save your info. Mind trying again?'),
+                  ),
+                );
               }
             },
             style: ElevatedButton.styleFrom(
@@ -476,5 +578,3 @@ const authOutlineInputBorder = OutlineInputBorder(
   borderSide: BorderSide(color: Color(0xFF757575)),
   borderRadius: BorderRadius.all(Radius.circular(100)),
 );
-
-

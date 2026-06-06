@@ -2,16 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/screens/master_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter17_mobile/helpers/utils.dart';
+import '../main.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
 import 'package:flutter17_mobile/providers/customer_provider.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   late CustomerProvider _customerProvider;
-
-  SplashScreen({super.key}) {
+  final bool isExpired;
+  SplashScreen({super.key, this.isExpired = false}) {
     _customerProvider = new CustomerProvider();
+  }
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.isExpired) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          duration: const Duration(milliseconds: 2500),
+          content: const Text(
+            "Session expired. \nPlease log in again.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+          backgroundColor: const Color.fromARGB(255, 158, 158, 158),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 150),
+        ));
+      });
+    }
   }
 
   @override
@@ -87,9 +119,9 @@ class SplashScreen extends StatelessWidget {
 
         if (accessToken != null && !isTokenExpired(accessToken)) {
           if (isCustomer) {
-            var customer = await _customerProvider
+            var customer = await widget._customerProvider
                 .getAll(filter: {'userAccountId': userId});
-            if (customer.data.isNotEmpty){
+            if (customer.data.isNotEmpty) {
               LoginResponse.currentCustomer = customer.data[0];
               //LoginResponse.accessToken = accessToken;
               LoginResponse.roleName = roleName;
@@ -98,7 +130,8 @@ class SplashScreen extends StatelessWidget {
               LoginResponse.userId = userId;
             }
             print("HepeK!! ${LoginResponse.currentCustomer!.id}");
-          } else {print('splash');
+          } else {
+            print('splash');
             await box.delete('token');
             await box.delete('userId');
             await box.delete('roleName');

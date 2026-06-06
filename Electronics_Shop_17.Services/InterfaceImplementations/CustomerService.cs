@@ -10,6 +10,7 @@ using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -50,5 +51,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             }
             return base.AddFilter(data, search);
         }
+
+        
     }
 }

@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter17_mobile/helpers/login_response.dart';
+import 'package:flutter17_mobile/helpers/utils.dart';
 import 'package:flutter17_mobile/models/search_result.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:http/http.dart';
+
+import 'package:flutter17_mobile/main.dart';
+
+import '../screens/splash_screen.dart';
+
+class AuthSessionExpiredException implements Exception {
+  @override
+  String toString() => "AuthSessionExpiredException";
+}
 
 abstract class BaseProvider<T> with ChangeNotifier {
   String? baseUrl;
@@ -18,15 +28,29 @@ abstract class BaseProvider<T> with ChangeNotifier {
     _endpoint = endpoint;
   }
 
+  Future<void>? _refreshFuture;
+
   Future<Response> sendWithRefresh(
       Future<Response> Function(Map<String, String> headers) requestFn) async {
     var headers = await getHeaders(withAuth: true);
     var response = await requestFn(headers);
 
     if (response.statusCode == 401) {
-      await refreshToken();
-      headers = await getHeaders(withAuth: true);
-      response = await requestFn(headers);
+      try {
+        _refreshFuture ??= refreshToken();
+        await _refreshFuture;
+        _refreshFuture = null;
+
+        headers = await getHeaders(withAuth: true);
+        response = await requestFn(headers);
+      } catch (e) {
+        _refreshFuture = null;
+        if (e is AuthSessionExpiredException ||
+            e.toString().contains("AuthSessionExpiredException")) {
+          rethrow;
+        }
+        rethrow;
+      }
     }
 
     return response;
@@ -37,7 +61,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
     final refreshToken = await storage.read(key: "refreshToken");
     final userId = await storage.read(key: "userId");
     if (refreshToken == null || userId == null) {
-      throw Exception("No refresh token or user ID found");
+      await _handleSessionExpired();
+      throw AuthSessionExpiredException();
     }
     var url = "${baseUrl}api/UserAccount/refresh";
 
@@ -46,7 +71,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "refreshToken": refreshToken,
-        "userId": int.parse(userId), 
+        "userId": int.parse(userId),
       }),
     );
 
@@ -56,8 +81,23 @@ abstract class BaseProvider<T> with ChangeNotifier {
       await storage.write(key: "accessToken", value: data['accessToken']);
       await storage.write(key: "refreshToken", value: data['refreshToken']);
     } else {
-      throw Exception("Refresh failed, please login again");
+      await _handleSessionExpired();
+      throw AuthSessionExpiredException();
     }
+  }
+
+  Future<void> _handleSessionExpired() async {
+    print("Refresh token expired. Redirecting to splash/login...");
+    scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
+
+    logoutCleanUp();
+
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => SplashScreen(isExpired: true),
+      ),
+      (Route<dynamic> route) => false,
+    );
   }
 
   Future<SearchResult<T>> getAll({dynamic filter}) async {
