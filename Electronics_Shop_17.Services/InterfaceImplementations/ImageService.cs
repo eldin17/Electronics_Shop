@@ -47,14 +47,13 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
         public async Task<DtoProduct> AddMultipleImages(int id, [FromForm] ImgMultipleVM obj)
         {
-            var product = await _context.Products.Include(x=>x.ProductImages).ThenInclude(x=>x.Image).FirstOrDefaultAsync(x=>x.Id== id);
+            var product = await _context.Products.Include(x => x.ProductImages).ThenInclude(x => x.Image).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (product == null)
+                throw new KeyNotFoundException($"Product with ID {id} not found!");
 
             if (obj == null || obj.ProductColor == null || (product.StateMachine != "Draft" && product.StateMachine != "Active"))
                 throw new ArgumentException("Invalid input!");
-            
-            
-            if (product == null)
-                throw new KeyNotFoundException($"Product with ID {id} not found!");
 
 
             using var transaction = await _context.Database.BeginTransactionAsync();

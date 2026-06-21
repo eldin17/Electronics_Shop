@@ -29,109 +29,45 @@ namespace Electronics_Shop_17.Controllers
         [HttpPost("login"), AllowAnonymous]
         public async Task<ActionResult<DtoLogin>> Login(LoginRequest obj)
         {
-
-            try
-            {
-                var result = await (_service as IUserAccountService).Login(obj);
-                return Ok(result);
-            }
-            catch (ArgumentException)
-            {
-                return BadRequest("Invalid input. Please provide a username and password.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized("Invalid credentials.(B)");
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An internal server error occurred. Please try again later.");
-            }
+            var result = await (_service as IUserAccountService).Login(obj);
+            return Ok(result);
         }
 
         [HttpPut("deactivate/{id}")]
         public async Task<ActionResult<DtoUserAccount>> Deactivate(int id)
         {
-            try
-            {
-                var result = await (_service as IUserAccountService).Deactivate(id);
-                return Ok(result);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound($"User with ID {id} not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
+            var result = await (_service as IUserAccountService).Deactivate(id);
+            return Ok(result);
         }
 
         [HttpPut("reactivate/{id}")]
         public async Task<ActionResult<DtoUserAccount>> Reactivate(int id)
         {
-            try
-            {
-                var result = await (_service as IUserAccountService).Reactivate(id);
-                return Ok(result);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound($"User with ID {id} not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
+            var result = await (_service as IUserAccountService).Reactivate(id);
+            return Ok(result);
         }
 
         [HttpPut("resetPW")]
         public async Task<ActionResult<DtoUserAccount>> ResetPW(ResetPW obj)
         {
-            try
-            {
-                var result = await (_service as IUserAccountService).ResetPW(obj);
-                return Ok(result);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound($"User with ID {obj.UserAccId} not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
+            var result = await (_service as IUserAccountService).ResetPW(obj);
+            return Ok(result);
         }
-        
+
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            try
-            { 
-                await (_service as IUserAccountService).Logout();
-                return Ok(new { message = "Logged out successfully" });
-            }
-            catch (Exception)
-            {                
-                return StatusCode(500, "An internal server error occurred during logout.");
-            }
+            await (_service as IUserAccountService).Logout();
+            return Ok(new { message = "Logged out successfully" });
         }
 
         [HttpPost("refresh")]
         [AllowAnonymous]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequest? input)
         {
-            try
-            {
-                var (accessToken, refreshToken) = await (_service as IUserAccountService).Refresh(input);
-                return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-
+            var (accessToken, refreshToken) = await (_service as IUserAccountService).Refresh(input);
+            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
         }
     }
 }

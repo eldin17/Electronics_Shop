@@ -18,45 +18,15 @@ namespace Electronics_Shop_17.Controllers
         [HttpPost("AddMultipleImages/{id}")]
         public async Task<ActionResult<DtoProduct>> AddMultipleImages(int id, [FromForm] ImgMultipleVM obj)
         {
-            try
-            {
-                var result = await (_service as IImageService).AddMultipleImages(id, obj);
-                return Ok(result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An unexpected error occurred.");
-            }
+            var result = await (_service as IImageService).AddMultipleImages(id, obj);
+            return Ok(result);
         }
 
         [HttpPost("AddSingleImage/{id}")]
         public async Task<ActionResult<DtoUserAccount>> AddSingleImage(int id, [FromForm] ImgSingleVM obj)
         {
-            try
-            {
-                var result = await (_service as IImageService).AddSingleImage(id, obj);
-                return Ok(result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An unexpected error occurred.");
-            }
+            var result = await (_service as IImageService).AddSingleImage(id, obj);
+            return Ok(result);
         }
     }
 }

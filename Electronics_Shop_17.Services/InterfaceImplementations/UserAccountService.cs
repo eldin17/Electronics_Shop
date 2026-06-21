@@ -107,14 +107,14 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             if (obj == null || string.IsNullOrWhiteSpace(obj.NewPassword) || string.IsNullOrWhiteSpace(obj.OldPassword))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Invalid input. Please provide both old and new password.");
             }
 
             var dbObj = await _context.UserAccounts.FindAsync(obj.UserAccId);
 
             if (dbObj == null || !VerifyPasswordHash(obj.OldPassword, dbObj.PasswordHash, dbObj.PasswordSalt) || dbObj.isDeactivated)
             {
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("Invalid credentials or account deactivated.");
             }
 
             CreatePasswordHash(obj.NewPassword, out byte[] pwHash, out byte[] pwSalt);
@@ -144,7 +144,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         {
             if (obj == null || string.IsNullOrWhiteSpace(obj.Username) || string.IsNullOrWhiteSpace(obj.Password))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Invalid input. Please provide a username and password.");
             }
 
             var dbObj = _context.UserAccounts.Include(x => x.Role).Include(x=>x.Customer).Include(x => x.Seller).SingleOrDefault(x => x.Username == obj.Username);            
@@ -152,7 +152,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             if (dbObj == null || !VerifyPasswordHash(obj.Password, dbObj.PasswordHash, dbObj.PasswordSalt))
             {
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("Invalid credentials.");
             }
 
             if (dbObj.isDeactivated)
@@ -163,11 +163,11 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             if (dbObj.Customer != null)            
                 if(dbObj.Customer.isDeleted)
-                    throw new UnauthorizedAccessException();
+                    throw new UnauthorizedAccessException("Invalid credentials.");
 
             if (dbObj.Seller != null)
                 if (dbObj.Seller.isDeleted)
-                    throw new UnauthorizedAccessException();
+                    throw new UnauthorizedAccessException("Invalid credentials.");
 
             string accessToken = CreateAccessToken(dbObj);
             string refreshToken = CreateRefreshToken();
@@ -379,7 +379,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                     !request.Cookies.TryGetValue("uid", out var uidStr) ||
                     !int.TryParse(uidStr, out userId))
                 {
-                    throw new UnauthorizedAccessException();
+                    throw new UnauthorizedAccessException("Invalid or expired refresh token.");
                 }
             }
 
@@ -389,7 +389,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 user.RefreshTokenExpiry <= DateTime.UtcNow ||
                 !VerifyRefreshToken(refreshToken, user.RefreshTokenHash, user.RefreshTokenSalt))
             {
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("Invalid or expired refresh token.");
             }
 
             string newAccessToken = CreateAccessToken(user);

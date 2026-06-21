@@ -17,20 +17,41 @@ namespace Electronics_Shop_17.Middleware
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, "An unhandled exception occurred: {Message}", exception.Message);
-
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            var problemDetails = new ProblemDetails
+            switch (exception)
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Internal Server Error",
-                Detail = "An unexpected error occurred while processing your request."
-            };
+                case KeyNotFoundException:
+                    _logger.LogWarning(exception, "KeyNotFoundException: {Message}", exception.Message);
+                    httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+                    await httpContext.Response.WriteAsJsonAsync(exception.Message, cancellationToken);
+                    return true;
 
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+                case ArgumentException:
+                    _logger.LogWarning(exception, "ArgumentException: {Message}", exception.Message);
+                    httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await httpContext.Response.WriteAsJsonAsync(exception.Message, cancellationToken);
+                    return true;
 
-            return true;
+                case UnauthorizedAccessException:
+                    _logger.LogWarning(exception, "UnauthorizedAccessException: {Message}", exception.Message);
+                    httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    if (!string.IsNullOrEmpty(exception.Message))
+                    {
+                        await httpContext.Response.WriteAsJsonAsync(exception.Message, cancellationToken);
+                    }
+                    return true;
+
+                default:
+                    _logger.LogError(exception, "An unhandled exception occurred: {Message}", exception.Message);
+                    httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    var problemDetails = new ProblemDetails
+                    {
+                        Status = StatusCodes.Status500InternalServerError,
+                        Title = "Internal Server Error",
+                        Detail = "An unexpected error occurred while processing your request."
+                    };
+                    await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+                    return true;
+            }
         }
     }
 }
