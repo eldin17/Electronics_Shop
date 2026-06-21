@@ -52,7 +52,9 @@
 
             <div class="form-check mb-0">
 
-              <input class="form-check-input me-2" type="checkbox" value="" id="loginFormCheckbox" name="rememberMe" ngModel />
+              <input class="form-check-input me-2"
+                     type="checkbox" value=""
+                     id="loginFormCheckbox" name="rememberMe" [(ngModel)]="rememberMe" />
               <label class="form-check-label" for="loginFormCheckbox">
                 Remember me
               </label>

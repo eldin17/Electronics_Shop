@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   styleUrl: './login.css',
 })
 export class Login {
+  rememberMe = false;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -24,7 +25,8 @@ export class Login {
 
     const payload = {
       username: form.value.username,
-      password: form.value.password
+      password: form.value.password,
+      rememberMe: this.rememberMe
     };
 
     this.authService.login(payload).subscribe({

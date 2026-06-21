@@ -17,6 +17,8 @@ namespace Electronics_Shop_17.Model.Helpers
         [MinLength(3, ErrorMessage = "Min lenght of password is 3 characters")]
         [MaxLength(20, ErrorMessage = "Max lenght of password is 20 characters")]
         public string Password { get; set; } = string.Empty;
+
+        public bool RememberMe { get; set; } = false;
     }
 }
 

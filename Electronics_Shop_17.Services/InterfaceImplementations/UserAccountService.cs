@@ -180,7 +180,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             await _context.SaveChangesAsync();
 
-            SetAuthCookies(dbObj.Id, refreshToken);
+            SetAuthCookies(dbObj.Id, refreshToken, obj.RememberMe);
 
             return new DtoLogin
             {
@@ -189,16 +189,21 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             };
         }
 
-        private void SetAuthCookies(int userId, string refreshToken)
+        private void SetAuthCookies(int userId, string refreshToken, bool rememberMe)
         {
             var options = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = false,            
                 SameSite = SameSiteMode.Lax,
-                Path = "/api/UserAccount",
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                Path = "/api/UserAccount"
+                
             };
+
+            if (rememberMe)
+            {
+                options.Expires = DateTimeOffset.UtcNow.AddDays(7); 
+            }
 
             var response = _httpContextAccessor.HttpContext!.Response;
             response.Cookies.Append("refreshToken", refreshToken, options);
@@ -274,7 +279,8 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),              
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),            
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),       
-                new Claim(ClaimTypes.Role, user.Role.RoleName)                           
+                new Claim(ClaimTypes.Role, user.Role.RoleName)                          
+                                      
             };                                                                           
 
             var key = new SymmetricSecurityKey(
@@ -397,7 +403,7 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             await _context.SaveChangesAsync();
 
-            SetAuthCookies(userId, newRefreshToken);
+            SetAuthCookies(userId, newRefreshToken, true);
 
             return (newAccessToken, newRefreshToken);
         }

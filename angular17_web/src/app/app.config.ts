@@ -14,7 +14,9 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       const authService = inject(AuthService);
       return firstValueFrom(
-        authService.refresh().pipe(catchError(() => of(null)))
+        authService.refresh().pipe(catchError((err) => {
+          return of(null);
+        }))
       );
     }),
     provideBrowserGlobalErrorListeners(),
