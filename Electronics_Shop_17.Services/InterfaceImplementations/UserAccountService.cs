@@ -180,15 +180,29 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             await _context.SaveChangesAsync();
 
+            SetAuthCookies(dbObj.Id, refreshToken);
+
             return new DtoLogin
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken,
-                UserId = dbObj.Id,
-                RoleName = dbObj.Role.RoleName,
-                isCustomer = dbObj.Customer != null,
-                isSeller = dbObj.Seller != null
+                RefreshToken = refreshToken
             };
+        }
+
+        private void SetAuthCookies(int userId, string refreshToken)
+        {
+            var options = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,            
+                SameSite = SameSiteMode.Lax,
+                Path = "/api/UserAccount",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            };
+
+            var response = _httpContextAccessor.HttpContext!.Response;
+            response.Cookies.Append("refreshToken", refreshToken, options);
+            response.Cookies.Append("uid", userId.ToString(), options);
         }
 
         private bool VerifyPasswordHash(string pw, byte[] pwHash, byte[] pwSalt)
@@ -318,6 +332,10 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             var authHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
             var token = authHeader.Replace("Bearer ", "");
+            var options = new CookieOptions { Path = "/api/UserAccount" };
+            var response = _httpContextAccessor.HttpContext!.Response;
+            response.Cookies.Delete("refreshToken", options);
+            response.Cookies.Delete("uid", options);
 
             if (!string.IsNullOrEmpty(token))
             {
@@ -338,16 +356,36 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         }
 
 
-        public async Task<(string AccessToken, string RefreshToken)> Refresh(RefreshRequest input)
+        public async Task<(string AccessToken, string RefreshToken)> Refresh(RefreshRequest? input)
         {
-            var user = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Id == input.UserId);
+            int userId;
+            string refreshToken;
+
+            if (input != null && !string.IsNullOrWhiteSpace(input.RefreshToken))
+            {
+                userId = input.UserId;
+                refreshToken = input.RefreshToken;
+            }
+            else
+            {
+                var request = _httpContextAccessor.HttpContext!.Request;
+                if (!request.Cookies.TryGetValue("refreshToken", out refreshToken!) ||
+                    !request.Cookies.TryGetValue("uid", out var uidStr) ||
+                    !int.TryParse(uidStr, out userId))
+                {
+                    throw new UnauthorizedAccessException();
+                }
+            }
+
+            var user = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Id == userId);
 
             if (user == null ||
                 user.RefreshTokenExpiry <= DateTime.UtcNow ||
-                !VerifyRefreshToken(input.RefreshToken, user.RefreshTokenHash, user.RefreshTokenSalt))
+                !VerifyRefreshToken(refreshToken, user.RefreshTokenHash, user.RefreshTokenSalt))
             {
                 throw new UnauthorizedAccessException();
             }
+
             string newAccessToken = CreateAccessToken(user);
             string newRefreshToken = CreateRefreshToken();
 
@@ -358,7 +396,8 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
             await _context.SaveChangesAsync();
-            
+
+            SetAuthCookies(userId, newRefreshToken);
 
             return (newAccessToken, newRefreshToken);
         }

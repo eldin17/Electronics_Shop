@@ -9,11 +9,8 @@ namespace Electronics_Shop_17.Model.Helpers
     public class DtoLogin
     {
         public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-        public int UserId { get; set; }
-        public string RoleName { get; set; }
-        public bool isCustomer { get; set; } 
-        public bool isSeller { get; set; } 
+        public string RefreshToken { get; set; }        
+        
         
     }
 }

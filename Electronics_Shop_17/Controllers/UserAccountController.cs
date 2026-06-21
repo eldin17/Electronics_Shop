@@ -120,7 +120,7 @@ namespace Electronics_Shop_17.Controllers
 
         [HttpPost("refresh")]
         [AllowAnonymous]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequest input)
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest? input)
         {
             try
             {

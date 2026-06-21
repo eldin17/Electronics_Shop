@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
-
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../models/register_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -47,14 +47,23 @@ class LoginProvider with ChangeNotifier {
 
         await storage.write(key: "accessToken", value: data['accessToken']);
         await storage.write(key: "refreshToken", value: data['refreshToken']);
-        await storage.write(key: "userId", value: data['userId'].toString());
 
-        LoginResponse.accessToken = await storage.read(key: "accessToken");
-        LoginResponse.userId = data['userId'];
-        LoginResponse.roleName = data['roleName'];
-        LoginResponse.isCustomer = data['isCustomer'];
-        LoginResponse.isSeller = data['isSeller'];
+        LoginResponse.accessToken = data['accessToken'];
 
+        Map<String, dynamic> decodedToken =
+            JwtDecoder.decode(data['accessToken']);
+
+        LoginResponse.userId = int.parse(decodedToken['sub']);
+        LoginResponse.roleName = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+        await storage.write(
+            key: "userId", value: LoginResponse.userId.toString());
+
+        // Derived from role, not sent separately by the backend anymore
+        LoginResponse.isCustomer = LoginResponse.roleName == 'Customer';
+        LoginResponse.isSeller = LoginResponse.roleName == 'Seller';
+        
+        
         if (LoginResponse.isCustomer!) {
           var customer = await _customerProvider
               .getAll(filter: {'userAccountId': LoginResponse.userId});
@@ -66,7 +75,6 @@ class LoginProvider with ChangeNotifier {
         return;
       }
     } catch (e) {
-      
       throw Exception("Login failed: ${e.toString()}");
     }
   }

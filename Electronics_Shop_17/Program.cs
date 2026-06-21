@@ -1,4 +1,5 @@
 using System.Text;
+using Electronics_Shop_17.Middleware;
 using Electronics_Shop_17.Services;
 using Electronics_Shop_17.Services.AI_Recommendations;
 using Electronics_Shop_17.Services.Database;
@@ -88,6 +89,9 @@ builder.Services.AddTransient<Checks>();
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 
 var ollamaEndpoint = builder.Configuration["Ollama:Endpoint"] ?? "http://localhost:11434";
 
@@ -99,11 +103,12 @@ builder.Services.AddKernel()
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowAngular", policy =>
     {
-        policy.AllowAnyOrigin() 
+        policy.WithOrigins("http://localhost:4200") 
+              .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowCredentials();
     });
 });
 
@@ -181,10 +186,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 
+app.UseExceptionHandler();
+
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowAngular");
 
 app.UseAuthentication();
 app.UseMiddleware<TokenBlacklistMiddleware>();
