@@ -33,11 +33,13 @@
 }
 
 
-#loginFormUsername::placeholder {
-  color: gray !important;
-  opacity: 1 !important;
+.remember-me-label {
+  color: rgba(58, 58, 58, 0.65);
+  font-weight: 500;
+  font-size: 0.9rem;
 }
-#loginFormPassword::placeholder {
+
+#rememberMeText {
   color: gray !important;
   opacity: 1 !important;
 }

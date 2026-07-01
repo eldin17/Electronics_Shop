@@ -18,7 +18,7 @@
 
 
           <div data-mdb-input-init class="form-outline mb-4 ">
-            <input type="text" id="loginFormUsername" name="username" ngModel required minlength="3" maxlength="20"
+            <input type="text" class="loginFormText" name="username" ngModel required minlength="3" maxlength="20"
                    class="form-control form-control-lg rounded-pill"
                    placeholder="Enter your username" />
             @if (loginForm.submitted && loginForm.controls['username']?.errors?.['required']) {
@@ -34,7 +34,7 @@
 
 
           <div data-mdb-input-init class="form-outline mb-3">
-            <input type="password" id="loginFormPassword" name="password" ngModel required minlength="3" maxlength="20"
+            <input type="password" class="loginFormText" name="password" ngModel required minlength="3" maxlength="20"
                    class="form-control form-control-lg rounded-pill"
                    placeholder="Enter your password" />
             @if (loginForm.submitted && loginForm.controls['password']?.errors?.['required']) {
@@ -55,7 +55,7 @@
               <input class="form-check-input me-2"
                      type="checkbox" value=""
                      id="loginFormCheckbox" name="rememberMe" [(ngModel)]="rememberMe" />
-              <label class="form-check-label" for="loginFormCheckbox">
+              <label class="form-check-label remember-me-label" for="loginFormCheckbox">
                 Remember me
               </label>
 

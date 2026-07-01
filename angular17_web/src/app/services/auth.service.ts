@@ -58,4 +58,17 @@ export class AuthService {
   getAccessToken(): string | null {
     return this.accessToken;
   }
+
+  register(payload: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'accept': 'text/plain'
+    });
+
+    return this.http
+      .post<any>(this.apiUrl + '/register', payload, {
+        headers,
+        withCredentials: true
+      });
+  }
 }
