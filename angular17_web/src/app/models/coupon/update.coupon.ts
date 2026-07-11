@@ -1,0 +1,27 @@
+export class UpdateCoupon {
+  code?: string;
+  discountAmount?: number;
+  minPurchaseAmount?: number;
+  maxUsagePerCustomer?: number;
+  productCategoryId?: number;
+  accessoryCategoryId?: number;
+  startDate?: Date;
+  endDate?: Date;
+  isActive?: boolean;
+  isDeleted?: boolean;
+
+  constructor(data?: any) {
+    if (!data) return;
+
+    this.code = data.code;
+    this.discountAmount = data.discountAmount;
+    this.minPurchaseAmount = data.minPurchaseAmount;
+    this.maxUsagePerCustomer = data.maxUsagePerCustomer;
+    this.productCategoryId = data.productCategoryId;
+    this.accessoryCategoryId = data.accessoryCategoryId;
+    this.startDate = data.startDate ? new Date(data.startDate) : undefined;
+    this.endDate = data.endDate ? new Date(data.endDate) : undefined;
+    this.isActive = data.isActive;
+    this.isDeleted = data.isDeleted;
+  }
+}
