@@ -1,0 +1,28 @@
+<header class="top-header">
+  <div class="header-row">
+    <a routerLink="/home" class="logo">ElectronicShop17</a>
+
+    <app-search-bar class="header-search"></app-search-bar>
+
+    <div class="header-actions">
+      <button (click)="goToNotifications()" title="Notifications">🔔</button>
+      <button (click)="goToCart()" title="Cart">🛒</button>
+      <button (click)="goToProfile()" title="Account">👤</button>
+    </div>
+  </div>
+
+  <nav class="nav-row">
+    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+    <a routerLink="/categories" routerLinkActive="active">Categories</a>
+    <a routerLink="/deals" routerLinkActive="active">Deals</a>
+    <a routerLink="/new-arrivals" routerLinkActive="active">New Arrivals</a>
+  </nav>
+</header>
+
+<main class="page-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; ElectronicShop17.</p>
+</footer>
