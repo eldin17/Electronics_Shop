@@ -9,8 +9,8 @@ Docker containers, automated email notifications.
 ### 📸 App Screenshots ###
 Rest of the screenshots can be found in the <a href="https://github.com/eldin17/Electronics_Shop/tree/main/app_screenshots">app_screenshots</a> folder. (All currently working parts of the project)
 <div style="display: flex;">
-  <img src="app_screenshots/home1_screen.jpg" alt="Home Screen" width="250"/>  
-  <img src="app_screenshots/product_details1_screen.jpg" alt="Product Details" width="250"/>
+  <img src="app_screenshots/mobile_app_flutter/home1_screen.jpg" alt="Home Screen" width="250"/>  
+  <img src="app_screenshots/mobile_app_flutter/product_details1_screen.jpg" alt="Product Details" width="250"/>
 </div>
 
 ### This application consists of ###
