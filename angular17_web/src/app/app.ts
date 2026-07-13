@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {Splash} from './screens/splash/splash';
+import {LoadingService} from './services/loading/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,5 @@ import {Splash} from './screens/splash/splash';
 })
 export class App {
   protected readonly title = signal('electronics-shop');
+  loadingService = inject(LoadingService);
 }

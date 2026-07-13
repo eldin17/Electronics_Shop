@@ -60,6 +60,11 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
             }
             return await GetAll(search);
         }
+        public async Task<Pagination<DtoProduct>> GetAllWithChecksByUserAccId(int userAccId, SearchProduct search = null)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(x=>x.UserAccountId==userAccId);
+            return await GetAllWithChecks(customer.Id, search);
+        }
 
 
         public override async Task<DtoProduct> GetById(int id)

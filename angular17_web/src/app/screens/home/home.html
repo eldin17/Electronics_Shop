@@ -1,9 +1,61 @@
-<p>home works!</p>
-<button  (click)="logout()"
-         class="btn  btn-lg rounded-4 w-100"
-         style="padding-left: 2.5rem; padding-right: 2.5rem;
-                     background-color: #ff8800; color: white">
-  Log Out
-</button>
+<section class="latest-products section-card">
+  <div class="section-header">
+    <h2>Latest Products</h2>
+    <a routerLink="/products">See more</a>
+  </div>
 
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  } @else {
+    <div class="product-grid">
+      @for (product of latestProducts; track product.id) {
+        <app-product-card
+          [product]="product"
+          (favoriteToggled)="onFavoriteToggled($event)"
+        ></app-product-card>
+      }
+    </div>
+  }
+</section>
 
+<section class="news-section section-card">
+  <div class="section-header">
+    <h2>News</h2>
+    <a routerLink="/news">See more</a>
+  </div>
+
+  @if (newsList.length > 0) {
+    <div class="news-scroll">
+      @for (item of newsList; track item; let i = $index) {
+        <app-news-card
+          [news]="item"
+          [image]="'/assets/images/background' + (i + 1) + '.jpg'">
+        </app-news-card>
+      }
+    </div>
+  } @else {
+    <p class="empty-message">No news right now.</p>
+  }
+</section>
+
+<section class="discount-products section-card">
+  <div class="section-header">
+    <h2>On Discount</h2>
+    <a routerLink="/products">See more</a>
+  </div>
+
+  @if (!errorMessage) {
+    @if (discountProducts.length > 0) {
+      <div class="product-grid">
+        @for (product of discountProducts; track product.id) {
+          <app-product-card
+            [product]="product"
+            (favoriteToggled)="onFavoriteToggled($event)"
+          ></app-product-card>
+        }
+      </div>
+    } @else {
+      <p class="empty-message">No discounted products right now.</p>
+    }
+  }
+</section>

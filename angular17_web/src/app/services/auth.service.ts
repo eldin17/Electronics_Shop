@@ -15,6 +15,30 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+  getUserId(): number | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.sub ? Number(payload.sub) : null;
+    } catch (e) {
+      console.error('Failed to decode token', e);
+      return null;
+    }
+  }
+  getUserRole(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   login(payload: any): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

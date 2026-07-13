@@ -6,11 +6,12 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {authInterceptor} from './helpers/auth-interceptor';
 import {AuthService} from './services/auth.service';
 import {catchError, firstValueFrom, of} from 'rxjs';
+import {loadingInterceptor} from './services/loading/loading.interceptor';
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([loadingInterceptor, authInterceptor])),
     provideAppInitializer(() => {
       const authService = inject(AuthService);
       return firstValueFrom(

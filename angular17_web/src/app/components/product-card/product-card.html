@@ -1,0 +1,28 @@
+<div class="product-card" (click)="onCardClick()">
+  <div class="image-wrapper">
+    <img [src]="imageUrl" [alt]="displayName" />
+
+    <button
+      class="favorite-btn"
+      [class.active]="product.isFavourite"
+      (click)="onFavoriteClick($event)"
+      title="Add to favorites"
+    >
+      {{ product.isFavourite ? '❤️' : '🤍' }}
+    </button>
+  </div>
+
+  <div class="info">
+    <p class="name">
+      <span class="brand">{{ product.brand }}</span>
+      <span class="model">{{ product.model }}</span>
+    </p>
+
+    <div class="price-row">
+      @if (hasDiscount) {
+        <span class="original-price">{{ product.price }}€</span>
+      }
+      <span class="price">{{ product.finalPrice }}€</span>
+    </div>
+  </div>
+</div>

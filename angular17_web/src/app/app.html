@@ -1,2 +1,6 @@
-
+@if (loadingService.loading()) {
+  <div class="global-spinner-overlay">
+    <div class="spinner"></div>
+  </div>
+}
 <router-outlet/>
