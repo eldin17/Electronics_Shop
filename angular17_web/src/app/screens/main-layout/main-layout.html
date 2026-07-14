@@ -7,19 +7,38 @@
     <div class="header-actions">
 
       <div class="notif-wrapper" #notifWrapper>
-        <button (click)="toggleNotifMenu()" title="Notifications" [class.active]="isNotifMenuOpen">
+        <button (click)="onBellClick()" title="Notifications" [class.active]="isNotifMenuOpen">
           🔔
-          <span class="badge">1</span>
+          @if (newNotificationCount > 0) {
+            <span class="badge">{{ newNotificationCount }}</span>
+          }
         </button>
 
         @if (isNotifMenuOpen) {
-          <div class="notif-dropdown">
+          <div class="notif-dropdown" [class.open]="isNotifMenuOpen">
             <div class="notif-content">
               <div class="notif-header">Notifications</div>
-              <div class="notif-empty">
-                <span class="empty-icon">🔔</span>
-                <p>Nothing here yet</p>
-              </div>
+
+              @if (isLoadingNotifications) {
+                <div class="notif-empty">
+                  <p>Loading...</p>
+                </div>
+              } @else if (notificationsList.length === 0) {
+                <div class="notif-empty">
+                  <span class="empty-icon">🔔</span>
+                  <p>Nothing here yet</p>
+                </div>
+              } @else {
+                <ul class="notif-list">
+                  @for (n of notificationsList; track n.id) {
+                    <li class="notif-item" (click)="onNotificationClick(n)">
+                      <div class="notif-title">{{ n.title }}</div>
+                      <div class="notif-message">{{ n.message }}</div>
+                      <div class="notif-date">{{ n.dateCreated | timeAgo }}</div>
+                    </li>
+                  }
+                </ul>
+              }
             </div>
           </div>
         }
@@ -49,7 +68,7 @@
             <div class="dropdown-divider"></div>
 
             <button (click)="logout()" class="logout-btn">
-               Log Out
+              Log Out
             </button>
           </div>
         }
@@ -73,3 +92,10 @@
 <footer class="site-footer">
   <p>&copy; ElectronicShop17.</p>
 </footer>
+
+@if (showToast) {
+  <div class="notif-toast">
+    <div class="notif-toast-title">🎉 {{ toastTitle }}</div>
+    <div class="notif-toast-content">{{ toastContent }}</div>
+  </div>
+}

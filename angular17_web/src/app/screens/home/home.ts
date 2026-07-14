@@ -32,14 +32,66 @@ export class Home implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.refresh().subscribe({
-      next: () => this.loadProducts(),
-      error: () => {
-        this.errorMessage = 'You must be logged in to view products.';
-        this.isLoading = false;
-        this.cdr.detectChanges();
+    const userAccId = this.authService.getUserId();
+
+    if (userAccId) {
+
+      this.loadProducts(userAccId);
+      this.loadNews();
+    } else {
+
+      this.authService.refresh().subscribe({
+        next: () => {
+          const refreshedId = this.authService.getUserId();
+          if (refreshedId) {
+            this.loadProducts(refreshedId);
+          } else {
+            this.handleAuthError();
+          }
+        },
+        error: () => this.handleAuthError()
+      });
+      this.loadNews();
+    }
+  }
+
+  private loadProducts(userAccId: number): void {
+    this.isLoading = true;
+
+    this.productService.getAllWithChecksByUserAccId(userAccId).subscribe({
+      next: (result) => {
+        const allProducts = result.data.map(item => new Product(item));
+
+
+
+        setTimeout(() => {
+          this.latestProducts = allProducts
+            .slice()
+            .sort((a, b) => b.id - a.id)
+            .slice(0, 6);
+
+          this.discountProducts = allProducts
+            .filter(p => p.finalPrice !== p.price)
+            .slice(0, 6);
+
+          this.isLoading = false;
+
+
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load products', err);
+        setTimeout(() => {
+          this.errorMessage = 'Could not load products.';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       }
     });
+  }
+
+  private loadNews(): void {
     this.newsService.getAll().subscribe({
       next: (result) => {
         this.newsList = result.data
@@ -53,41 +105,10 @@ export class Home implements OnInit {
     });
   }
 
-  private loadProducts(): void {
-    const userAccId = this.authService.getUserId();
-
-    if (!userAccId) {
-      this.errorMessage = 'You must be logged in to view products.';
-      this.isLoading = false;
-      this.cdr.detectChanges();
-      return;
-    }
-
-    this.isLoading = true;
-
-    this.productService.getAllWithChecksByUserAccId(userAccId).subscribe({
-      next: (result) => {
-        const allProducts = result.data.map(item => new Product(item));
-
-        this.latestProducts = allProducts
-          .slice()
-          .sort((a, b) => b.id - a.id)
-          .slice(0, 6);
-
-        this.discountProducts = allProducts
-          .filter(p => p.finalPrice !== p.price)
-          .slice(0, 6);
-
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to load products', err);
-        this.errorMessage = 'Could not load products.';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
+  private handleAuthError(): void {
+    this.errorMessage = 'You must be logged in to view products.';
+    this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
   onFavoriteToggled(product: Product): void {

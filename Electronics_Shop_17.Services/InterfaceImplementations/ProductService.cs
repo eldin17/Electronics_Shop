@@ -31,12 +31,44 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
         public override async Task<Pagination<DtoProduct>> GetAll(SearchProduct? search = null)
         {
             var products = await base.GetAll(search);
+            if (products.Data == null || !products.Data.Any())
+            {
+                return products;
+            }
+
+            var productIds = products.Data.Select(p => p.Id).ToList();
+
+            var discounts = await _context.Discounts
+                .Where(d => d.IsActive &&
+                            DateTime.UtcNow >= d.StartDate &&
+                            DateTime.UtcNow <= d.EndDate &&
+                            d.ProductDiscounts.Any(pd => productIds.Contains(pd.ProductId)))
+                .Include(d => d.ProductDiscounts)
+                .ToListAsync();
+
+            var averageRatings = await _context.Reviews
+                .Where(r => productIds.Contains(r.ProductId))
+                .GroupBy(r => r.ProductId)
+                .Select(g => new { ProductId = g.Key, AverageRating = g.Average(r => r.Rating) })
+                .ToDictionaryAsync(x => x.ProductId, x => x.AverageRating);
 
             foreach (var item in products.Data)
             {
-                var priceCheckedObj = await _checks.PriceCheck(item);
-                item.FinalPrice = priceCheckedObj.FinalPrice;
-                item.reviewScoreAvg = await _checks.ReviewCheck(item);
+                item.reviewScoreAvg = averageRatings.TryGetValue(item.Id, out var avg) ? avg : 0;
+
+                item.FinalPrice = item.Price;
+
+                var productDiscountIds = item.ProductDiscounts.Select(pd => pd.DiscountId).ToList();
+                var relevantDiscounts = discounts.Where(d => productDiscountIds.Contains(d.Id));
+
+                foreach (var discount in relevantDiscounts)
+                {
+                    item.FinalPrice -= discount.Amount;
+                    if ((double)item.FinalPrice < (double)item.Price * 0.6)
+                    {
+                        throw new InvalidOperationException("There has been a mistake with discounts for this product");
+                    }
+                }
             }
 
             return products;
