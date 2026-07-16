@@ -25,7 +25,7 @@ export class MainLayout implements OnInit, OnDestroy {
   notificationsList: Notification[] = [];
   newNotificationCount = 0;
   isLoadingNotifications = true;
-
+  private isBadgeDismissed = false;
 
   showToast = false;
   toastTitle = '';
@@ -48,14 +48,26 @@ export class MainLayout implements OnInit, OnDestroy {
     this.subs.push(
       this.notificationService.notifications$.subscribe(list => {
         this.notificationsList = list;
+        if(!this.isBadgeDismissed) {
+          this.newNotificationCount = list.length;
+        }
       })
     );
-    this.notificationService.newNotificationCount$.subscribe(count => {
-      console.log('Badge count updated:', count);
-      this.newNotificationCount = count;
-    });
+
     this.subs.push(
-      this.notificationService.popup$.subscribe(popup => this.showPopup(popup))
+      this.notificationService.newNotificationCount$.subscribe(count => {
+        console.log('Badge count updated:', count);
+        if (!this.isBadgeDismissed) {
+          this.newNotificationCount = count;
+        }
+      })
+    );
+
+    this.subs.push(
+      this.notificationService.popup$.subscribe(popup => {
+        this.isBadgeDismissed = false;
+        this.showPopup(popup);
+      })
     );
 
     const userId = this.authService.getUserId();
@@ -65,8 +77,6 @@ export class MainLayout implements OnInit, OnDestroy {
       this.notificationService.loadForUser(userId).finally(() => {
         this.isLoadingNotifications = false;
       });
-
-      // Mirrors initSignalR() being called from Home's initState in Flutter.
       this.notificationService.initSignalR(() => this.authService.getAccessToken());
     } else {
       this.isLoadingNotifications = false;
@@ -76,8 +86,6 @@ export class MainLayout implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
     if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
-
-
   }
 
   goToNotifications(): void {
@@ -86,10 +94,6 @@ export class MainLayout implements OnInit, OnDestroy {
 
   goToProfile(): void {
     //this.router.navigate(['/profile']);
-  }
-
-  goToCart(): void {
-    //this.router.navigate(['/cart']);
   }
 
   logout() {
@@ -137,6 +141,9 @@ export class MainLayout implements OnInit, OnDestroy {
 
     this.isNotifMenuOpen = true;
 
+    this.newNotificationCount = 0;
+    this.isBadgeDismissed = true;
+
     const userId = this.authService.getUserId?.();
     if (userId) {
       this.isLoadingNotifications = true;
@@ -154,7 +161,6 @@ export class MainLayout implements OnInit, OnDestroy {
     console.log('Selected:', option);
     this.isProfileMenuOpen = false;
   }
-
 
   onNotificationClick(notification: Notification): void {
     const userId = this.authService.getUserId();

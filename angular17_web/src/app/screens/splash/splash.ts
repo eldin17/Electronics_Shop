@@ -17,7 +17,7 @@ export class Splash {
   onEnterClick(): void {
     const time = new Date().toLocaleTimeString();
 
-    console.log('Button clicked at:', time);
+    console.log('Splash Skip Button clicked at:', time);
 
     if (this.authService.getAccessToken()) {
       console.log('Valid session found, navigating to home...');

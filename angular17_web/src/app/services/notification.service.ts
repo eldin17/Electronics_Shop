@@ -33,23 +33,17 @@ export class NotificationService extends BaseCRUDProvider<Notification, SearchNo
   private hubConnection?: signalR.HubConnection;
   private isConnected = false;
 
-
   private newNotificationCountSubject = new BehaviorSubject<number>(0);
   newNotificationCount$: Observable<number> = this.newNotificationCountSubject.asObservable();
-  get newNotificationCount(): number {
-    return this.newNotificationCountSubject.value;
-  }
 
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   notifications$: Observable<Notification[]> = this.notificationsSubject.asObservable();
 
-
   private popupSubject = new Subject<NotificationPopup>();
   popup$: Observable<NotificationPopup> = this.popupSubject.asObservable();
 
-
-
-  getAllForUser(userAccountId: number, filter?: SearchNotification): Promise<Pagination<Notification>> {
+  getAllForUser(userAccountId: number, filter?: SearchNotification):
+    Promise<Pagination<Notification>> {
     const params = this.getQueryParams(filter);
 
     return firstValueFrom(
@@ -60,12 +54,6 @@ export class NotificationService extends BaseCRUDProvider<Notification, SearchNo
           context: new HttpContext().set(BYPASS_LOADING, true)
         }
       )
-    );
-  }
-
-  addForUser(payload: AddNotification): Promise<Notification> {
-    return firstValueFrom(
-      this.http.post<Notification>(`${this.baseUrl}${this.endpoint}/AddForUser`, payload)
     );
   }
 
@@ -82,8 +70,6 @@ export class NotificationService extends BaseCRUDProvider<Notification, SearchNo
     this.newNotificationCountSubject.next(0);
   }
 
-
-
   async loadForUser(userAccountId: number): Promise<void> {
     const result = await this.getAllForUser(userAccountId);
     this.notificationsSubject.next(result.data);
@@ -94,7 +80,6 @@ export class NotificationService extends BaseCRUDProvider<Notification, SearchNo
     const result = await this.getAllForUser(userAccountId);
     this.notificationsSubject.next(result.data);
   }
-
 
   initSignalR(getToken: () => string | null | undefined): void {
     if (this.isConnected) {

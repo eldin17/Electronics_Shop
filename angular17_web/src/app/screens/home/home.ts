@@ -1,6 +1,6 @@
 import {Component, OnInit, ChangeDetectorRef, ViewChildren, QueryList, ElementRef} from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import { ProductCard } from '../../components/product-card/product-card';
 import { Product } from '../../models/product/product';
 import { ProductService } from '../../services/product.service';
@@ -11,18 +11,17 @@ import {NewsCard} from '../../components/news-card/news-card';
 
 @Component({
   selector: 'app-home',
-  imports: [ProductCard, FormsModule, NewsCard,],
+  imports: [ProductCard, FormsModule, NewsCard,RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
   latestProducts: Product[] = [];
   discountProducts: Product[] = [];
+  newsList: News[] = [];
 
   isLoading = true;
   errorMessage = '';
-
-  newsList: News[] = [];
 
   constructor(
     private authService: AuthService,
@@ -35,11 +34,11 @@ export class Home implements OnInit {
     const userAccId = this.authService.getUserId();
 
     if (userAccId) {
-
       this.loadProducts(userAccId);
       this.loadNews();
-    } else {
-
+    }
+    else
+    {
       this.authService.refresh().subscribe({
         next: () => {
           const refreshedId = this.authService.getUserId();
@@ -62,8 +61,6 @@ export class Home implements OnInit {
       next: (result) => {
         const allProducts = result.data.map(item => new Product(item));
 
-
-
         setTimeout(() => {
           this.latestProducts = allProducts
             .slice()
@@ -75,7 +72,6 @@ export class Home implements OnInit {
             .slice(0, 6);
 
           this.isLoading = false;
-
 
           this.cdr.detectChanges();
         });
@@ -97,7 +93,7 @@ export class Home implements OnInit {
         this.newsList = result.data
           .slice()
           .sort((a: any, b: any) => b.id - a.id)
-          .slice(0, 6)
+          .slice(0, 4)
           .map((item: any) => new News(item));
         this.cdr.detectChanges();
       },

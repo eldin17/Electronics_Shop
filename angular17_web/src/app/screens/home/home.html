@@ -1,8 +1,7 @@
 <section class="latest-products section-card">
   <div class="section-header">
     <h2>Latest Products</h2>
-    <a routerLink="/products">See more</a>
-  </div>
+    <a routerLink="/products" [queryParams]="{ sort: 'latest' }">See more</a>  </div>
 
   @if (errorMessage) {
     <p class="error">{{ errorMessage }}</p>
@@ -11,7 +10,6 @@
       @for (product of latestProducts; track product.id) {
         <app-product-card
           [product]="product"
-          (favoriteToggled)="onFavoriteToggled($event)"
         ></app-product-card>
       }
     </div>
@@ -41,7 +39,7 @@
 <section class="discount-products section-card">
   <div class="section-header">
     <h2>On Discount</h2>
-    <a routerLink="/products">See more</a>
+    <a routerLink="/products" [queryParams]="{ sort: 'discount' }">See more</a>
   </div>
 
   @if (!errorMessage) {
@@ -50,7 +48,6 @@
         @for (product of discountProducts; track product.id) {
           <app-product-card
             [product]="product"
-            (favoriteToggled)="onFavoriteToggled($event)"
           ></app-product-card>
         }
       </div>

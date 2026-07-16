@@ -1,5 +1,9 @@
 <header class="top-header">
   <div class="header-row">
+    <img src="assets/images/Logo.jpg"
+         alt="Electronics Shop Logo"
+         class="img-fluid "
+         style="max-width: 40px;">
     <a routerLink="/home" class="logo">ElectronicShop17</a>
 
     <app-search-bar class="header-search"></app-search-bar>
@@ -44,11 +48,9 @@
         }
       </div>
 
-
-      <button (click)="goToCart()" title="Cart">🛒</button>
-
       <div class="profile-wrapper" #profileWrapper>
-        <button (click)="toggleProfileMenu()" title="Account" [class.active]="isProfileMenuOpen">👤</button>
+        <button (click)="toggleProfileMenu()" title="Account"
+                [class.active]="isProfileMenuOpen">👤</button>
 
         @if (isProfileMenuOpen) {
           <div class="profile-dropdown">
@@ -79,9 +81,9 @@
 
   <nav class="nav-row">
     <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-    <a routerLink="/categories" routerLinkActive="active">Categories</a>
-    <a routerLink="/deals" routerLinkActive="active">Deals</a>
-    <a routerLink="/new-arrivals" routerLinkActive="active">New Arrivals</a>
+    <a routerLink="/wishlist" routerLinkActive="active">Wishlist</a>
+    <a routerLink="/cart" routerLinkActive="active">Shopping Cart</a>
+    <a routerLink="/news"  routerLinkActive="active">News</a>
   </nav>
 </header>
 

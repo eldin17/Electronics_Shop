@@ -37,7 +37,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         switchMap((res) => {
           isRefreshing = false;
           refreshSubject.next(res.accessToken);
-          return next(req.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } }));
+          return next(
+            req.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } }));
         }),
         catchError((refreshErr) => {
           isRefreshing = false;

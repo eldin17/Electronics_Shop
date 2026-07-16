@@ -9,7 +9,7 @@
       </div>
 
       <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-        <form (ngSubmit)="onLoginSubmit(loginForm)" #loginForm="ngForm">
+        <form #loginForm="ngForm" (ngSubmit)="onLoginSubmit(loginForm)" >
 
           <h1 class="display-6 fw-bold mb-2">Welcome</h1>
           <p class="lead mb-5 text-secondary">

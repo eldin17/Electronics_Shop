@@ -2,14 +2,13 @@
   <div class="image-wrapper">
     <img [src]="imageUrl" [alt]="displayName" />
 
-    <button
-      class="favorite-btn"
+    <span
+      class="favorite-badge"
       [class.active]="product.isFavourite"
-      (click)="onFavoriteClick($event)"
-      title="Add to favorites"
+      title="Favorites state"
     >
       {{ product.isFavourite ? '❤️' : '🤍' }}
-    </button>
+    </span>
   </div>
 
   <div class="info">

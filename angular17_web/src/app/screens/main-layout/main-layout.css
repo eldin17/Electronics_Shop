@@ -212,18 +212,23 @@
 
 .notif-wrapper > button {
   position: relative;
-  background: none;
   border: none;
-  font-size: 20px;
+  font-size: 17px;
   cursor: pointer;
-  padding: 8px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f2f5;
+  transition: background 0.15s ease;
 }
+
 
 .notif-wrapper > button:hover,
 .notif-wrapper > button.active {
-  background-color: rgba(0, 0, 0, 0.06);
+  background: #ebebef;
 }
 
 .badge {

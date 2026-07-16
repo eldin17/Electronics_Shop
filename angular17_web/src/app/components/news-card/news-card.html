@@ -4,6 +4,6 @@
 
   <div class="news-content">
     <h3 class="news-title">{{ news.title || 'No Data' }}</h3>
-    <span class="news-date">{{ timeAgo }}</span>
+    <span class="news-date">{{ news.datePublished | timeAgo }}</span>
   </div>
 </div>

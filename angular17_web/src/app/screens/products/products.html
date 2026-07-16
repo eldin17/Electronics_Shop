@@ -1,0 +1,51 @@
+<div class="products-container section-card">
+  <div class="section-header">
+    <h2>
+      @if (sortType === 'latest') { Latest Products }
+      @else if (sortType === 'discount') { Discounted Products }
+      @else { All Products }
+    </h2>
+    <a routerLink="/home" class="back-home">Back to Home</a>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-spinner">Loading items...</div>
+  } @else if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  } @else if (paginatedProducts.length === 0) {
+    <p class="empty-message">No products available at the moment.</p>
+  } @else {
+    <div class="product-grid">
+      @for (product of paginatedProducts; track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+      }
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="pagination-controls">
+        <button
+          (click)="setPage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+          class="page-btn prev-btn">
+          ‹
+        </button>
+
+        @for (page of getPagesArray(); track page) {
+          <button
+            (click)="setPage(page)"
+            [class.active]="currentPage === page"
+            class="page-btn">
+            {{ page }}
+          </button>
+        }
+
+        <button
+          (click)="setPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+          class="page-btn next-btn">
+          ›
+        </button>
+      </div>
+    }
+  }
+</div>
