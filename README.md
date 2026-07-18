@@ -13,7 +13,7 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
   <img src="app_screenshots/mobile_app_flutter/product_details1_screen.jpg" alt="Product Details Flutter" width="250"/>
 </div>
 <div style="display: flex;">
-  <img src="app_screenshots/web_app_angular/home_screen_1.jpg" alt="Home Screen Angular" width="700"/>    
+  <img src="app_screenshots/web_app_angular/home_screen_1.jpg" alt="Home Screen Angular" width="800"/>    
 </div>
 
 ### This application consists of ###
