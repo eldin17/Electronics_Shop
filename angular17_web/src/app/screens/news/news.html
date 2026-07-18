@@ -1,1 +1,39 @@
-<p>news works!</p>
+<div class="news-page">
+  <section class="news-detail section-card">
+    @if (selectedNews) {
+      <div class="news-detail-content">
+        <h2>{{ selectedNews.title }}</h2>
+        <p>{{ selectedNews.content }}</p>
+      </div>
+    } @else {
+      <div class="empty-message-block">
+        <p class="empty-message">No news selected</p>
+      </div>
+    }
+  </section>
+
+  <section class="news-list-section section-card">
+    <div class="section-header">
+      <h2>News</h2>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    } @else if (newsList.length > 0) {
+      <div class="news-scroll">
+        @for (item of newsList; track item.id; let i = $index) {
+          <a [routerLink]="['/news', item.id]"
+             class="news-card-link"
+             [class.active]="selectedNews?.id === item.id">
+            <app-news-card
+              [news]="item"
+              [image]="'/assets/images/background' + (i + 1) + '.jpg'">
+            </app-news-card>
+          </a>
+        }
+      </div>
+    } @else {
+      <p class="empty-message">No news right now.</p>
+    }
+  </section>
+</div>

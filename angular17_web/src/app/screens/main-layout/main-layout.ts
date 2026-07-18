@@ -6,6 +6,8 @@ import { AuthService } from '../../services/auth.service';
 import { NotificationService, NotificationPopup } from '../../services/notification.service';
 import { Notification } from '../../models/notification/notification';
 import {TimeAgoPipe} from '../../helpers/time-ago-pipe';
+import {DiscountService} from '../../services/discount.service';
+import {Discount} from '../../models/discount/discount';
 
 
 @Component({
@@ -18,6 +20,8 @@ import {TimeAgoPipe} from '../../helpers/time-ago-pipe';
 export class MainLayout implements OnInit, OnDestroy {
   @ViewChild('profileWrapper') profileWrapper!: ElementRef;
   @ViewChild('notifWrapper') notifWrapper!: ElementRef;
+
+  discount: Discount | null = null;
 
   isProfileMenuOpen = false;
   isNotifMenuOpen = false;
@@ -37,6 +41,7 @@ export class MainLayout implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
+    private discountService: DiscountService,
     private router: Router,
     private elementRef: ElementRef,
     private cd: ChangeDetectorRef
@@ -81,6 +86,20 @@ export class MainLayout implements OnInit, OnDestroy {
     } else {
       this.isLoadingNotifications = false;
     }
+
+    this.discountService.getOneRandom().subscribe({
+      next: (d) => (this.discount = d),
+      error: (err) => {
+        console.error('Failed to load discount:', err);
+        this.discount = null;
+      }
+    });
+  }
+
+  get bannerText(): string {
+    return this.discount
+      ? `Something special is waiting below! 🔥 Save ${this.discount.amount}€ on select items!`
+      : 'Something special is waiting below! ✨ Check out our latest deals!';
   }
 
   ngOnDestroy(): void {

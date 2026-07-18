@@ -25,10 +25,12 @@
   @if (newsList.length > 0) {
     <div class="news-scroll">
       @for (item of newsList; track item; let i = $index) {
-        <app-news-card
-          [news]="item"
-          [image]="'/assets/images/background' + (i + 1) + '.jpg'">
-        </app-news-card>
+        <a [routerLink]="['/news', item.id]" class="news-card-link">
+          <app-news-card
+            [news]="item"
+            [image]="'/assets/images/background' + (i + 1) + '.jpg'">
+          </app-news-card>
+        </a>
       }
     </div>
   } @else {

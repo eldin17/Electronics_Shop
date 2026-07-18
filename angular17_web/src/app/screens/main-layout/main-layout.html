@@ -1,10 +1,10 @@
 <header class="top-header">
   <div class="header-row">
-    <img src="assets/images/Logo.jpg"
-         alt="Electronics Shop Logo"
-         class="img-fluid "
-         style="max-width: 40px;">
-    <a routerLink="/home" class="logo">ElectronicShop17</a>
+
+    <a routerLink="/home" class="logo"><img src="assets/images/Logo.jpg"
+                                            alt="Electronics Shop Logo"
+                                            class="img-fluid "
+                                            style="max-width: 40px;">ElectronicShop17</a>
 
     <app-search-bar class="header-search"></app-search-bar>
 
@@ -80,10 +80,16 @@
   </div>
 
   <nav class="nav-row">
-    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-    <a routerLink="/wishlist" routerLinkActive="active">Wishlist</a>
-    <a routerLink="/cart" routerLinkActive="active">Shopping Cart</a>
-    <a routerLink="/news"  routerLinkActive="active">News</a>
+    <div class="nav-links">
+      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/wishlist" routerLinkActive="active">Wishlist</a>
+      <a routerLink="/cart" routerLinkActive="active">Shopping Cart</a>
+      <a routerLink="/news" routerLinkActive="active">News</a>
+    </div>
+
+    <div class="discount-banner">
+      {{ bannerText }}
+    </div>
   </nav>
 </header>
 
