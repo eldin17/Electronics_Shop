@@ -188,6 +188,9 @@ export class MainLayout implements OnInit, OnDestroy {
     this.notificationService.markAsRead(userId, notification.id).catch(err =>
       console.error('Failed to mark notification as read:', err)
     );
+
+    this.isNotifMenuOpen = false;
+    this.router.navigate(['/notification', notification.id]);
   }
 
   get notificationCount(): number {

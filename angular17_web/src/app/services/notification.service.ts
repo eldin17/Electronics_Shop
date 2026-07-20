@@ -11,6 +11,7 @@ import { Notification } from '../models/notification/notification';
 import { Pagination } from '../models/pagination';
 import { MyConfig } from '../my-config';
 import {BYPASS_LOADING} from './loading/loading.interceptor';
+import {News} from '../models/news/news';
 
 export interface NotificationPopup {
   title: string;
@@ -118,5 +119,13 @@ export class NotificationService extends BaseCRUDProvider<Notification, SearchNo
   stopSignalR(): void {
     this.hubConnection?.stop();
     this.isConnected = false;
+  }
+
+  getByIdNoLoading(id: number): Promise<Notification> {
+    return firstValueFrom(
+      this.http.get<any>(`${this.baseUrl}${this.endpoint}/${id}`, {
+        context: new HttpContext().set(BYPASS_LOADING, true)
+      })
+    ).then(data => this.fromJson(data));
   }
 }

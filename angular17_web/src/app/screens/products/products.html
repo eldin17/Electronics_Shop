@@ -1,7 +1,8 @@
 <div class="products-container section-card">
   <div class="section-header">
     <h2>
-      @if (sortType === 'latest') { Latest Products }
+      @if (searchQuery) { Results for "{{ searchQuery }}" }
+      @else if (sortType === 'latest') { Latest Products }
       @else if (sortType === 'discount') { Discounted Products }
       @else { All Products }
     </h2>

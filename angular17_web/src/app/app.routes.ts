@@ -8,6 +8,7 @@ import {Products} from './screens/products/products';
 import {NewsScreen} from './screens/news/news';
 import {WishlistScreen} from './screens/wishlist/wishlist';
 import {ShoppingCart} from './screens/shopping-cart/shopping-cart';
+import {Notifications} from './screens/notifications/notifications';
 
 export const routes: Routes = [
   { path: '', component: Splash },
@@ -24,7 +25,8 @@ export const routes: Routes = [
       { path: 'news/:id', component: NewsScreen },
       { path: 'wishlist', component: WishlistScreen  },
       { path: 'cart', component: ShoppingCart  },
-
+      { path: 'notification', component: Notifications  },
+      { path: 'notification/:id', component: Notifications },
     ]
   },
 

@@ -1,0 +1,38 @@
+<div class="notif-page">
+  <section class="notif-detail section-card">
+    @if (selectedNotif) {
+      <div class="notif-detail-content">
+        <h2>{{ selectedNotif.title }}</h2>
+        <p>{{ selectedNotif.message }}</p>
+      </div>
+    } @else {
+      <div class="empty-message-block">
+        <p class="empty-message">No notification selected</p>
+      </div>
+    }
+  </section>
+
+  <section class="notif-list-section section-card">
+    <div class="section-header">
+      <h2>Notification</h2>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    } @else if (notifList.length > 0) {
+      <div class="notif-scroll">
+        @for (item of notifList; track item.id; let i = $index) {
+          <a [routerLink]="['/notification', item.id]"
+             class="notif-card-link"
+             [class.active]="selectedNotif?.id === item.id">
+            <app-notif-card
+              [notif]="item">
+            </app-notif-card>
+          </a>
+        }
+      </div>
+    } @else {
+      <p class="empty-message">No notifications right now.</p>
+    }
+  </section>
+</div>

@@ -21,7 +21,7 @@ export class SearchBar {
     if (!trimmed) return;
 
     this.search.emit(trimmed);
-    this.router.navigate(['/search'], { queryParams: { q: trimmed } });
+    this.router.navigate(['/products'], { queryParams: { search: trimmed } });
   }
 
   onClear(): void {

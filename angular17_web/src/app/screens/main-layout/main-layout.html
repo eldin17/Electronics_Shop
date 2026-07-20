@@ -21,7 +21,8 @@
         @if (isNotifMenuOpen) {
           <div class="notif-dropdown" [class.open]="isNotifMenuOpen">
             <div class="notif-content">
-              <div class="notif-header">Notifications</div>
+              <a routerLink="/notification" class="notif-header"
+                 (click)="isNotifMenuOpen = false">Notifications</a>
 
               @if (isLoadingNotifications) {
                 <div class="notif-empty">

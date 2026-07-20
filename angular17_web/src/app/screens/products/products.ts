@@ -20,6 +20,7 @@ export class Products implements OnInit {
   isLoading = true;
   errorMessage = '';
   sortType: 'latest' | 'discount' | 'all' = 'all';
+  searchQuery = '';
 
   currentPage = 1;
   pageSize = 10;
@@ -36,6 +37,7 @@ export class Products implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       this.sortType = params['sort'] || 'all';
+      this.searchQuery = params['search'] || '';
       this.currentPage = 1;
 
       if (userAccId) {
@@ -66,8 +68,12 @@ export class Products implements OnInit {
   private applySortingAndFiltering(): void {
     let tempProducts = [...this.allProducts];
 
-    if (this.sortType === 'latest') {
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      tempProducts = tempProducts.filter(p => p.brand.toLowerCase().includes(q) || p.model.toLowerCase().includes(q));
+    }
 
+    if (this.sortType === 'latest') {
       tempProducts.sort((a, b) => b.id - a.id);
     }
     else if (this.sortType === 'discount') {
@@ -101,7 +107,6 @@ export class Products implements OnInit {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
-
 
   getPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);

@@ -1,10 +1,10 @@
-.news-page {
+.notif-page {
   display: flex;
   gap: 24px;
   align-items: stretch;
 }
 
-.news-detail {
+.notif-detail {
   flex: 1 1 35%;
   height: 480px;
   display: flex;
@@ -17,15 +17,15 @@
   overflow: hidden;
 }
 
-.news-detail-content {
+.notif-detail-content {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
   padding-right: 8px;
 
-h2 {
-  margin-top: 20px;
-}
+  h2 {
+    margin-top: 20px;
+  }
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -44,7 +44,7 @@ h2 {
   height: 100%;
 }
 
-.news-list-section {
+.notif-list-section {
   flex: 1 1 20%;
   height: 480px;
   display: flex;
@@ -56,35 +56,35 @@ h2 {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.news-scroll {
+.notif-scroll {
   grid-template-columns: repeat(2, 1fr);
   flex: 1;
   overflow-y: auto;
   padding: 10px;
   min-height: 0;
 
-&::-webkit-scrollbar {
-  width: 6px;
-}
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
   &::-webkit-scrollbar-thumb {
     background: #ddd;
     border-radius: 4px;
   }
 }
 
-.news-card-link {
+.notif-card-link {
   display: block;
   text-decoration: none;
   color: inherit;
   border-radius: 16px;
   overflow: hidden;
 
-app-news-card {
-  display: block;
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-}
+  app-notif-card {
+    display: block;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+  }
 
   &.active {
     outline: 3px solid #5a5a5a;
@@ -94,11 +94,11 @@ app-news-card {
 }
 
 @media (max-width: 992px) {
-  .news-page {
+  .notif-page {
     flex-direction: column;
   }
-  .news-detail,
-  .news-list-section {
+  .notif-detail,
+  .notif-list-section {
     height: 400px;
   }
 }
