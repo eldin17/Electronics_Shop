@@ -11,5 +11,6 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IShoppingCartService : IBaseServiceCRUD<DtoShoppingCart,SearchShoppingCart,AddShoppingCart,UpdateShoppingCart>
     {
+        Task<DtoShoppingCart> GetByUserId(int userAccId);
     }
 }

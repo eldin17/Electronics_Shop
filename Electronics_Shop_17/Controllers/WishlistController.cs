@@ -15,7 +15,11 @@ namespace Electronics_Shop_17.Controllers
         {
          
         }
-
         
+        [HttpGet("GetByUserId/{userAccId}")]
+        public async Task<DtoWishlist> GetByUserId(int userAccId)
+        {
+            return await (_service as IWishlistService).GetByUserId(userAccId);
+        }
     }
 }

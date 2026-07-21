@@ -58,5 +58,11 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             return dbWishlist;
         }
+
+        public async Task<DtoWishlist> GetByUserId(int userAccId)
+        {
+            var customer = await _context.Customers.Include(x=>x.Wishlist).FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+            return await GetById(customer.Wishlist.Id);
+        }
     }
 }

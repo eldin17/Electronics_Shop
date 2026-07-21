@@ -1,0 +1,50 @@
+<div class="product-card-2" (click)="openProduct($event)">
+  <div class="image-wrapper">
+    <img [src]="imageUrl" [alt]="displayName" />
+  </div>
+
+  <div class="info">
+    <p class="name">
+      <span class="brand">{{ product.brand }}</span>
+      <span class="model">{{ product.model }}</span>
+    </p>
+
+    <div class="price-row">
+      @if (hasDiscount) {
+        <span class="original-price">{{ product.price }}€</span>
+      }
+      <span class="price">{{ product.finalPrice }}€</span>
+    </div>
+  </div>
+
+  <div class="card-actions">
+    <button
+      class="action-btn details-btn"
+      type="button"
+      (click)="openProduct($event)"
+      aria-label="See Details"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M21 21L15.5 15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <button
+      class="action-btn delete-btn"
+      type="button"
+      (click)="onDelete($event)"
+      aria-label="Remove from wishlist"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M4 7H20M9 7V5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V7M18 7L17.2934 18.0431C17.1937 19.6039 15.8971 20.8 14.3333 20.8H9.66667C8.10289 20.8 6.80629 19.6039 6.70664 18.0431L6 7"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+  </div>
+</div>

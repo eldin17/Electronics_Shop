@@ -1,0 +1,151 @@
+.product-card-2 {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin: 0px 10px 0px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.product-card-2:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.card-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.product-card-2:hover .card-actions {
+  transform: translateX(0);
+}
+
+.cart-btn {
+  background: #fff0e6;
+  color: #ff6b35;
+}
+
+.cart-btn:hover {
+  background: #ffe2d1;
+}
+
+.action-btn {
+  width: 100px;
+  height: 100%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.delete-btn {
+  background: #ffe3e3;
+  color: #ff5a5a;
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.delete-btn:hover {
+  background: #ffd3d3;
+}
+
+.product-card-2:hover .delete-btn {
+  transform: translateX(0);
+}
+
+.delete-btn:hover {
+  background: #ffd3d3;
+}
+
+.image-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+  width: 110px;
+  height: 110px;
+  background: #ffffff;
+  box-shadow: 0 0px 16px rgba(0, 0, 0, 0.1);
+
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.brand {
+  font-size: 15px;
+  color: #888;
+  margin: 0;
+}
+
+.model {
+  font-size: 18px;
+  color: #3e3e3e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ff6b35;
+}
+
+.original-price {
+  font-size: 14px;
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+.details-btn {
+  background: #fff4e0;
+  color: #d98c1f;
+}
+
+.details-btn:hover {
+  background: #ffe9c2;
+}

@@ -1,1 +1,23 @@
-<p>wishlist works!</p>
+<div class="wishlist-screen">
+  <header class="header">
+    <h1>Your Wishlist</h1>
+    <span class="count">{{ items.length }} items</span>
+  </header>
+
+  @if (isLoading) {
+    <p class="status">Loading...</p>
+  } @else if (errorMessage) {
+    <p class="status">{{ errorMessage }}</p>
+  } @else if (items.length === 0) {
+    <p class="status">Your wishlist is empty.</p>
+  } @else {
+    <div class="list">
+      @for (item of items; track item.id) {
+        <app-product-card-2
+          [product]="item.product!"
+          (remove)="onRemove(item.id)"
+        />
+      }
+    </div>
+  }
+</div>

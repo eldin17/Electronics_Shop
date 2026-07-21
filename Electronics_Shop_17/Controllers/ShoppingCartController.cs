@@ -14,5 +14,10 @@ namespace Electronics_Shop_17.Controllers
         public ShoppingCartController(IShoppingCartService service) : base(service)
         {
         }
+        [HttpGet("GetByUserId/{userAccId}")]
+        public async Task<DtoShoppingCart> GetByUserId(int userAccId)
+        {
+            return await (_service as IShoppingCartService).GetByUserId(userAccId);
+        }
     }
 }

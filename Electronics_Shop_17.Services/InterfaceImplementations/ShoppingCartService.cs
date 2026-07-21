@@ -59,5 +59,11 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
             return dbShoppingCart;
         }
+
+        public async Task<DtoShoppingCart> GetByUserId(int userAccId)
+        {
+            var customer = await _context.Customers.Include(x => x.ShoppingCart).FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+            return await GetById(customer.ShoppingCart.Id);
+        }
     }
 }
