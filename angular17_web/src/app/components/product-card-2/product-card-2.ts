@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class ProductCard2 {
   @Input({ required: true }) product!: Product;
+  @Input() image?: string;
   @Output() remove = new EventEmitter<number>();
   @Output() addToCart = new EventEmitter<number>();
 
@@ -20,7 +21,7 @@ export class ProductCard2 {
   }
 
   get imageUrl(): string {
-    return this.product.productImages?.[0]?.image.path ?? '/assets/images/Logo2.jpg';
+    return this.image ?? this.product.productImages?.[0]?.image.path ?? '/assets/images/Logo2.jpg';
   }
 
   get hasDiscount(): boolean {

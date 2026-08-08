@@ -17,6 +17,7 @@
           @for (item of items; track item.id) {
             <app-product-card-2
               [product]="item.product!"
+              [image]="resolveItemImage(item)"
               (remove)="onRemove(item.id)"
             />
           }

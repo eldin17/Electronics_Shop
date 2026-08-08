@@ -88,6 +88,16 @@ export class ShoppingCart implements OnInit {
     return Math.max(this.subtotal - discount, 0);
   }
 
+  resolveItemImage(item: CartItem): string {
+    const images = item.product?.productImages ?? [];
+
+    const match = images.find(
+      (img) => img.productColor?.id === item.productColorId,
+    );
+
+    return (match ?? images[0])?.image?.path ?? '';
+  }
+
   onRemove(itemId: number): void {
     if (!this.cartId) return;
 

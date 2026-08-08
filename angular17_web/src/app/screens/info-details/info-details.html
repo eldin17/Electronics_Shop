@@ -1,0 +1,49 @@
+<div class="list-detail-page">
+  <section class="detail-section">
+    @if (selectedItem) {
+      <div class="detail-content">
+        <h2>{{ selectedItem.title }}</h2>
+        @if (isNews) {
+          <p>{{ asNews(selectedItem).content }}</p>
+        } @else {
+          <p>{{ asNotif(selectedItem).message }}</p>
+        }
+      </div>
+    } @else {
+      <div class="empty-message-block">
+        <p class="empty-message">{{ emptySelectionMessage }}</p>
+      </div>
+    }
+  </section>
+
+  <section class="list-section">
+    <div class="section-header">
+      <h2>{{ listTitle }}</h2>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    } @else if (itemList.length > 0) {
+      <div class="item-scroll">
+        @for (item of itemList; track item.id; let i = $index) {
+          <a [routerLink]="[routerLinkBase, item.id]"
+             class="item-card-link"
+             [class.active]="isSelected(item)">
+            @if (isNews) {
+              <app-news-card
+                [news]="asNews(item)"
+                [image]="'/assets/images/background' + (i + 1) + '.jpg'">
+              </app-news-card>
+            } @else {
+              <app-notif-card
+                [notif]="asNotif(item)">
+              </app-notif-card>
+            }
+          </a>
+        }
+      </div>
+    } @else {
+      <p class="empty-message">{{ emptyListMessage }}</p>
+    }
+  </section>
+</div>

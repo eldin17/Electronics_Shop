@@ -1,10 +1,10 @@
-.notif-page {
+.list-detail-page {
   display: flex;
   gap: 24px;
   align-items: stretch;
 }
 
-.notif-detail {
+.detail-section {
   flex: 1 1 35%;
   height: 480px;
   display: flex;
@@ -17,13 +17,13 @@
   overflow: hidden;
 }
 
-.notif-detail-content {
+.detail-content {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
   padding-right: 8px;
 
-  h2 {
+  & h2 {
     margin-top: 20px;
   }
 
@@ -44,7 +44,7 @@
   height: 100%;
 }
 
-.notif-list-section {
+.list-section {
   flex: 1 1 20%;
   height: 480px;
   display: flex;
@@ -56,7 +56,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.notif-scroll {
+.item-scroll {
   grid-template-columns: repeat(2, 1fr);
   flex: 1;
   overflow-y: auto;
@@ -72,14 +72,15 @@
   }
 }
 
-.notif-card-link {
+.item-card-link {
   display: block;
   text-decoration: none;
   color: inherit;
   border-radius: 16px;
   overflow: hidden;
 
-  app-notif-card {
+  & app-news-card,
+  & app-notif-card {
     display: block;
     width: 100%;
     border-radius: 16px;
@@ -94,11 +95,11 @@
 }
 
 @media (max-width: 992px) {
-  .notif-page {
+  .list-detail-page {
     flex-direction: column;
   }
-  .notif-detail,
-  .notif-list-section {
+  .detail-section,
+  .list-section {
     height: 400px;
   }
 }

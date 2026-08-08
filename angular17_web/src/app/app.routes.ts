@@ -5,10 +5,9 @@ import { Register } from './screens/auth/register/register';
 import { Home } from './screens/home/home';
 import { MainLayout } from './screens/main-layout/main-layout';
 import {Products} from './screens/products/products';
-import {NewsScreen} from './screens/news/news';
 import {WishlistScreen} from './screens/wishlist/wishlist';
 import {ShoppingCart} from './screens/shopping-cart/shopping-cart';
-import {Notifications} from './screens/notifications/notifications';
+import {InfoDetails} from './screens/info-details/info-details';
 
 export const routes: Routes = [
   { path: '', component: Splash },
@@ -21,12 +20,12 @@ export const routes: Routes = [
     children: [
       { path: 'home', component: Home },
       { path: 'products', component: Products },
-      { path: 'news', component: NewsScreen },
-      { path: 'news/:id', component: NewsScreen },
+      { path: 'news', component: InfoDetails, data: { type: 'news' } },
+      { path: 'news/:id', component: InfoDetails, data: { type: 'news' } },
       { path: 'wishlist', component: WishlistScreen  },
       { path: 'cart', component: ShoppingCart  },
-      { path: 'notification', component: Notifications  },
-      { path: 'notification/:id', component: Notifications },
+      { path: 'notification', component: InfoDetails, data: { type: 'notification' } },
+      { path: 'notification/:id', component: InfoDetails, data: { type: 'notification' } },
     ]
   },
 
