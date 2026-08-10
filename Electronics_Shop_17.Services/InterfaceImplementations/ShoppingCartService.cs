@@ -62,7 +62,16 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
         public async Task<DtoShoppingCart> GetByUserId(int userAccId)
         {
-            var customer = await _context.Customers.Include(x => x.ShoppingCart).FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+            var customer = await _context.Customers
+                .Include(x => x.ShoppingCart)
+                .FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+
+            if (customer == null)
+                throw new KeyNotFoundException("Customer not found.");
+
+            if (customer.ShoppingCart == null)
+                return await Add(new AddShoppingCart { CustomerId = customer.Id });
+
             return await GetById(customer.ShoppingCart.Id);
         }
     }

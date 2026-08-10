@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
+
 export class Login {
   rememberMe = false;
 
@@ -34,9 +35,13 @@ export class Login {
         console.log('Login success:', response);
 
 
-        console.log('Navigating to home screen...');
-
-        this.router.navigate(['/home']);
+        if (this.authService.isProfileComplete()) {
+          console.log('Setup complete, navigating to home screen...');
+          this.router.navigate(['/home']);
+        } else {
+          console.log('Setup incomplete, navigating to finish setup...');
+          this.router.navigate(['/finish-set-up']);
+        }
       },
       error: (err) => {
         console.error('Login failed:', err);

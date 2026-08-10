@@ -1,0 +1,66 @@
+<div class="container-fluid d-flex justify-content-center py-5">
+  <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+    <form #setupForm="ngForm" (ngSubmit)="onConfirm(setupForm)">
+
+      <h1 class="text-center fw-bold mb-2">Almost There!</h1>
+      <p class="text-center text-secondary mb-4">
+        Let's finalize your profile! Fill in the last few details, and
+        you'll be all set to explore everything we have to offer.
+      </p>
+
+      <div class="form-outline mb-3">
+        <label class="form-label small text-secondary">Firstname</label>
+        <input type="text" name="firstName" ngModel required
+               class="form-control form-control-lg rounded-pill"
+               placeholder="Enter your firstname" />
+      </div>
+
+      <div class="form-outline mb-3">
+        <label class="form-label small text-secondary">Lastname</label>
+        <input type="text" name="lastName" ngModel required
+               class="form-control form-control-lg rounded-pill"
+               placeholder="Enter your lastname" />
+      </div>
+
+      <div class="form-outline mb-3">
+        <label class="form-label small text-secondary">Date of birth</label>
+        <input type="date" name="dateOfBirth" ngModel required
+               class="form-control form-control-lg rounded-pill"
+               placeholder="Select date of birth" />
+      </div>
+
+      <div class="form-outline mb-3">
+        <label class="form-label small text-secondary">Country</label>
+        <app-country-picker name="country" ngModel required></app-country-picker>
+      </div>
+
+      <div class="form-outline mb-3">
+        <label class="form-label small text-secondary">City</label>
+        <input type="text" name="city" ngModel required
+               class="form-control form-control-lg rounded-pill"
+               placeholder="Enter your city" />
+      </div>
+
+      <div class="form-outline mb-3">
+        <label class="form-label small text-secondary">Street</label>
+        <input type="text" name="street" ngModel required
+               class="form-control form-control-lg rounded-pill"
+               placeholder="Enter your street" />
+      </div>
+
+      <div class="form-outline mb-4">
+        <label class="form-label small text-secondary">Postal Code</label>
+        <input type="text" name="postalCode" ngModel required
+               class="form-control form-control-lg rounded-pill"
+               placeholder="Enter your postal code" />
+      </div>
+
+      <button type="submit"
+              class="btn btn-lg rounded-4 w-100"
+              style="background-color: #ff8800; color: white">
+        Confirm
+      </button>
+
+    </form>
+  </div>
+</div>

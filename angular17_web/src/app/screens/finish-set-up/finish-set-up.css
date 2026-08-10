@@ -1,0 +1,33 @@
+.form-control::placeholder {
+  color: #b0b0b0;
+  opacity: 1;
+
+}
+
+
+.form-control::-webkit-input-placeholder {
+  color: #b0b0b0;
+}
+
+.form-control::-moz-placeholder {
+  color: #b0b0b0;
+  opacity: 1;
+}
+
+
+input[type='date'].form-control::-webkit-datetime-edit-fields-wrapper,
+input[type='date'].form-control::-webkit-datetime-edit-text,
+input[type='date'].form-control::-webkit-datetime-edit-month-field,
+input[type='date'].form-control::-webkit-datetime-edit-day-field,
+input[type='date'].form-control::-webkit-datetime-edit-year-field {
+  color: #b0b0b0;
+}
+
+
+input[type='date'].form-control:valid::-webkit-datetime-edit-fields-wrapper,
+input[type='date'].form-control:valid::-webkit-datetime-edit-text,
+input[type='date'].form-control:valid::-webkit-datetime-edit-month-field,
+input[type='date'].form-control:valid::-webkit-datetime-edit-day-field,
+input[type='date'].form-control:valid::-webkit-datetime-edit-year-field {
+  color: #212529;
+}

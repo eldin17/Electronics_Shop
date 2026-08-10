@@ -1,0 +1,46 @@
+<div class="country-picker">
+  <div
+    class="form-control form-control-lg rounded-pill country-picker__trigger"
+    [class.country-picker__trigger--placeholder]="!selected"
+    (click)="toggleOpen()"
+  >
+    <img
+      *ngIf="selected?.code"
+      class="country-picker__flag"
+      [src]="'https://flagcdn.com/w40/' + selected!.code.toLowerCase() + '.png'"
+      [alt]="selected!.name"
+    />
+    <span>{{ selected ? selected.name : 'Enter your country' }}</span>
+  </div>
+
+  <div class="country-picker__panel" *ngIf="isOpen">
+    <div class="country-picker__search">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search"
+        [(ngModel)]="search"
+        [ngModelOptions]="{ standalone: true }"
+        autofocus
+      />
+    </div>
+
+    <ul class="country-picker__list">
+      <li
+        *ngFor="let country of filteredCountries"
+        class="country-picker__item"
+        (click)="selectCountry(country)"
+      >
+        <img
+          class="country-picker__flag"
+          [src]="'https://flagcdn.com/w40/' + country.code.toLowerCase() + '.png'"
+          [alt]="country.name"
+        />
+        <span>{{ country.name }}</span>
+      </li>
+      <li *ngIf="filteredCountries.length === 0" class="country-picker__empty">
+        No countries found
+      </li>
+    </ul>
+  </div>
+</div>

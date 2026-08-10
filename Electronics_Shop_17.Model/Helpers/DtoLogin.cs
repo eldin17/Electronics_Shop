@@ -9,8 +9,7 @@ namespace Electronics_Shop_17.Model.Helpers
     public class DtoLogin
     {
         public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }        
-        
-        
+        public string RefreshToken { get; set; }
+        public bool SetupCompleted { get; set; }
     }
 }

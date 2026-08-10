@@ -7,11 +7,13 @@ import {CartItem} from '../../models/cart-item/cart.item';
 import {ShoppingCartService} from '../../services/shopping.cart.service';
 import {ShoppingCartItemService} from '../../services/shopping.cart.item.service';
 import {ProductCard2} from '../../components/product-card-2/product-card-2';
+import {CouponPopUp, AppliedCoupon} from '../../components/coupon-pop-up/coupon-pop-up';
 
 @Component({
   selector: 'app-shopping-cart',
   imports: [
-    ProductCard2
+    ProductCard2,
+    CouponPopUp
   ],
   templateUrl: './shopping-cart.html',
   styleUrl: './shopping-cart.css',
@@ -22,7 +24,8 @@ export class ShoppingCart implements OnInit {
   isLoading = true;
   errorMessage = '';
 
-  appliedCoupon: { code: string; discountAmount: number } | null = null;
+  appliedCoupon: AppliedCoupon | null = null;
+  showCouponPopup = false;
 
   constructor(
     private shoppingCartService: ShoppingCartService,
@@ -114,7 +117,16 @@ export class ShoppingCart implements OnInit {
   }
 
   onAddCoupon(): void {
-    console.log('Add coupon code');
+    this.showCouponPopup = true;
+  }
+
+  onCouponApplied(coupon: AppliedCoupon): void {
+    this.appliedCoupon = coupon;
+    this.showCouponPopup = false;
+  }
+
+  onCouponPopupClosed(): void {
+    this.showCouponPopup = false;
   }
 
   onCheckout(): void {

@@ -64,4 +64,12 @@
       </aside>
     </div>
   }
+
+  @if (showCouponPopup) {
+    <app-coupon-pop-up
+      [purchaseAmount]="subtotal"
+      (closed)="onCouponPopupClosed()"
+      (applied)="onCouponApplied($event)"
+    />
+  }
 </div>

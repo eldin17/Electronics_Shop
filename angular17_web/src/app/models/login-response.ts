@@ -5,4 +5,6 @@ export class LoginResponse{
   roleName:string="";
   isCustomer:boolean=false;
   isSeller:boolean=false;
+  setupCompleted: boolean=false;
+
 }

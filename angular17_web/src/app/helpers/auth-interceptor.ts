@@ -1,10 +1,7 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, switchMap, throwError, BehaviorSubject, filter, take } from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
 import {AuthService} from '../services/auth.service';
-
-let isRefreshing = false;
-const refreshSubject = new BehaviorSubject<string | null>(null);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -20,28 +17,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      if (isRefreshing) {
-        return refreshSubject.pipe(
-          filter((t) => t !== null),
-          take(1),
-          switchMap((newToken) =>
-            next(req.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } }))
-          )
-        );
-      }
-
-      isRefreshing = true;
-      refreshSubject.next(null);
-
       return authService.refresh().pipe(
-        switchMap((res) => {
-          isRefreshing = false;
-          refreshSubject.next(res.accessToken);
-          return next(
-            req.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } }));
-        }),
+        switchMap((res) =>
+          next(req.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } }))
+        ),
         catchError((refreshErr) => {
-          isRefreshing = false;
           authService.clearAccessToken();
           return throwError(() => refreshErr);
         })

@@ -61,7 +61,16 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
 
         public async Task<DtoWishlist> GetByUserId(int userAccId)
         {
-            var customer = await _context.Customers.Include(x=>x.Wishlist).FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+            var customer = await _context.Customers
+                .Include(x => x.Wishlist)
+                .FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+
+            if (customer == null)
+                throw new KeyNotFoundException("Customer not found.");
+
+            if (customer.Wishlist == null)
+                return await Add(new AddWishlist { CustomerId = customer.Id });
+
             return await GetById(customer.Wishlist.Id);
         }
     }

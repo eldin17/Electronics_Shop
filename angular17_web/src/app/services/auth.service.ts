@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {BehaviorSubject, finalize, Observable, shareReplay, tap} from 'rxjs';
 import {MyConfig} from '../my-config';
 import {LoginResponse} from '../models/login-response';
 
@@ -9,6 +9,8 @@ export class AuthService {
   private apiUrl = `${MyConfig.address}/api/UserAccount`;
 
   private accessToken: string | null = null;
+
+  private setupCompleted: boolean | null = null;
 
   private isAuthenticated$ = new BehaviorSubject<boolean>(false);
   readonly authenticated$ = this.isAuthenticated$.asObservable();
@@ -39,7 +41,7 @@ export class AuthService {
     }
   }
 
-  login(payload: any): Observable<any> {
+  login(payload: any): Observable<LoginResponse> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'accept': 'text/plain'
@@ -53,19 +55,39 @@ export class AuthService {
       .pipe(
         tap((res) => {
           this.setAccessToken(res.accessToken);
+          this.setSetupCompleted(res.setupCompleted);
         })
       );
   }
 
+
+  private refresh$: Observable<LoginResponse> | null = null;
+
   refresh(): Observable<LoginResponse> {
-    return this.http
+    if (this.refresh$) {
+      return this.refresh$;
+    }
+
+    this.refresh$ = this.http
       .post<LoginResponse>(this.apiUrl + '/refresh', {}, { withCredentials: true })
-      .pipe(tap((res) => this.setAccessToken(res.accessToken)));
+      .pipe(
+        tap((res) => {
+          this.setAccessToken(res.accessToken);
+          this.setSetupCompleted(res.setupCompleted);
+        }),
+        shareReplay(1),
+        finalize(() => (this.refresh$ = null))
+      );
+
+    return this.refresh$;
   }
 
   logout(): Observable<any> {
     return this.http.post(this.apiUrl + '/logout', {}, { withCredentials: true }).pipe(
-      tap(() => this.clearAccessToken())
+      tap(() => {
+        this.clearAccessToken();
+        this.setupCompleted = null;
+      })
     );
   }
 
@@ -81,6 +103,14 @@ export class AuthService {
 
   getAccessToken(): string | null {
     return this.accessToken;
+  }
+
+  setSetupCompleted(value: boolean | null) {
+    this.setupCompleted = value;
+  }
+
+  isProfileComplete(): boolean {
+    return this.setupCompleted === true;
   }
 
   register(payload: any): Observable<any> {

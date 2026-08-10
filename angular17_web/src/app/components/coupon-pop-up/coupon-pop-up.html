@@ -1,0 +1,40 @@
+<div class="coupon-backdrop" (click)="onBackdropClick()">
+  <div class="coupon-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" type="button" (click)="close()" aria-label="Close">
+      ✕
+    </button>
+
+    <h2>Add coupon code</h2>
+    <p class="hint">Enter your code below to apply a discount.</p>
+
+    <form (ngSubmit)="onSubmit()">
+      <input
+        type="text"
+        class="coupon-input"
+        placeholder="e.g. SUMMER10"
+        [(ngModel)]="couponCode"
+        name="couponCode"
+        [disabled]="isChecking"
+        autocomplete="off"
+      />
+
+      @if (feedback) {
+        <p
+          class="feedback"
+          [class.success]="feedback.type === 'success'"
+          [class.error]="feedback.type === 'error'"
+        >
+          {{ feedback.message }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        class="apply-btn"
+        [disabled]="isChecking || !couponCode.trim()"
+      >
+        {{ isChecking ? 'Checking...' : 'Apply' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -16,19 +16,31 @@ export class Splash {
 
   onEnterClick(): void {
     const time = new Date().toLocaleTimeString();
-
     console.log('Splash Skip Button clicked at:', time);
 
     if (this.authService.getAccessToken()) {
+      this.routeAfterAuthCheck();
+      return;
+    }
+
+    this.authService.refresh().subscribe({
+      next: () => this.routeAfterAuthCheck(),
+      error: () => {
+        console.log('No valid session, navigating to login...');
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  private routeAfterAuthCheck(): void {
+    if (this.authService.isProfileComplete()) {
       console.log('Valid session found, navigating to home...');
       this.router.navigate(['/home']);
     } else {
-      console.log('No valid session, navigating to login...');
-      this.router.navigate(['/login']);
+      console.log('Valid session but setup incomplete, navigating to finish setup...');
+      this.router.navigate(['/finish-set-up']);
     }
-
   }
 
 }
-
 
