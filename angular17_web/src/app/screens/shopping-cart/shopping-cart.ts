@@ -35,23 +35,8 @@ export class ShoppingCart implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userAccId = this.authService.getUserId();
-
-    if (userAccId) {
-      this.loadShoppingCart(userAccId);
-    } else {
-      this.authService.refresh().subscribe({
-        next: () => {
-          const refreshedId = this.authService.getUserId();
-          if (refreshedId) {
-            this.loadShoppingCart(refreshedId);
-          } else {
-            this.handleAuthError();
-          }
-        },
-        error: () => this.handleAuthError(),
-      });
-    }
+    const userAccId = this.authService.getUserId()!;
+    this.loadShoppingCart(userAccId);
   }
 
   private loadShoppingCart(userAccId: number): void {

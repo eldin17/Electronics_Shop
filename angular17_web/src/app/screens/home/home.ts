@@ -35,23 +35,9 @@ export class Home implements OnInit {
 
     if (userAccId) {
       this.loadProducts(userAccId);
-      this.loadNews();
     }
-    else
-    {
-      this.authService.refresh().subscribe({
-        next: () => {
-          const refreshedId = this.authService.getUserId();
-          if (refreshedId) {
-            this.loadProducts(refreshedId);
-          } else {
-            this.handleAuthError();
-          }
-        },
-        error: () => this.handleAuthError()
-      });
-      this.loadNews();
-    }
+
+    this.loadNews();
   }
 
   private loadProducts(userAccId: number): void {

@@ -66,8 +66,8 @@ namespace Electronics_Shop_17.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequest? input)
         {
-            var (accessToken, refreshToken) = await (_service as IUserAccountService).Refresh(input);
-            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+            var (accessToken, refreshToken, setupCompleted) = await (_service as IUserAccountService).Refresh(input);
+            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken , SetupCompleted = setupCompleted });
         }
     }
 }

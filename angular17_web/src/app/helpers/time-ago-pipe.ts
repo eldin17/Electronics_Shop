@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'timeAgo',
   standalone: true,
-  pure: false // re-evaluates on each CD cycle so "just now" ages naturally without a manual refresh
+  pure: false
 })
 export class TimeAgoPipe implements PipeTransform {
   transform(value: Date | string | null | undefined): string {

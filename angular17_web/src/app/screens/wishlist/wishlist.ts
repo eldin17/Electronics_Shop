@@ -28,23 +28,8 @@ export class WishlistScreen implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userAccId = this.authService.getUserId();
-
-    if (userAccId) {
-      this.loadWishlist(userAccId);
-    } else {
-      this.authService.refresh().subscribe({
-        next: () => {
-          const refreshedId = this.authService.getUserId();
-          if (refreshedId) {
-            this.loadWishlist(refreshedId);
-          } else {
-            this.handleAuthError();
-          }
-        },
-        error: () => this.handleAuthError(),
-      });
-    }
+    const userAccId = this.authService.getUserId()!;
+    this.loadWishlist(userAccId);
   }
 
   private loadWishlist(userAccId: number): void {

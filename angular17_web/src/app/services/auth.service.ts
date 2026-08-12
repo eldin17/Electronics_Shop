@@ -12,9 +12,6 @@ export class AuthService {
 
   private setupCompleted: boolean | null = null;
 
-  private isAuthenticated$ = new BehaviorSubject<boolean>(false);
-  readonly authenticated$ = this.isAuthenticated$.asObservable();
-
   constructor(private http: HttpClient) {}
 
   getUserId(): number | null {
@@ -29,27 +26,11 @@ export class AuthService {
       return null;
     }
   }
-  getUserRole(): string | null {
-    const token = this.getAccessToken();
-    if (!token) return null;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? null;
-    } catch (e) {
-      return null;
-    }
-  }
 
   login(payload: any): Observable<LoginResponse> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'accept': 'text/plain'
-    });
 
     return this.http
       .post<LoginResponse>(this.apiUrl + '/login', payload, {
-        headers,
         withCredentials: true
       })
       .pipe(
@@ -59,7 +40,6 @@ export class AuthService {
         })
       );
   }
-
 
   private refresh$: Observable<LoginResponse> | null = null;
 
@@ -75,8 +55,8 @@ export class AuthService {
           this.setAccessToken(res.accessToken);
           this.setSetupCompleted(res.setupCompleted);
         }),
-        shareReplay(1),
-        finalize(() => (this.refresh$ = null))
+        finalize(() => (this.refresh$ = null)),
+        shareReplay(1)
       );
 
     return this.refresh$;
@@ -93,12 +73,10 @@ export class AuthService {
 
   setAccessToken(token: string) {
     this.accessToken = token;
-    this.isAuthenticated$.next(true);
   }
 
   clearAccessToken() {
     this.accessToken = null;
-    this.isAuthenticated$.next(false);
   }
 
   getAccessToken(): string | null {
@@ -114,14 +92,8 @@ export class AuthService {
   }
 
   register(payload: any): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'accept': 'text/plain'
-    });
-
     return this.http
       .post<any>(this.apiUrl + '/register', payload, {
-        headers,
         withCredentials: true
       });
   }

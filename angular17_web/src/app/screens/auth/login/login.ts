@@ -34,14 +34,7 @@ export class Login {
       next: (response) => {
         console.log('Login success:', response);
 
-
-        if (this.authService.isProfileComplete()) {
-          console.log('Setup complete, navigating to home screen...');
           this.router.navigate(['/home']);
-        } else {
-          console.log('Setup incomplete, navigating to finish setup...');
-          this.router.navigate(['/finish-set-up']);
-        }
       },
       error: (err) => {
         console.error('Login failed:', err);
