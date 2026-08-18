@@ -6,8 +6,62 @@
       @else if (sortType === 'discount') { Discounted Products }
       @else { All Products }
     </h2>
-    <a routerLink="/home" class="back-home">Back to Home</a>
+    <div class="header-actions">
+      <button
+        type="button"
+        class="filter-toggle-btn"
+        [class.active]="filterVisible"
+        (click)="toggleFilterSection()">
+        Filters
+      </button>
+    </div>
   </div>
+
+  @if (filterVisible) {
+    <div class="filter-section">
+
+
+      <div class="filter-row filter-price-row">
+        <input
+          type="number"
+          class="filter-input"
+          placeholder="Price Low"
+          [value]="priceLow ?? ''"
+          (input)="onPriceLowInput($event)" />
+        <input
+          type="number"
+          class="filter-input"
+          placeholder="Price High"
+          [value]="priceHigh ?? ''"
+          (input)="onPriceHighInput($event)" />
+      </div>
+
+      @if (availableCategories.length > 0) {
+        <div class="filter-categories">
+          @for (category of availableCategories; track category) {
+            <button
+              type="button"
+              class="category-chip"
+              [class.selected]="isCategorySelected(category)"
+              (click)="toggleCategory(category)">
+              {{ category }}
+            </button>
+          }
+        </div>
+      }
+
+      <div class="filter-buttons">
+        @if (hasActiveFilters) {
+          <button type="button" class="reset-filters-btn" (click)="resetFilters()">
+            Reset filters
+          </button>
+        }
+        <button type="button" class="apply-filters-btn" (click)="applyFilters()">
+          Apply filters
+        </button>
+      </div>
+    </div>
+  }
 
   @if (isLoading) {
     <div class="loading-spinner">Loading items...</div>

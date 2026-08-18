@@ -4,6 +4,12 @@
   flex-direction: column;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .back-home {
   font-size: 0.9rem;
   color: #8a8a8a;
@@ -13,6 +19,134 @@
 }
 .back-home:hover {
   color: #2e2e2e;
+}
+
+.filter-toggle-btn {
+  background: #f7f7f7;
+  border: none;
+  color: #555;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.filter-toggle-btn:hover {
+  background: #eaeaea;
+  color: #2e2e2e;
+}
+
+.filter-toggle-btn.active {
+  background: #ff7643;
+  color: #fff;
+}
+
+.filter-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: filter-fade-in 0.2s ease-in-out;
+}
+
+@keyframes filter-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-row {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-price-row .filter-input {
+  flex: 1;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(151, 151, 151, 0.1);
+  font-size: 0.95rem;
+  color: #2e2e2e;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+
+.filter-input::placeholder {
+  color: #757575;
+}
+
+.filter-input:focus {
+  box-shadow: 0 0 0 2px rgba(255, 118, 67, 0.4);
+}
+
+.filter-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.category-chip {
+  border: none;
+  background: rgba(151, 151, 151, 0.1);
+  color: #8a8a8a;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.category-chip:hover {
+  background: rgba(151, 151, 151, 0.2);
+}
+
+.category-chip.selected {
+  background: rgba(255, 68, 0, 0.15);
+  color: #ff7643;
+  font-weight: 600;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.reset-filters-btn,
+.apply-filters-btn {
+  flex: 1;
+  border: none;
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.reset-filters-btn {
+  background: #9b9b9b;
+  color: #fff;
+}
+
+.apply-filters-btn {
+  background: #ff7643;
+  color: #fff;
+}
+
+.reset-filters-btn:hover,
+.apply-filters-btn:hover {
+  opacity: 0.9;
 }
 
 .product-grid {
@@ -81,6 +215,10 @@
   .product-grid {
     grid-template-columns: repeat(2, minmax(160px, 220px));
     gap: 16px;
+  }
+
+  .filter-row {
+    flex-direction: column;
   }
 }
 

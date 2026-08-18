@@ -35,13 +35,13 @@ export class NotificationService extends BaseCRUDProvider<Notification, SearchNo
   private isConnected = false;
 
   private newNotificationCountSubject = new BehaviorSubject<number>(0);
-  newNotificationCount$: Observable<number> = this.newNotificationCountSubject.asObservable();
+  public newNotificationCount$: Observable<number> = this.newNotificationCountSubject.asObservable();
 
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
-  notifications$: Observable<Notification[]> = this.notificationsSubject.asObservable();
+  public notifications$: Observable<Notification[]> = this.notificationsSubject.asObservable();
 
   private popupSubject = new Subject<NotificationPopup>();
-  popup$: Observable<NotificationPopup> = this.popupSubject.asObservable();
+  public popup$: Observable<NotificationPopup> = this.popupSubject.asObservable();
 
   getAllForUser(userAccountId: number, filter?: SearchNotification):
     Promise<Pagination<Notification>> {

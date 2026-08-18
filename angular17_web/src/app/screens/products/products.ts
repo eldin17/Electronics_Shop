@@ -1,18 +1,21 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ProductCard} from '../../components/product-card/product-card';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {Product} from '../../models/product/product';
 import {ProductService} from '../../services/product.service';
 import {AuthService} from '../../services/auth.service';
 
+import {Subscription} from 'rxjs';
+import {ProductSearchService} from '../../services/search.service';
+
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [ProductCard, RouterLink],
+  imports: [ProductCard],
   templateUrl: './products.html',
   styleUrl: './products.css'
 })
-export class Products implements OnInit {
+export class Products implements OnInit, OnDestroy {
   allProducts: Product[] = [];
   displayProducts: Product[] = [];
   paginatedProducts: Product[] = [];
@@ -26,18 +29,35 @@ export class Products implements OnInit {
   pageSize = 10;
   totalPages = 1;
 
+  filterVisible = false;
+  filterSearchText = '';
+  priceLow: number | null = null;
+  priceHigh: number | null = null;
+  selectedCategories = new Set<string>();
+  availableCategories: string[] = [];
+
+  private headerSearchSub?: Subscription;
+
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private authService: AuthService
+    private authService: AuthService,
+    private productSearchService: ProductSearchService
   ) {}
 
   ngOnInit(): void {
+  this.headerSearchSub = this.productSearchService.searchTerm$.subscribe(term => {
+      this.filterSearchText = term;
+      this.searchQuery = term;
+      this.applyFilters();
+    });
+
     const userAccId = this.authService.getUserId();
 
     this.route.queryParams.subscribe(params => {
       this.sortType = params['sort'] || 'all';
       this.searchQuery = params['search'] || '';
+      this.filterSearchText = this.searchQuery;
       this.currentPage = 1;
 
       if (userAccId) {
@@ -49,11 +69,18 @@ export class Products implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.headerSearchSub?.unsubscribe();
+  }
+
   private loadAllProducts(userAccId: number): void {
     this.isLoading = true;
     this.productService.getAllWithChecksByUserAccId(userAccId).subscribe({
       next: (result) => {
         this.allProducts = result.data.map(item => new Product(item));
+        this.availableCategories = Array.from(
+          new Set(this.allProducts.map(p => p.productCategory.name).filter((c): c is string => !!c))
+        );
         this.applySortingAndFiltering();
         this.isLoading = false;
       },
@@ -68,9 +95,20 @@ export class Products implements OnInit {
   private applySortingAndFiltering(): void {
     let tempProducts = [...this.allProducts];
 
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
+    const q = this.filterSearchText.trim().toLowerCase();
+    if (q) {
       tempProducts = tempProducts.filter(p => p.brand.toLowerCase().includes(q) || p.model.toLowerCase().includes(q));
+    }
+
+    if (this.selectedCategories.size > 0) {
+      tempProducts = tempProducts.filter(p => p.productCategory.name && this.selectedCategories.has(p.productCategory.name));
+    }
+
+    if (this.priceLow != null) {
+      tempProducts = tempProducts.filter(p => p.finalPrice >= this.priceLow!);
+    }
+    if (this.priceHigh != null) {
+      tempProducts = tempProducts.filter(p => p.finalPrice <= this.priceHigh!);
     }
 
     if (this.sortType === 'latest') {
@@ -90,7 +128,10 @@ export class Products implements OnInit {
     }
 
     this.displayProducts = tempProducts;
-    this.totalPages = Math.ceil(this.displayProducts.length / this.pageSize);
+    this.totalPages = Math.ceil(this.displayProducts.length / this.pageSize) || 1;
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = 1;
+    }
     this.updatePageData();
   }
 
@@ -110,5 +151,59 @@ export class Products implements OnInit {
 
   getPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  toggleFilterSection(): void {
+    this.filterVisible = !this.filterVisible;
+  }
+
+  onSearchInput(event: Event): void {
+    this.filterSearchText = (event.target as HTMLInputElement).value;
+  }
+
+  onPriceLowInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.priceLow = value === '' ? null : Number(value);
+  }
+
+  onPriceHighInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.priceHigh = value === '' ? null : Number(value);
+  }
+
+  toggleCategory(category: string): void {
+    if (this.selectedCategories.has(category)) {
+      this.selectedCategories.delete(category);
+    } else {
+      this.selectedCategories.add(category);
+    }
+  }
+
+  isCategorySelected(category: string): boolean {
+    return this.selectedCategories.has(category);
+  }
+
+  get hasActiveFilters(): boolean {
+    return !!this.filterSearchText || this.priceLow != null || this.priceHigh != null || this.selectedCategories.size > 0;
+  }
+
+  applyFilters(): void {
+    if (this.priceLow != null && this.priceHigh != null &&
+      this.priceHigh > 0 && this.priceLow > 0 && this.priceHigh < this.priceLow) {
+      const temp = this.priceHigh;
+      this.priceHigh = this.priceLow;
+      this.priceLow = temp;
+    }
+    this.currentPage = 1;
+    this.applySortingAndFiltering();
+  }
+
+  resetFilters(): void {
+    this.filterSearchText = '';
+    this.priceLow = null;
+    this.priceHigh = null;
+    this.selectedCategories.clear();
+    this.currentPage = 1;
+    this.applySortingAndFiltering();
   }
 }
