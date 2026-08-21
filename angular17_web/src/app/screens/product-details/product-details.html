@@ -1,1 +1,149 @@
-<p>product-details works!</p>
+@if (isLoading) {
+  <p class="loading-message">Loading product…</p>
+} @else if (errorMessage) {
+  <p class="error">{{ errorMessage }}</p>
+} @else {
+  <div class="product-details-page">
+
+    <div class="product-main-grid">
+      <div class="gallery section-card">
+        <div class="main-image">
+          @if (imageList.length > 0) {
+            <img [src]="selectedImage?.image?.path || imageList[0].image.path" [alt]="product.brand + ' ' + product.model">
+          }
+        </div>
+
+        @if (imageList.length > 1) {
+          <div class="thumbnail-row">
+            @for (img of imageList; track img.id; let i = $index) {
+              <div
+                class="thumb"
+                [class.active]="selectedImageIndex === i"
+                (click)="selectImage(i)">
+                <img [src]="img.image.path" [alt]="product.brand + ' ' + product.model">
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="info section-card">
+        <div class="info-top-row">
+          <div class="header-inline-group">
+            <h1 class="product-name">
+              {{ product.brand && product.model ? product.brand + ' ' + product.model : 'No data' }}
+            </h1>
+
+            @if (product.reviewScoreAvg != null) {
+              <button class="rating-badge" (click)="goToReviews()">
+                <span>{{ product.reviewScoreAvg.toFixed(1) }}</span>
+                <span class="star">★</span>
+              </button>
+            }
+          </div>
+
+          <button
+            type="button"
+            class="fav-btn"
+            [class.active]="product.isFavourite"
+            (click)="toggleFavourite()"
+            aria-label="Toggle favourite">
+            ♥
+          </button>
+        </div>
+
+        <div class="ai-btn-row">
+          <button type="button" class="ai-summary-inline-btn" (click)="toggleAiSummary()">
+            ✦ Check AI Summary
+          </button>
+        </div>
+
+        @if (showAiSummary) {
+          <div class="ai-summary-panel">
+            <div class="ai-summary-header">
+              <span>✦ AI Review Insights</span>
+              <button type="button" (click)="showAiSummary = false" aria-label="Close AI summary">×</button>
+            </div>
+
+            @if (aiSummaryLoading) {
+              <p class="ai-loading">Analyzing local customer feedback…</p>
+            } @else if (aiSummaryError) {
+              <p class="ai-error">{{ aiSummaryError }}</p>
+            } @else {
+              <div class="ai-summary-content">{{ aiSummaryText }}</div>
+            }
+          </div>
+        }
+
+        <div class="price-row">
+          @if (product.finalPrice === product.price) {
+            <span class="final-price">{{ product.finalPrice }}€</span>
+          } @else {
+            <span class="old-price">{{ product.price }}€</span>
+            <span class="final-price">{{ product.finalPrice }}€</span>
+          }
+        </div>
+
+        @if (product.description) {
+          <p class="description" [class.expanded]="descExpanded">
+            {{ product.description }}
+          </p>
+        }
+
+        <div class="link-row">
+          <button type="button" class="link-btn" (click)="descExpanded = !descExpanded">
+            {{ descExpanded ? 'Show Less' : 'See More Detail' }} ›
+          </button>
+          <button type="button" class="link-btn" (click)="goToReviews()">Reviews</button>
+        </div>
+
+        @if (product.productColors && product.productColors.length) {
+          <div class="color-row">
+            @for (color of product.productColors; track color.id) {
+              <button
+                type="button"
+                class="color-swatch"
+                [style.background]="colorHex(color)"
+                [class.active]="selectedProductColor?.id === color.id"
+                (click)="selectColor(color)"
+                [attr.aria-label]="'Select color ' + color.name"
+                [title]="color.name">
+              </button>
+            }
+          </div>
+        }
+
+        <div class="qty-row">
+          <button type="button" class="qty-btn" (click)="decrementQty()" aria-label="Decrease quantity">−</button>
+          <span class="qty-value">{{ quantityInfo }}</span>
+          <button type="button" class="qty-btn" (click)="incrementQty()" aria-label="Increase quantity">+</button>
+        </div>
+
+        <div class="action-row">
+          <button type="button" class="add-to-cart-btn" (click)="addToCart()">
+            Add To Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (recList.length > 0) {
+      <section class="recommended section-card">
+        <div class="section-header">
+          <h2>Recommended for you</h2>
+        </div>
+        <div class="product-grid">
+          @for (p of recList; track p.id) {
+            <div class="recommended-item" (click)="openProduct(p.id!)">
+              <app-product-card [product]="p"></app-product-card>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  @if (toastMessage) {
+    <div class="toast">{{ toastMessage }}</div>
+  }
+}

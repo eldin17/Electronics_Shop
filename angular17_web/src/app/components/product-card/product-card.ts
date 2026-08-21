@@ -24,6 +24,6 @@ export class ProductCard {
     return this.product.finalPrice < this.product.price;
   }
   onCardClick(): void {
-    this.router.navigate(['/product', this.product.id]);
+    this.router.navigate(['/products', this.product.id]);
   }
 }

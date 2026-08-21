@@ -35,6 +35,6 @@ export class ProductCard2 {
 
   openProduct(event: MouseEvent): void {
     event.stopPropagation();
-    console.log('Opening product card ->', this.product.id);
+    this.router.navigate(['/products', this.product.id]);
   }
 }

@@ -35,4 +35,10 @@ export class ProductService extends BaseCRUDProvider<Product, SearchProduct, Add
       { params: this.getQueryParams(search) }
     );
   }
+
+  getByIdWithChecks(customerId: number, id: number): Observable<Product> {
+    return this.http.get<Product>(
+      `${this.baseUrl}${this.endpoint}/GetByIdWithChecks/${customerId}/${id}`
+    );
+  }
 }
