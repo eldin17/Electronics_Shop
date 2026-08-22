@@ -11,6 +11,7 @@ import { AiService } from '../../services/ai.service';
 import { Product } from '../../models/product/product';
 
 import { ProductCard } from '../../components/product-card/product-card';
+import { SeeMoreDetails } from '../../components/see-more-details/see-more-details';
 import { ProductImage } from '../../models/product-image/product.image';
 import { ProductColor } from '../../models/product-color/product.color';
 import { AddCartItem } from '../../models/cart-item/add.cart.item';
@@ -29,7 +30,7 @@ function normalizeHex(hex: string): string {
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [ProductCard],
+  imports: [ProductCard, SeeMoreDetails],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css',
 })
@@ -43,7 +44,7 @@ export class ProductDetails implements OnInit {
   wishlistItemId = 0;
   quantityInfo = 1;
 
-  descExpanded = false;
+  showSeeMoreDetails = false;
 
   showAiSummary = false;
   aiSummaryLoading = false;
@@ -276,6 +277,14 @@ export class ProductDetails implements OnInit {
       this.toastMessage = '';
       this.cdr.detectChanges();
     }, 2000);
+  }
+
+  openSeeMoreDetails(): void {
+    this.showSeeMoreDetails = true;
+  }
+
+  closeSeeMoreDetails(): void {
+    this.showSeeMoreDetails = false;
   }
 
   goToReviews(): void {

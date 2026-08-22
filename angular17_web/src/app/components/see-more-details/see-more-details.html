@@ -1,0 +1,30 @@
+<div class="see-more-overlay" (click)="close()">
+  <div class="see-more-popup" (click)="$event.stopPropagation()">
+    <div class="see-more-header">
+      <h2>{{ product.brand }} {{ product.model }}</h2>
+      <button type="button" class="close-btn" (click)="close()" aria-label="Close">×</button>
+    </div>
+
+    @if (product.description) {
+      <p class="full-description">{{ product.description }}</p>
+    }
+
+    <h3 class="specs-title">Technical Specifications</h3>
+
+    @if (specSections.length > 0) {
+      @for (section of specSections; track section.title) {
+        <div class="spec-section">
+          <h4 class="spec-section-title">{{ section.title }}</h4>
+          @for (row of section.rows; track row.label) {
+            <div class="spec-row">
+              <span class="spec-label">{{ row.label }}:</span>
+              <span class="spec-value">{{ row.value }}</span>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <p class="no-specs">No additional specifications available for this product.</p>
+    }
+  </div>
+</div>

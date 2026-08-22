@@ -85,14 +85,14 @@
         </div>
 
         @if (product.description) {
-          <p class="description" [class.expanded]="descExpanded">
+          <p class="description">
             {{ product.description }}
           </p>
         }
 
         <div class="link-row">
-          <button type="button" class="link-btn" (click)="descExpanded = !descExpanded">
-            {{ descExpanded ? 'Show Less' : 'See More Detail' }} ›
+          <button type="button" class="link-btn" (click)="openSeeMoreDetails()">
+            See More Detail ›
           </button>
           <button type="button" class="link-btn" (click)="goToReviews()">Reviews</button>
         </div>
@@ -145,5 +145,12 @@
 
   @if (toastMessage) {
     <div class="toast">{{ toastMessage }}</div>
+  }
+
+  @if (showSeeMoreDetails) {
+    <app-see-more-details
+      [product]="product"
+      (closed)="closeSeeMoreDetails()"
+    />
   }
 }

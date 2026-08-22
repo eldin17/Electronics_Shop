@@ -141,6 +141,12 @@
   text-decoration: line-through;
 }
 
+.quantity {
+  font-size: 0.85rem;
+  color: #9ba9b8;
+  font-weight: 700;
+}
+
 .details-btn {
   background: #fff4e0;
   color: #d98c1f;

@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 export class ProductCard2 {
   @Input({ required: true }) product!: Product;
   @Input() image?: string;
+  @Input() quantity?: number;
   @Output() remove = new EventEmitter<number>();
   @Output() addToCart = new EventEmitter<number>();
 
