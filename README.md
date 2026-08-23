@@ -15,7 +15,9 @@ Rest of the screenshots can be found in the <a href="https://github.com/eldin17/
 <div style="display: flex;">
   <img src="app_screenshots/web_app_angular/home_screen_1.jpg" alt="Home Screen Angular" width="800"/>    
 </div>
-
+<div style="display: flex;">
+  <img src="app_screenshots/web_app_angular/product_details_screen_1.jpg" alt="Home Screen Angular" width="800"/>    
+</div>
 ### This application consists of ###
 
 📱 Mobile App – Built with Flutter
