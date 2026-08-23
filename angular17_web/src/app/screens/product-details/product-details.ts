@@ -288,7 +288,11 @@ export class ProductDetails implements OnInit {
   }
 
   goToReviews(): void {
-    console.log('TODO: no reviews route defined yet for product', this.product.id);
+    if (!this.product?.id) return;
+
+    this.router.navigate(['/products', this.product.id, 'reviews'], {
+      state: { product: this.product },
+    });
   }
 
   toggleAiSummary(): void {

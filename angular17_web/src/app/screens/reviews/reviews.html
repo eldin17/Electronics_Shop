@@ -1,0 +1,88 @@
+@if (isLoading) {
+  <p class="loading-message">Loading reviews…</p>
+} @else if (errorMessage) {
+  <p class="error">{{ errorMessage }}</p>
+} @else {
+  <div class="reviews-screen">
+    <header class="reviews-header">
+      <button type="button" class="back-btn" (click)="goBack()" aria-label="Go back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="header-title-group">
+        <h1>User Reviews</h1>
+        @if (product.brand && product.model) {
+          <span class="product-subtitle">{{ product.brand }} {{ product.model }}</span>
+        }
+      </div>
+
+      @if (product.reviewScoreAvg != null) {
+        <div class="rating-badge">
+          <span>{{ product.reviewScoreAvg.toFixed(1) }}</span>
+          <span class="badge-star">★</span>
+        </div>
+      }
+    </header>
+
+
+    <div class="reviews-content-grid">
+
+      <section class="reviews-list-container">
+        <div class="reviews-list">
+          @if (reviews.length === 0) {
+            <p class="empty-message">No reviews yet. Be the first to leave one!</p>
+          }
+
+          @for (review of reviews; track review.id) {
+            <app-review-item [review]="review" />
+          }
+        </div>
+      </section>
+
+
+      <section class="post-review-container">
+        <div class="post-review-card">
+          <h3>Leave a Review</h3>
+          <div class="post-review-fields">
+            <div class="comment-input-wrap">
+              <span class="comment-label">Comment</span>
+              <textarea
+                class="comment-input"
+                rows="4"
+                placeholder="Write your review here..."
+                [(ngModel)]="newComment">
+              </textarea>
+            </div>
+
+            <div class="rating-and-submit">
+              <div class="rating-selector">
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <button
+                    type="button"
+                    class="rating-star-btn"
+                    [class.filled]="n <= (hoverRating || newRating)"
+                    (click)="setRating(n)"
+                    (mouseenter)="setHoverRating(n)"
+                    (mouseleave)="clearHoverRating()"
+                    [attr.aria-label]="'Rate ' + n + ' stars'">
+                    ★
+                  </button>
+                }
+              </div>
+
+              <button
+                type="button"
+                class="post-btn"
+                [disabled]="isSubmitting || !newRating || !newComment.trim()"
+                (click)="postReview()">
+                Post Review
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+}

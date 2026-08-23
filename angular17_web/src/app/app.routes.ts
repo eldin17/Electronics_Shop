@@ -11,6 +11,7 @@ import {ShoppingCart} from './screens/shopping-cart/shopping-cart';
 import {InfoDetails} from './screens/info-details/info-details';
 import { authGuard, finishSetUpGuard, guestGuard } from './guards/auth.guard';
 import {ProductDetails} from './screens/product-details/product-details';
+import {Reviews} from './screens/reviews/reviews';
 
 export const routes: Routes = [
   { path: '', component: Splash, canActivate: [guestGuard] },
@@ -26,6 +27,7 @@ export const routes: Routes = [
       { path: 'home', component: Home },
       { path: 'products', component: Products },
       { path: 'products/:id', component: ProductDetails },
+      { path: 'products/:id/reviews', component: Reviews },
       { path: 'news', component: InfoDetails, data: { type: 'news' } },
       { path: 'news/:id', component: InfoDetails, data: { type: 'news' } },
       { path: 'wishlist', component: WishlistScreen  },
