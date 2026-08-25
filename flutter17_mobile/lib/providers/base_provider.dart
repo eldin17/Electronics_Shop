@@ -30,8 +30,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
   Future<void>? _refreshFuture;
 
-  Future<Response> sendWithRefresh(
-      Future<Response> Function(Map<String, String> headers) requestFn) async {
+  Future<Response> sendWithRefresh
+  (Future<Response> Function(Map<String, String> headers) requestFn) async {
     var headers = await getHeaders(withAuth: true);
     var response = await requestFn(headers);
 
@@ -107,7 +107,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       var queryString = getQueryString(filter);
       url = "$url?$queryString";
     }
-    var headers = getHeaders(withAuth: true);
+    //var headers = getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 
@@ -137,7 +137,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   Future<T> getById(int id) async {
     var url = "$baseUrl$_endpoint/$id";
 
-    var headers = getHeaders(withAuth: true);
+    //var headers = getHeaders(withAuth: true);
 
     var uri = Uri.parse(url);
 

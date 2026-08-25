@@ -9,6 +9,7 @@ using Electronics_Shop_17.Model.Requests;
 using Electronics_Shop_17.Model.SearchObjects;
 using Electronics_Shop_17.Services.Database;
 using Electronics_Shop_17.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Electronics_Shop_17.Services.InterfaceImplementations
 {
@@ -36,6 +37,18 @@ namespace Electronics_Shop_17.Services.InterfaceImplementations
                 data = data.Where(x => x.DateOfBirth == search.DateOfBirth);
             }
             return base.AddFilter(data, search);
+        }
+
+        public async Task<DtoPerson> GetByUserId(int userAccId)
+        {
+            var customer = await _context.Customers
+               .Include(x => x.Person)
+               .FirstOrDefaultAsync(x => x.UserAccountId == userAccId);
+
+            if (customer == null)
+                throw new KeyNotFoundException("Customer not found.");            
+
+            return await GetById(customer.Person.Id);
         }
     }
 }

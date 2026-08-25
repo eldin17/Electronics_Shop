@@ -1,15 +1,17 @@
-import {ChangeDetectorRef, Component} from '@angular/core';
-import {Router, RouterLink} from '@angular/router';
-import {FormsModule, NgForm} from '@angular/forms';
-import {AuthService} from '../../../services/auth.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {ImageService} from '../../../services/image.service';
-import {firstValueFrom} from 'rxjs';
+import { Component } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule, NgForm } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ImageService } from '../../../services/image.service';
+
+import { firstValueFrom } from 'rxjs';
+import {ImageUpload} from '../../../components/image-upload/image-upload';
 
 @Component({
   selector: 'app-register',
   imports: [
-    FormsModule, RouterLink
+    FormsModule, RouterLink, ImageUpload
   ],
   templateUrl: './register.html',
   styleUrl: './register.css',
@@ -19,27 +21,13 @@ export class Register {
   constructor(private authService: AuthService,
               private imageService: ImageService,
               private router: Router,
-              private snackBar: MatSnackBar,
-              private cdr: ChangeDetectorRef
+              private snackBar: MatSnackBar
   ) {}
 
   selectedFile: File | null = null;
-  imagePreview: string | ArrayBuffer | null = null;
 
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    this.selectedFile = input.files[0];
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imagePreview = reader.result;
-      this.cdr.detectChanges();
-    };
-    reader.readAsDataURL(this.selectedFile);
+  onImageSelected(file: File): void {
+    this.selectedFile = file;
   }
 
   async onRegisterSubmit(form: NgForm) {
@@ -85,4 +73,3 @@ export class Register {
     }
   }
 }
-

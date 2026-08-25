@@ -1,0 +1,23 @@
+<div class="profile-wrapper" #wrapper>
+  <button (click)="toggle()" title="Account" [class.active]="isOpen">👤</button>
+
+  @if (isOpen) {
+    <div class="profile-dropdown">
+      <button (click)="onOption('Personal Info')">
+        <span class="icon">🪪</span> My Personal Info
+      </button>
+      <button (click)="onOption('Orders')">
+        <span class="icon">📦</span> My Orders
+      </button>
+      <button (click)="onOption('Account')">
+        <span class="icon">⚙️</span> My Account
+      </button>
+
+      <div class="dropdown-divider"></div>
+
+      <button (click)="onLogout()" class="logout-btn">
+        Log Out
+      </button>
+    </div>
+  }
+</div>

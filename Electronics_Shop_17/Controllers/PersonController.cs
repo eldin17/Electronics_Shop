@@ -13,6 +13,12 @@ namespace Electronics_Shop_17.Controllers
     {
         public PersonController(IPersonService service) : base(service)
         {
+
+        }
+        [HttpGet("GetByUserId/{userAccId}")]
+        public async Task<DtoPerson> GetByUserId(int userAccId)
+        {
+            return await (_service as IPersonService).GetByUserId(userAccId);
         }
     }
 }

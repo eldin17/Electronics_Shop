@@ -49,33 +49,10 @@
         }
       </div>
 
-      <div class="profile-wrapper" #profileWrapper>
-        <button (click)="toggleProfileMenu()" title="Account"
-                [class.active]="isProfileMenuOpen">👤</button>
-
-        @if (isProfileMenuOpen) {
-          <div class="profile-dropdown">
-            <button (click)="onProfileOption('My Orders')">
-              <span class="icon">📦</span> My Orders
-            </button>
-            <button (click)="onProfileOption('Wishlist')">
-              <span class="icon">❤️</span> Wishlist
-            </button>
-            <button (click)="onProfileOption('Settings')">
-              <span class="icon">⚙️</span> Settings
-            </button>
-            <button (click)="onProfileOption('Addresses')">
-              <span class="icon">📍</span> Addresses
-            </button>
-
-            <div class="dropdown-divider"></div>
-
-            <button (click)="logout()" class="logout-btn">
-              Log Out
-            </button>
-          </div>
-        }
-      </div>
+      <app-profile-dropdown
+        (opened)="onProfileMenuOpened()"
+        (logoutClicked)="logout()">
+      </app-profile-dropdown>
 
     </div>
   </div>

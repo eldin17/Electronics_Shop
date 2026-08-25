@@ -1,0 +1,143 @@
+<div class="container-fluid profile-edit-page py-4" *ngIf="!isLoading">
+
+  <button type="button" class="btn-back mb-4" (click)="goBack()">
+    <i class="bi bi-arrow-left"></i>
+  </button>
+
+  <div class="text-center mb-5">
+    <h1 class="display-6 fw-bold mb-2">Update Your Info</h1>
+    <p class="lead text-secondary mb-0">
+      Need to make a change? Update your personal details below<br class="d-none d-md-block" />
+      and keep your profile up to date.
+    </p>
+  </div>
+
+  <form #profileForm="ngForm" (ngSubmit)="onSubmit(profileForm)">
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-lg-7">
+        <div class="card profile-card h-100">
+          <div class="row g-4" ngModelGroup="person">
+
+            <div class="col-md-6">
+              <label class="field-label">Firstname</label>
+              <input
+                type="text" name="firstName" #firstName="ngModel"
+                [(ngModel)]="model.person.firstName" required
+                class="form-control form-control-lg rounded-pill"
+                placeholder="Enter your firstname" />
+              @if (profileForm.submitted && firstName.errors?.['required']) {
+                <div class="text-danger">Firstname is required</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="field-label">Lastname</label>
+              <input
+                type="text" name="lastName" #lastName="ngModel"
+                [(ngModel)]="model.person.lastName" required
+                class="form-control form-control-lg rounded-pill"
+                placeholder="Enter your lastname" />
+              @if (profileForm.submitted && lastName.errors?.['required']) {
+                <div class="text-danger">Lastname is required</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="field-label">Date of birth</label>
+              <div class="input-icon-wrap">
+                <input
+                  type="date" name="dateOfBirth" #dateOfBirth="ngModel"
+                  [(ngModel)]="model.person.dateOfBirth" required
+                  class="form-control form-control-lg rounded-pill" />
+                <i class="bi bi-calendar3 field-icon"></i>
+              </div>
+              @if (profileForm.submitted && dateOfBirth.errors?.['required']) {
+                <div class="text-danger">Date of birth is required</div>
+              }
+            </div>
+
+          </div>
+
+          <div class="row g-4" ngModelGroup="adress">
+
+            <div class="col-md-12">
+              <label class="field-label">Contry</label>
+              <app-country-picker
+                name="country" #country="ngModel"
+                [(ngModel)]="model.adress.country" required>
+              </app-country-picker>
+              @if (profileForm.submitted && country.errors?.['required']) {
+                <div class="text-danger">Contry is required</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="field-label">City</label>
+              <div class="input-icon-wrap">
+                <input
+                  type="text" name="city" #city="ngModel"
+                  [(ngModel)]="model.adress.city" required
+                  class="form-control form-control-lg rounded-pill"
+                  placeholder="Enter your city" />
+                <i class="bi bi-house field-icon"></i>
+              </div>
+              @if (profileForm.submitted && city.errors?.['required']) {
+                <div class="text-danger">City is required</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="field-label">Street</label>
+              <div class="input-icon-wrap">
+                <input
+                  type="text" name="street" #street="ngModel"
+                  [(ngModel)]="model.adress.street" required
+                  class="form-control form-control-lg rounded-pill"
+                  placeholder="Enter your street" />
+                <i class="bi bi-geo-alt field-icon"></i>
+              </div>
+              @if (profileForm.submitted && street.errors?.['required']) {
+                <div class="text-danger">Street is required</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="field-label">Postal Code</label>
+              <div class="input-icon-wrap">
+                <input
+                  type="text" name="postalCode" #postalCode="ngModel"
+                  [(ngModel)]="model.adress.postalCode" required
+                  class="form-control form-control-lg rounded-pill"
+                  placeholder="Enter your postal code" />
+                <i class="bi bi-credit-card field-icon"></i>
+              </div>
+              @if (profileForm.submitted && postalCode.errors?.['required']) {
+                <div class="text-danger">Postal Code is required</div>
+              }
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-lg-4">
+        <div class="card profile-card h-100 d-flex align-items-center justify-content-center">
+          <app-image-upload
+            [imageUrl]="imagePreview"
+            (fileSelected)="onImageSelected($event)">
+          </app-image-upload>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-lg rounded-4 update-btn">
+        Update Info
+      </button>
+    </div>
+  </form>
+
+</div>

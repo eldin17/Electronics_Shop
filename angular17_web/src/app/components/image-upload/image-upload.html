@@ -1,0 +1,15 @@
+<div class="avatar-upload">
+  <div class="avatar-wrapper" (click)="fileInput.click()">
+    <div class="avatar-preview">
+      <img [src]="imageUrl ?? defaultImage" alt="Profile preview" />
+    </div>
+  </div>
+  <p class="avatar-caption">{{ caption }}</p>
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    class="d-none"
+    (change)="onFileChange($event)"
+  />
+</div>

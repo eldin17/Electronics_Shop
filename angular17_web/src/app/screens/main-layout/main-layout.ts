@@ -8,22 +8,22 @@ import { Notification } from '../../models/notification/notification';
 import {TimeAgoPipe} from '../../helpers/time-ago-pipe';
 import {DiscountService} from '../../services/discount.service';
 import {Discount} from '../../models/discount/discount';
+import { ProfileDropdown } from '../../components/profile-dropdown/profile-dropdown';
 
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SearchBar, TimeAgoPipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SearchBar, TimeAgoPipe, ProfileDropdown],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css'
 })
 export class MainLayout implements OnInit, OnDestroy {
-  @ViewChild('profileWrapper') profileWrapper!: ElementRef;
+  @ViewChild(ProfileDropdown) profileDropdown?: ProfileDropdown;
   @ViewChild('notifWrapper') notifWrapper!: ElementRef;
 
   discount: Discount | null = null;
 
-  isProfileMenuOpen = false;
   isNotifMenuOpen = false;
 
   notificationsList: Notification[] = [];
@@ -131,11 +131,6 @@ export class MainLayout implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (this.isProfileMenuOpen &&
-      this.profileWrapper &&
-      !this.profileWrapper.nativeElement.contains(event.target)) {
-      this.isProfileMenuOpen = false;
-    }
     if (this.isNotifMenuOpen &&
       this.notifWrapper &&
       !this.notifWrapper.nativeElement.contains(event.target)) {
@@ -143,15 +138,13 @@ export class MainLayout implements OnInit, OnDestroy {
     }
   }
 
-  toggleProfileMenu(): void {
-    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+  onProfileMenuOpened(): void {
     this.isNotifMenuOpen = false;
   }
 
-
   async onBellClick(): Promise<void> {
     const wasOpen = this.isNotifMenuOpen;
-    this.isProfileMenuOpen = false;
+    this.profileDropdown?.close();
 
     if (wasOpen) {
       this.isNotifMenuOpen = false;
@@ -174,11 +167,6 @@ export class MainLayout implements OnInit, OnDestroy {
           this.cd.detectChanges();
         });
     }
-  }
-
-  onProfileOption(option: string): void {
-    console.log('Selected:', option);
-    this.isProfileMenuOpen = false;
   }
 
   onNotificationClick(notification: Notification): void {

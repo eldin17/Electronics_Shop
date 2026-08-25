@@ -1,0 +1,74 @@
+.profile-edit-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.btn-back {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 50%;
+}
+
+.btn-back:hover {
+  background: #f2f2f2;
+}
+
+.profile-card {
+  border: 1px solid #eee;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.field-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 6px;
+  margin-left: 20px;
+}
+
+.input-icon-wrap {
+  position: relative;
+}
+
+.input-icon-wrap .form-control {
+  padding-right: 44px;
+}
+
+.field-icon {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  color: #ccc;
+  pointer-events: none;
+}
+
+.form-control::placeholder {
+  color: #ccc !important;
+  font-weight: 300;
+}
+
+.update-btn {
+  padding: 0.75rem 3rem;
+  background-color: #ff8800;
+  color: #fff;
+  border: none;
+}
+
+.update-btn:hover {
+  background-color: #e67a00;
+  color: #fff;
+}
+
+app-country-picker {
+  display: block;
+}
+
+.profile-card .row + .row {
+  margin-top: 1.5rem;
+}

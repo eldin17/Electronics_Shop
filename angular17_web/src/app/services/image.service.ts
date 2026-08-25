@@ -15,7 +15,7 @@ export class ImageService {
     formData.append('vmImage', file, file.name);
 
     return this.http.post<any>(
-      `${this.apiUrl}/UserAccount/${userId}/image`,
+      `${this.apiUrl}/AddSingleImage/${userId}`,
       formData,
       { withCredentials: true }
     );

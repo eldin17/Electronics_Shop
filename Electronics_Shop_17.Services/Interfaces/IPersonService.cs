@@ -11,5 +11,6 @@ namespace Electronics_Shop_17.Services.Interfaces
 {
     public interface IPersonService : IBaseServiceCRUD<DtoPerson,SearchPerson,AddPerson,UpdatePerson>
     {
+        Task<DtoPerson> GetByUserId(int userAccId);
     }
 }

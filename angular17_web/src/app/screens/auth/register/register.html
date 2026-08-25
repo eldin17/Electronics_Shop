@@ -86,21 +86,7 @@
     </div>
 
     <div class="col-md-9 col-lg-6 col-xl-5 d-flex justify-content-center align-items-center">
-      <div class="avatar-upload">
-        <div class="avatar-wrapper" (click)="fileInput.click()">
-          <div class="avatar-preview">
-            <img [src]="imagePreview ?? '/assets/images/Logo2.jpg'" alt="Profile preview" />
-          </div>
-        </div>
-        <p class="avatar-caption">Click to add image</p>
-        <input
-          #fileInput
-          type="file"
-          accept="image/*"
-          class="d-none"
-          (change)="onImageSelected($event)"
-        />
-      </div>
+      <app-image-upload (fileSelected)="onImageSelected($event)"></app-image-upload>
     </div>
 
   </div>
