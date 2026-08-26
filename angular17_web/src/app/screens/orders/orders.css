@@ -1,0 +1,76 @@
+.orders-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.count {
+  font-size: 13px;
+  color: #888;
+}
+
+.btn-back {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 50%;
+}
+
+.btn-back:hover {
+  background: #f2f2f2;
+}
+
+.orders-card {
+  border: 1px solid #eee;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  color: #555;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.pay-now-btn {
+  background-color: #ff8800;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  padding: 0.65rem 2rem;
+  align-self: flex-start;
+}
+
+.pay-now-btn:hover {
+  background-color: #e67a00;
+  color: #fff;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 4px;
+}

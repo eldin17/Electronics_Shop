@@ -1,21 +1,14 @@
 <div class="container-fluid profile-edit-page py-4" *ngIf="!isLoading">
 
-  <button type="button" class="btn-back mb-4" (click)="goBack()">
-    <i class="bi bi-arrow-left"></i>
-  </button>
-
-  <div class="text-center mb-5">
-    <h1 class="display-6 fw-bold mb-2">Update Your Info</h1>
-    <p class="lead text-secondary mb-0">
-      Need to make a change? Update your personal details below<br class="d-none d-md-block" />
-      and keep your profile up to date.
-    </p>
-  </div>
+  <header class="header">
+    <h1>Update Your Info</h1>
+    <span class="count">Need to make a change? Update your personal details below and keep your profile up to date.</span>
+  </header>
 
   <form #profileForm="ngForm" (ngSubmit)="onSubmit(profileForm)">
     <div class="row g-4 justify-content-center">
 
-      <div class="col-lg-7">
+      <div class="col-lg-6">
         <div class="card profile-card h-100">
           <div class="row g-4" ngModelGroup="person">
 
@@ -122,7 +115,7 @@
       </div>
 
 
-      <div class="col-lg-4">
+      <div class="col-lg-6">
         <div class="card profile-card h-100 d-flex align-items-center justify-content-center">
           <app-image-upload
             [imageUrl]="imagePreview"

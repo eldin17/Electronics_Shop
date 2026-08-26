@@ -1,0 +1,19 @@
+<div
+  class="order-item"
+  [class.order-item--selected]="selected"
+  (click)="onClick()"
+>
+  <div class="order-item__icon">
+    <i class="bi bi-bag-fill"></i>
+  </div>
+
+  <div class="order-item__info">
+    <div class="order-item__title">Order #{{ order.id }}</div>
+    <div class="order-item__total">Total: {{ displayTotal }}€</div>
+  </div>
+
+  <div class="order-item__status">
+    <i *ngIf="isPending" class="bi bi-exclamation-triangle-fill status-icon status-icon--pending"></i>
+    <i *ngIf="!isPending" class="bi bi-check-circle-fill status-icon status-icon--done"></i>
+  </div>
+</div>

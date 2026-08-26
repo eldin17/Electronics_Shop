@@ -41,4 +41,38 @@ export class ProductService extends BaseCRUDProvider<Product, SearchProduct, Add
       `${this.baseUrl}${this.endpoint}/GetByIdWithChecks/${customerId}/${id}`
     );
   }
+
+  activate(id: number): Observable<Product> {
+    return this.http.patch<Product>(
+      `${this.baseUrl}${this.endpoint}/Activate/${id}`,
+      {}
+    );
+  }
+
+  checkStock(id: number): Observable<Product> {
+    return this.http.patch<Product>(
+      `${this.baseUrl}${this.endpoint}/CheckStock/${id}`,
+      {}
+    );
+  }
+
+  restock(id: number): Observable<Product> {
+    return this.http.patch<Product>(
+      `${this.baseUrl}${this.endpoint}/Restock/${id}`,
+      {}
+    );
+  }
+
+  restore(id: number): Observable<Product> {
+    return this.http.patch<Product>(
+      `${this.baseUrl}${this.endpoint}/Restore/${id}`,
+      {}
+    );
+  }
+
+  allowedActionsInState(id: number): Observable<string[]> {
+    return this.http.get<string[]>(
+      `${this.baseUrl}${this.endpoint}/AllowedActionsInState/${id}`
+    );
+  }
 }

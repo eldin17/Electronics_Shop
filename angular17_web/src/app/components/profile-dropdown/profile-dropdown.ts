@@ -35,6 +35,9 @@ export class ProfileDropdown {
       case 'Personal Info':
         this.router.navigate(['/profile-edit']);
         break;
+      case 'Orders':
+        this.router.navigate(['/orders']);
+        break;
       default:
         console.log('Selected:', option);
     }

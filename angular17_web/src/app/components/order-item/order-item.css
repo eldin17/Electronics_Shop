@@ -1,0 +1,56 @@
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: #f4efe9;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.order-item:hover {
+  background: #efe8df;
+}
+
+.order-item--selected {
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  border-color: #ff8800;
+}
+
+.order-item__icon {
+  font-size: 1.5rem;
+  color: #ff8800;
+  flex-shrink: 0;
+}
+
+.order-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.order-item__title {
+  font-weight: 700;
+  color: #222;
+}
+
+.order-item__total {
+  color: #ff8800;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.status-icon {
+  font-size: 1.25rem;
+}
+
+.status-icon--pending {
+  color: #ffc107;
+}
+
+.status-icon--done {
+  color: #28a745;
+}

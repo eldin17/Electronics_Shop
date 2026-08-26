@@ -1,1 +1,68 @@
-<p>orders works!</p>
+<div class="orders-page py-4" *ngIf="!isLoading">
+
+  <header class="header">
+    <h1>Your Orders</h1>
+    <span class="count">{{ orders.length }} orders</span>
+  </header>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <div *ngIf="!errorMessage && orders.length === 0" class="text-secondary">
+    No orders found.
+  </div>
+
+  <div class="row g-4" *ngIf="!errorMessage && orders.length > 0">
+
+    <div class="col-lg-6">
+      <div class="card orders-card h-100 d-flex flex-column" *ngIf="selectedOrder as order">
+        <h2 class="h4 fw-bold mb-3">Order #{{ order.id }}</h2>
+
+        <div class="detail-row">
+          <span>Total Amount</span>
+          <span>{{ order.totalAmount }}€</span>
+        </div>
+        <div class="detail-row">
+          <span>Final Total</span>
+          <span>{{ order.finalTotalAmount ?? order.totalAmount }}€</span>
+        </div>
+        <div class="detail-row">
+          <span>Order Time</span>
+          <span>{{ order.orderTime | date:'dd-MMM-yy HH:mm' }}</span>
+        </div>
+
+        <hr />
+
+        <h3 class="h6 fw-bold mb-3">Items</h3>
+        <div class="order-item-row" *ngFor="let item of order.orderItems">
+          <span>{{ item.product?.brand }} {{ item.product?.model }}</span>
+          <span>{{ item.finalPrice }}€</span>
+        </div>
+
+        <button
+          *ngIf="isSelectedPending"
+          type="button"
+          class="btn pay-now-btn mt-4"
+          (click)="payNow()"
+        >
+          Pay Now
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card orders-card h-100">
+        <div class="order-list">
+          <app-order-item
+            *ngFor="let order of orders"
+            [order]="order"
+            [selected]="selectedOrder?.id === order.id"
+            (selectOrder)="selectOrder($event)"
+          >
+          </app-order-item>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

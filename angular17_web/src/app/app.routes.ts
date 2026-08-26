@@ -13,6 +13,7 @@ import { authGuard, finishSetUpGuard, guestGuard } from './guards/auth.guard';
 import {ProductDetails} from './screens/product-details/product-details';
 import {Reviews} from './screens/reviews/reviews';
 import {ProfileEdit} from './screens/profile-edit/profile-edit';
+import {Orders} from './screens/orders/orders';
 
 export const routes: Routes = [
   { path: '', component: Splash, canActivate: [guestGuard] },
@@ -36,6 +37,8 @@ export const routes: Routes = [
       { path: 'notification', component: InfoDetails, data: { type: 'notification' } },
       { path: 'notification/:id', component: InfoDetails, data: { type: 'notification' } },
       { path: 'profile-edit', component: ProfileEdit },
+      { path: 'orders', component: Orders },
+
     ]
   },
 
